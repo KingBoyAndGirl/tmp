@@ -80,9 +80,9 @@
       position: absolute;
       top: 42px;
       right: 38px;
-      width: min(760px, 48%);
-      height: 74%;
-      min-height: 380px;
+      width: min(620px, 40%);
+      height: 58%;
+      min-height: 320px;
       background: var(--table-bg);
       border: 1px solid var(--table-border);
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
@@ -96,22 +96,22 @@
       justify-content: space-between;
       align-items: center;
       gap: 14px;
-      padding: 14px 16px 10px;
+      padding: 12px 14px 8px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
       background: linear-gradient(180deg, rgba(11, 38, 88, 0.96), rgba(10, 32, 74, 0.86));
     }
 
     .table-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
       color: #fff;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .table-sub {
-      font-size: 12px;
+      font-size: 11px;
       color: rgba(214, 228, 255, 0.78);
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     .table-stats {
@@ -126,41 +126,30 @@
       background: rgba(255,255,255,0.05);
       color: #ddebff;
       border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
+      padding: 5px 9px;
+      font-size: 11px;
       white-space: nowrap;
     }
 
     .table-header,
     .table-row {
       display: grid;
+      grid-template-columns: 74px 1.55fr 1.15fr 86px;
       align-items: center;
     }
 
-    .table-panel[data-kind="province-summary"] .table-header,
-    .table-panel[data-kind="province-summary"] .table-row {
-      grid-template-columns: 92px 1.1fr 1.2fr 1fr 98px;
-    }
-
-    .table-panel[data-kind="link-detail"] .table-header,
-    .table-panel[data-kind="link-detail"] .table-row,
-    .table-panel[data-kind="direction-detail"] .table-header,
-    .table-panel[data-kind="direction-detail"] .table-row {
-      grid-template-columns: 92px 1.7fr 1.2fr 100px;
-    }
-
     .table-header {
-      min-height: 54px;
+      min-height: 44px;
       background: var(--table-head);
       border-bottom: 1px solid rgba(255,255,255,0.06);
       color: #8dccff;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
     }
 
     .table-header > div,
     .table-row > div {
-      padding: 0 16px;
+      padding: 0 12px;
     }
 
     .table-header > div:not(:last-child),
@@ -178,10 +167,10 @@
     .table-track { width: 100%; }
 
     .table-row {
-      min-height: 88px;
+      min-height: 68px;
       border-bottom: 1px solid var(--table-line);
       color: #eef5ff;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .index-wrap {
@@ -191,28 +180,28 @@
     }
 
     .index-circle {
-      width: 38px;
-      height: 38px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 2px solid rgba(104, 193, 255, 0.9);
       color: #dbf4ff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      box-shadow: inset 0 0 18px rgba(0, 162, 255, 0.28), 0 0 20px rgba(0, 122, 255, 0.2);
+      font-size: 15px;
+      box-shadow: inset 0 0 14px rgba(0, 162, 255, 0.25), 0 0 14px rgba(0, 122, 255, 0.18);
       background: radial-gradient(circle at 35% 35%, rgba(86, 171, 255, 0.5), rgba(15, 71, 143, 0.4));
     }
 
     .object-cell {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       min-width: 0;
     }
 
     .object-cell .main {
-      font-size: 16px;
+      font-size: 14px;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
@@ -220,28 +209,26 @@
     }
 
     .object-cell .sub {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .metric-cell,
-    .summary-cell {
+    .metric-cell {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       color: #eaf2ff;
-      font-size: 13px;
-      line-height: 1.45;
+      font-size: 12px;
+      line-height: 1.35;
       min-width: 0;
     }
 
-    .metric-cell .muted,
-    .summary-cell .muted {
+    .metric-cell .muted {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -257,10 +244,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 62px;
-      padding: 9px 14px;
+      min-width: 54px;
+      padding: 7px 10px;
       border-radius: 4px;
-      font-size: 13px;
+      font-size: 12px;
       color: #fff;
     }
 
@@ -269,13 +256,13 @@
     .status-normal { background: #4f5f7d; }
 
     .panel-footer {
-      min-height: 44px;
+      min-height: 38px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 14px;
       color: rgba(214, 228, 255, 0.72);
-      font-size: 12px;
+      font-size: 11px;
       background: rgba(6, 21, 58, 0.96);
       border-top: 1px solid rgba(255,255,255,0.05);
     }
@@ -284,22 +271,8 @@
       .table-panel {
         top: 24px;
         right: 24px;
-        width: min(760px, calc(100% - 48px));
-        height: 66%;
-      }
-      .table-panel[data-kind="province-summary"] .table-header,
-      .table-panel[data-kind="province-summary"] .table-row {
-        grid-template-columns: 82px 1fr 1.15fr 0.95fr 90px;
-      }
-      .table-panel[data-kind="link-detail"] .table-header,
-      .table-panel[data-kind="link-detail"] .table-row,
-      .table-panel[data-kind="direction-detail"] .table-header,
-      .table-panel[data-kind="direction-detail"] .table-row {
-        grid-template-columns: 82px 1.45fr 1.1fr 90px;
-      }
-      .table-header > div,
-      .table-row > div {
-        padding: 0 12px;
+        width: min(620px, calc(100% - 48px));
+        height: 56%;
       }
     }
 
@@ -309,7 +282,7 @@
       .table-panel {
         position: static;
         width: auto;
-        height: 420px;
+        height: 320px;
         margin: 12px;
       }
       .canvas-wrap { background: rgba(8, 12, 20, 0.95); }
@@ -335,72 +308,34 @@
     <section class="view active" id="view-national">
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/national.png" alt="全国总览图" />
-        <div class="table-panel" data-kind="province-summary">
+        <div class="table-panel">
           <div class="table-topbar">
             <div>
-              <div class="table-title">各省告警汇总</div>
+              <div class="table-title">动态阈值告警</div>
               <div class="table-sub">范围：全国 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警省份：7</span>
-              <span class="stat-pill">内部告警链路：19</span>
+              <span class="stat-pill">告警总数：7</span>
             </div>
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>省份</div>
-            <div>省内告警情况</div>
-            <div>最高值</div>
+            <div>告警对象</div>
+            <div>当前值 / 占比</div>
             <div>状态</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row">
-                <div class="index-wrap"><span class="index-circle">1</span></div>
-                <div class="object-cell"><div class="main">山东</div><div class="sub">内部最严重链路：济南 → 烟台</div></div>
-                <div class="summary-cell"><div>告警链路 7 条</div><div class="muted">涉及 4 个城市/方向</div></div>
-                <div class="metric-cell"><div>25.39ms</div><div class="muted">最高占比 71%</div></div>
-                <div class="state-cell"><span class="status-tag status-danger">告警</span></div>
-              </div>
-              <div class="table-row">
-                <div class="index-wrap"><span class="index-circle">2</span></div>
-                <div class="object-cell"><div class="main">江苏</div><div class="sub">内部最严重链路：南京 → 南通</div></div>
-                <div class="summary-cell"><div>告警链路 3 条</div><div class="muted">涉及 2 个城市/方向</div></div>
-                <div class="metric-cell"><div>22.30ms</div><div class="muted">最高占比 62%</div></div>
-                <div class="state-cell"><span class="status-tag status-danger">告警</span></div>
-              </div>
-              <div class="table-row">
-                <div class="index-wrap"><span class="index-circle">3</span></div>
-                <div class="object-cell"><div class="main">河北</div><div class="sub">内部最严重链路：石家庄 → 秦皇岛</div></div>
-                <div class="summary-cell"><div>告警链路 4 条</div><div class="muted">涉及 3 个城市/方向</div></div>
-                <div class="metric-cell"><div>21.10ms</div><div class="muted">最高占比 59%</div></div>
-                <div class="state-cell"><span class="status-tag status-danger">告警</span></div>
-              </div>
-              <div class="table-row">
-                <div class="index-wrap"><span class="index-circle">4</span></div>
-                <div class="object-cell"><div class="main">辽宁</div><div class="sub">内部最严重链路：沈阳 → 大连</div></div>
-                <div class="summary-cell"><div>告警链路 2 条</div><div class="muted">涉及 2 个城市/方向</div></div>
-                <div class="metric-cell"><div>20.40ms</div><div class="muted">最高占比 57%</div></div>
-                <div class="state-cell"><span class="status-tag status-danger">告警</span></div>
-              </div>
-              <div class="table-row">
-                <div class="index-wrap"><span class="index-circle">5</span></div>
-                <div class="object-cell"><div class="main">四川</div><div class="sub">内部最严重链路：成都 → 绵阳</div></div>
-                <div class="summary-cell"><div>告警链路 3 条</div><div class="muted">涉及 2 个城市/方向</div></div>
-                <div class="metric-cell"><div>19.90ms</div><div class="muted">最高占比 58%</div></div>
-                <div class="state-cell"><span class="status-tag status-warn">关注</span></div>
-              </div>
-              <div class="table-row">
-                <div class="index-wrap"><span class="index-circle">6</span></div>
-                <div class="object-cell"><div class="main">广东</div><div class="sub">内部最严重链路：广州 → 湛江</div></div>
-                <div class="summary-cell"><div>告警链路 1 条</div><div class="muted">涉及 1 个城市/方向</div></div>
-                <div class="metric-cell"><div>18.40ms</div><div class="muted">最高占比 52%</div></div>
-                <div class="state-cell"><span class="status-tag status-warn">关注</span></div>
-              </div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="object-cell"><div class="main">山东</div><div class="sub">内部最严重链路：济南 → 烟台</div></div><div class="metric-cell"><div>25.39ms</div><div class="muted">内部告警 7 条 / 71%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="object-cell"><div class="main">江苏</div><div class="sub">内部最严重链路：南京 → 南通</div></div><div class="metric-cell"><div>22.30ms</div><div class="muted">内部告警 3 条 / 62%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="object-cell"><div class="main">河北</div><div class="sub">内部最严重链路：石家庄 → 秦皇岛</div></div><div class="metric-cell"><div>21.10ms</div><div class="muted">内部告警 4 条 / 59%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="object-cell"><div class="main">辽宁</div><div class="sub">内部最严重链路：沈阳 → 大连</div></div><div class="metric-cell"><div>20.40ms</div><div class="muted">内部告警 2 条 / 57%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="object-cell"><div class="main">四川</div><div class="sub">内部最严重链路：成都 → 绵阳</div></div><div class="metric-cell"><div>19.90ms</div><div class="muted">内部告警 3 条 / 58%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="object-cell"><div class="main">广东</div><div class="sub">内部最严重链路：广州 → 湛江</div></div><div class="metric-cell"><div>18.40ms</div><div class="muted">内部告警 1 条 / 52%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span>全国页仅展示各省内部告警汇总</span>
+            <span>统一告警组件</span>
             <span>Hover 暂停</span>
           </div>
         </div>
@@ -410,20 +345,19 @@
     <section class="view" id="view-province-network">
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/province-network.png" alt="省份迁徙图网状结构" />
-        <div class="table-panel" data-kind="link-detail">
+        <div class="table-panel">
           <div class="table-topbar">
             <div>
-              <div class="table-title">市区链路告警明细</div>
+              <div class="table-title">动态阈值告警</div>
               <div class="table-sub">范围：山东 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警链路：3</span>
-              <span class="stat-pill">关注链路：2</span>
+              <span class="stat-pill">告警总数：3</span>
             </div>
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>链路对象</div>
+            <div>告警对象</div>
             <div>当前值 / 占比</div>
             <div>状态</div>
           </div>
@@ -438,7 +372,7 @@
             </div>
           </div>
           <div class="panel-footer">
-            <span>省内页展示真实市区链路明细</span>
+            <span>统一告警组件</span>
             <span>Hover 暂停</span>
           </div>
         </div>
@@ -448,20 +382,19 @@
     <section class="view" id="view-province-radial">
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/province-radial.png" alt="省份迁徙图点射结构" />
-        <div class="table-panel" data-kind="link-detail">
+        <div class="table-panel">
           <div class="table-topbar">
             <div>
-              <div class="table-title">市区链路告警明细</div>
+              <div class="table-title">动态阈值告警</div>
               <div class="table-sub">范围：山东 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警链路：3</span>
-              <span class="stat-pill">关注链路：2</span>
+              <span class="stat-pill">告警总数：3</span>
             </div>
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>链路对象</div>
+            <div>告警对象</div>
             <div>当前值 / 占比</div>
             <div>状态</div>
           </div>
@@ -476,7 +409,7 @@
             </div>
           </div>
           <div class="panel-footer">
-            <span>点射页展示真实市区链路明细</span>
+            <span>统一告警组件</span>
             <span>Hover 暂停</span>
           </div>
         </div>
@@ -486,20 +419,19 @@
     <section class="view" id="view-city">
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/city.png" alt="市区迁徙图" />
-        <div class="table-panel" data-kind="direction-detail">
+        <div class="table-panel">
           <div class="table-topbar">
             <div>
-              <div class="table-title">方向告警明细</div>
+              <div class="table-title">动态阈值告警</div>
               <div class="table-sub">范围：潍坊 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警方向：2</span>
-              <span class="stat-pill">关注方向：1</span>
+              <span class="stat-pill">告警总数：2</span>
             </div>
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>方向对象</div>
+            <div>告警对象</div>
             <div>当前值 / 占比</div>
             <div>状态</div>
           </div>
@@ -514,7 +446,7 @@
             </div>
           </div>
           <div class="panel-footer">
-            <span>市区页展示东南西北方向明细</span>
+            <span>统一告警组件</span>
             <span>Hover 暂停</span>
           </div>
         </div>
