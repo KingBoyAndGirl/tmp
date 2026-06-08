@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>云边网络质量识别 - 超阈值告警原型</title>
+  <style>
+    :root {
+      --bg: #081120;
+      --panel: rgba(9, 24, 48, 0.88);
+      --panel-2: rgba(14, 32, 62, 0.95);
+      --line: rgba(80, 159, 255, 0.18);
+      --text: #d8e7ff;
+      --muted: #86a7d7;
+      --primary: #4ac2ff;
+      --ok: #89ff72;
+      --warn: #ffd54c;
+      --danger: #ff6b6b;
+      --danger-2: #ff835d;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 50% 10%, rgba(80, 110, 255, 0.18), transparent 32%),
+        radial-gradient(circle at 20% 20%, rgba(0, 200, 255, 0.08), transparent 30%),
+        linear-gradient(180deg, #091323 0%, #060d19 100%);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .title p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .rule {
+      min-width: 360px;
+      padding: 16px 18px;
+      border: 1px solid rgba(122, 180, 255, 0.18);
+      background: linear-gradient(180deg, rgba(16, 38, 74, 0.95), rgba(9, 25, 49, 0.9));
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .rule strong {
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .rule ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 13px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: linear-gradient(180deg, rgba(17, 39, 75, 0.95), rgba(10, 24, 48, 0.9));
+      border: 1px solid rgba(100, 166, 255, 0.16);
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric::after {
+      content: "";
+      position: absolute;
+      inset: auto -30px -30px auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(77, 195, 255, 0.18), transparent 65%);
+    }
+
+    .metric .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .metric .value {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .metric .sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn, .ghost-btn, .filter-chip {
+      border: 1px solid rgba(119, 171, 255, 0.2);
+      background: rgba(10, 22, 43, 0.75);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active,
+    .ghost-btn.active,
+    .filter-chip.active {
+      color: #fff;
+      background: linear-gradient(180deg, rgba(62, 124, 255, 0.4), rgba(17, 53, 116, 0.68));
+      border-color: rgba(122, 182, 255, 0.45);
+      box-shadow: 0 8px 24px rgba(48, 108, 255, 0.22);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .select-pill {
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(11, 25, 46, 0.88);
+      border: 1px solid rgba(119, 171, 255, 0.18);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .chip-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: 2px;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .stage,
+    .sidebar {
+      background: linear-gradient(180deg, rgba(11, 24, 47, 0.95), rgba(8, 18, 35, 0.95));
+      border: 1px solid rgba(116, 172, 255, 0.12);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .stage {
+      padding: 18px;
+      position: relative;
+      min-height: 760px;
+      overflow: hidden;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(82, 150, 255, 0.12), transparent 32%),
+        radial-gradient(circle at 50% 50%, rgba(72, 197, 255, 0.07), transparent 48%);
+      pointer-events: none;
+    }
+
+    .sidebar {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .panel-title h2,
+    .sidebar h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .panel-title small,
+    .sidebar .caption,
+    .map-caption {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(7, 16, 31, 0.7);
+      border: 1px solid rgba(109, 169, 255, 0.12);
+      border-radius: 14px;
+      z-index: 4;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .dot.cloud { color: #8bff66; background: #8bff66; }
+    .dot.prov { color: #ffd54c; background: #ffd54c; }
+    .dot.alert { color: var(--danger); background: var(--danger); }
+
+    .bar {
+      width: 32px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .bar.ok { background: linear-gradient(90deg, #8aff70, #b8ff83); }
+    .bar.warn { background: linear-gradient(90deg, #ffd24a, #ffb648); }
+    .bar.danger { background: linear-gradient(90deg, #ff7d67, #ff5e6d); }
+
+    .side-card,
+    .list-item,
+    .direction-card {
+      background: rgba(11, 23, 43, 0.75);
+      border: 1px solid rgba(106, 170, 255, 0.1);
+      border-radius: 16px;
+    }
+
+    .side-card {
+      padding: 14px;
+    }
+
+    .side-card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mini {
+      padding: 10px 12px;
+      background: rgba(16, 31, 58, 0.8);
+      border-radius: 12px;
+    }
+
+    .mini .k {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    .mini .v {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .list-item {
+      padding: 12px 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .list-item .name {
+      font-size: 14px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .list-item .meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .badge.ok { background: rgba(125, 255, 108, 0.12); color: #96ff72; }
+    .badge.warn { background: rgba(255, 207, 87, 0.12); color: #ffd458; }
+    .badge.danger { background: rgba(255, 106, 106, 0.13); color: #ff8d8d; }
+
+    .alert-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, rgba(255, 107, 107, 0.12), rgba(255, 154, 108, 0.04));
+      border: 1px solid rgba(255, 113, 113, 0.14);
+      color: #ffd8d8;
+      font-size: 13px;
+    }
+
+    .svg-wrap {
+      position: absolute;
+      inset: 70px 12px 12px 12px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .map-shape {
+      fill: rgba(42, 112, 205, 0.52);
+      stroke: rgba(95, 183, 255, 0.88);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 22px rgba(56, 137, 255, 0.25));
+    }
+
+    .subshape {
+      fill: rgba(67, 142, 231, 0.12);
+      stroke: rgba(117, 187, 255, 0.45);
+      stroke-width: 1.2;
+    }
+
+    .province-node circle,
+    .city-node circle,
+    .area-node circle {
+      stroke: rgba(255,255,255,0.7);
+      stroke-width: 2;
+      filter: drop-shadow(0 0 12px rgba(121, 211, 255, 0.35));
+    }
+
+    .province-node text,
+    .city-node text,
+    .area-node text,
+    .map-label {
+      fill: rgba(228, 240, 255, 0.92);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .map-small {
+      fill: var(--muted);
+      font-size: 12px;
+    }
+
+    .network-line {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 4;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .network-line.ok { stroke: #95ff75; color: #95ff75; }
+    .network-line.warn { stroke: #ffd04c; color: #ffd04c; }
+    .network-line.danger { stroke: #ff6f6f; color: #ff6f6f; }
+    .network-line.dim { opacity: 0.16; filter: none; }
+
+    .center-pulse {
+      fill: rgba(86, 193, 255, 0.18);
+      stroke: rgba(115, 223, 255, 0.88);
+      stroke-width: 2;
+    }
+
+    .direction-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .direction-card {
+      padding: 12px;
+    }
+
+    .direction-card h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .direction-card .line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .direction-card.alert {
+      border-color: rgba(255, 114, 114, 0.24);
+      box-shadow: inset 0 0 0 1px rgba(255, 108, 108, 0.08);
+    }
+
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      transform: translate(14px, 14px);
+      background: rgba(17, 31, 57, 0.96);
+      border: 1px solid rgba(122, 175, 255, 0.24);
+      color: #fff;
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      min-width: 220px;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+    }
+
+    .tooltip.visible {
+      opacity: 1;
+    }
+
+    .tooltip .tt-title {
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    @media (max-width: 1200px) {
+      .content { grid-template-columns: 1fr; }
+      .stage { min-height: 620px; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .topbar { flex-direction: column; }
+      .rule { min-width: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="title">
+        <h1>云边网络质量识别 · 超阈值告警原型</h1>
+        <p>原型重点：全国页只看风险分布，省内页看市际点射告警，市内页看东南西北方向告警。<br/>视觉规则：绿色正常、黄色关注、红色告警；右侧面板统一展示 7 天占比、平均时延、样本数与最近采样时间。</p>
+      </div>
+      <div class="rule">
+        <strong>当前告警规则</strong>
+        <ul>
+          <li>统计窗口：最近 7 天</li>
+          <li>时延阈值：20ms 以下不告警</li>
+          <li>当链路 <b>avgDelay &gt; 20ms</b> 的样本占比 <b>≥ 50%</b> 时，进入告警态</li>
+          <li>适用对象：市与市点射链路、市内东南西北方向链路</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="label">告警省份</div>
+        <div class="value">7 <span style="font-size:14px;color:var(--muted);font-weight:600;">个</span></div>
+        <div class="sub">全国概览只展示风险范围，不直接绘全国连线</div>
+      </div>
+      <div class="metric">
+        <div class="label">省内告警链路</div>
+        <div class="value">19 <span style="font-size:14px;color:var(--muted);font-weight:600;">条</span></div>
+        <div class="sub">7 天内超 20ms 占比 ≥ 50%</div>
+      </div>
+      <div class="metric">
+        <div class="label">市内告警方向</div>
+        <div class="value">6 <span style="font-size:14px;color:var(--muted);font-weight:600;">个</span></div>
+        <div class="sub">重点关注东 / 南 / 西 / 北方向</div>
+      </div>
+      <div class="metric">
+        <div class="label">最近更新时间</div>
+        <div class="value">09:35 <span style="font-size:14px;color:var(--muted);font-weight:600;">今日</span></div>
+        <div class="sub">原型静态数据，正式版将接分析结果接口</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="national">全国总览</button>
+      <button class="tab-btn" data-tab="province">省内关系图</button>
+      <button class="tab-btn" data-tab="city">市内关系图</button>
+    </div>
+
+    <section class="view active" id="view-national">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="select-pill">全国</span>
+          <span class="chip-label">展示：</span>
+          <button class="filter-chip active">风险省份分布</button>
+          <button class="filter-chip">告警省份 Top 排名</button>
+        </div>
+        <div class="toolbar-right">
+          <button class="ghost-btn active">近 7 天</button>
+          <button class="ghost-btn">仅看告警省份</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="stage">
+          <div class="panel-title">
+            <h2>全国总览</h2>
+            <small>原型策略：省份只看风险聚合，不在全国层面画链路，避免视觉过载</small>
+          </div>
+
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1000 680">
+              <path class="map-shape" d="M176,180 L250,120 L380,110 L450,152 L562,140 L690,112 L820,162 L846,246 L820,326 L862,390 L844,474 L742,532 L650,520 L556,568 L420,550 L314,590 L224,534 L180,442 L126,390 L118,300 Z" />
+              <path class="subshape" d="M248,144 L332,184 L278,250 L210,218 Z" />
+              <path class="subshape" d="M396,154 L478,198 L438,264 L354,242 Z" />
+              <path class="subshape" d="M536,170 L628,176 L612,258 L522,250 Z" />
+              <path class="subshape" d="M684,150 L790,190 L760,272 L654,252 Z" />
+              <path class="subshape" d="M620,300 L744,322 L702,412 L588,390 Z" />
+              <path class="subshape" d="M410,304 L520,330 L488,412 L380,392 Z" />
+              <path class="subshape" d="M274,332 L350,390 L300,470 L226,418 Z" />
+
+              <g class="province-node tip-target" data-title="新疆" data-lines='[["告警城市", "1 个"], ["告警链路", "2 条"], ["最高超阈值占比", "53%"], ["7天平均时延", "18.7ms"]]'>
+                <circle cx="220" cy="278" r="12" fill="#95ff75"></circle>
+                <text x="192" y="308">新疆</text>
+              </g>
+              <g class="province-node tip-target" data-title="青海" data-lines='[["告警城市", "0 个"], ["告警链路", "0 条"], ["最高超阈值占比", "12%"], ["7天平均时延", "9.8ms"]]'>
+                <circle cx="330" cy="322" r="10" fill="#95ff75"></circle>
+                <text x="308" y="352">青海</text>
+              </g>
+              <g class="province-node tip-target" data-title="四川" data-lines='[["告警城市", "2 个"], ["告警链路", "3 条"], ["最高超阈值占比", "58%"], ["7天平均时延", "19.9ms"]]'>
+                <circle cx="446" cy="442" r="13" fill="#ffd24c"></circle>
+                <text x="424" y="472">四川</text>
+              </g>
+              <g class="province-node tip-target" data-title="湖北" data-lines='[["告警城市", "1 个"], ["告警链路", "2 条"], ["最高超阈值占比", "49%"], ["7天平均时延", "17.2ms"]]'>
+                <circle cx="602" cy="396" r="11" fill="#95ff75"></circle>
+                <text x="582" y="426">湖北</text>
+              </g>
+              <g class="province-node tip-target" data-title="广东" data-lines='[["告警城市", "1 个"], ["告警链路", "1 条"], ["最高超阈值占比", "52%"], ["7天平均时延", "18.4ms"]]'>
+                <circle cx="700" cy="534" r="12" fill="#95ff75"></circle>
+                <text x="676" y="564">广东</text>
+              </g>
+              <g class="province-node tip-target" data-title="山东" data-lines='[["告警城市", "4 个"], ["告警链路", "7 条"], ["最高超阈值占比", "71%"], ["7天平均时延", "23.6ms"]]'>
+                <circle cx="760" cy="282" r="15" fill="#ff6b6b"></circle>
+                <circle cx="760" cy="282" r="28" fill="none" stroke="rgba(255,107,107,0.28)" stroke-width="3"></circle>
+                <text x="736" y="312">山东</text>
+              </g>
+              <g class="province-node tip-target" data-title="河北" data-lines='[["告警城市", "2 个"], ["告警链路", "4 条"], ["最高超阈值占比", "59%"], ["7天平均时延", "21.1ms"]]'>
+                <circle cx="684" cy="250" r="13" fill="#ffd24c"></circle>
+                <text x="660" y="228">河北</text>
+              </g>
+              <g class="province-node tip-target" data-title="辽宁" data-lines='[["告警城市", "1 个"], ["告警链路", "2 条"], ["最高超阈值占比", "57%"], ["7天平均时延", "20.4ms"]]'>
+                <circle cx="786" cy="208" r="12" fill="#ffd24c"></circle>
+                <text x="804" y="212">辽宁</text>
+              </g>
+              <g class="province-node tip-target" data-title="江苏" data-lines='[["告警城市", "2 个"], ["告警链路", "3 条"], ["最高超阈值占比", "62%"], ["7天平均时延", "22.3ms"]]'>
+                <circle cx="768" cy="360" r="14" fill="#ff6b6b"></circle>
+                <text x="786" y="366">江苏</text>
+              </g>
+              <g class="province-node tip-target" data-title="福建" data-lines='[["告警城市", "0 个"], ["告警链路", "0 条"], ["最高超阈值占比", "16%"], ["7天平均时延", "12.6ms"]]'>
+                <circle cx="806" cy="470" r="10" fill="#95ff75"></circle>
+                <text x="824" y="476">福建</text>
+              </g>
+
+              <text class="map-label" x="120" y="92">省份风险聚合示意</text>
+              <text class="map-small" x="120" y="114">红色省份表示存在持续超阈值链路，可点击钻取省内关系图</text>
+            </svg>
+          </div>
+
+          <div class="legend">
+            <div class="legend-row"><span class="dot cloud"></span> 云能节点 / 正常省份</div>
+            <div class="legend-row"><span class="dot prov"></span> 关注省份（接近阈值）</div>
+            <div class="legend-row"><span class="dot alert"></span> 告警省份（含持续超阈值链路）</div>
+            <div class="legend-row"><span class="bar ok"></span> 正常链路</div>
+            <div class="legend-row"><span class="bar warn"></span> 关注链路</div>
+            <div class="legend-row"><span class="bar danger"></span> 告警链路</div>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="alert-strip">
+            <span>重点告警省份：山东</span>
+            <span class="badge danger">7 条告警链路</span>
+          </div>
+
+          <div class="side-card">
+            <h3>山东 · 告警摘要</h3>
+            <div class="caption">全国页不看具体连线，只展示“是否值得钻取”</div>
+            <div class="side-card-grid">
+              <div class="mini"><span class="k">告警城市</span><span class="v">4</span></div>
+              <div class="mini"><span class="k">告警链路</span><span class="v">7</span></div>
+              <div class="mini"><span class="k">最高超阈值占比</span><span class="v">71%</span></div>
+              <div class="mini"><span class="k">7天平均时延</span><span class="v">23.6ms</span></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>告警省份 Top 5</h3>
+            <div class="caption">建议点击省份后进入省内点射关系图</div>
+            <div class="list" style="margin-top:10px;">
+              <div class="list-item">
+                <div><div class="name">山东</div><div class="meta">7 条告警链路 · 最高占比 71%</div></div>
+                <span class="badge danger">严重</span>
+              </div>
+              <div class="list-item">
+                <div><div class="name">江苏</div><div class="meta">3 条告警链路 · 最高占比 62%</div></div>
+                <span class="badge danger">告警</span>
+              </div>
+              <div class="list-item">
+                <div><div class="name">河北</div><div class="meta">4 条告警链路 · 最高占比 59%</div></div>
+                <span class="badge warn">关注</span>
+              </div>
+              <div class="list-item">
+                <div><div class="name">四川</div><div class="meta">3 条告警链路 · 最高占比 58%</div></div>
+                <span class="badge warn">关注</span>
+              </div>
+              <div class="list-item">
+                <div><div class="name">辽宁</div><div class="meta">2 条告警链路 · 最高占比 57%</div></div>
+                <span class="badge warn">关注</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>设计说明</h3>
+            <div class="caption">全国页的目标是“发现问题在哪”，而不是“把问题链路全画出来”。</div>
+            <ul style="margin:10px 0 0;padding-left:18px;color:var(--muted);line-height:1.9;font-size:12px;">
+              <li>省份上使用红色角标/外圈表达有告警</li>
+              <li>右侧固定放 Top 榜单，便于值守时直接聚焦</li>
+              <li>点击省份进入下一层，查看市与市点射关系</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="view-province">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="select-pill">山东</span>
+          <span class="chip-label">视图：</span>
+          <button class="filter-chip active province-toggle" data-mode="all">全部链路</button>
+          <button class="filter-chip province-toggle" data-mode="alert">仅告警链路</button>
+        </div>
+        <div class="toolbar-right">
+          <button class="ghost-btn active">近 7 天</button>
+          <button class="ghost-btn">按超阈值占比排序</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="stage">
+          <div class="panel-title">
+            <h2>省内关系图 · 山东</h2>
+            <small>点射结构：核心城市 → 目标城市，红线即为持续超阈值告警链路</small>
+          </div>
+
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1000 680" id="province-svg">
+              <path class="map-shape" d="M190,190 L300,132 L468,146 L612,126 L774,174 L852,272 L822,410 L676,494 L492,528 L320,500 L212,426 L162,316 Z" />
+              <path class="subshape" d="M304,170 L406,212 L370,282 L264,246 Z" />
+              <path class="subshape" d="M454,178 L560,186 L540,270 L428,260 Z" />
+              <path class="subshape" d="M618,182 L742,220 L694,300 L588,258 Z" />
+              <path class="subshape" d="M288,316 L392,330 L360,418 L250,396 Z" />
+              <path class="subshape" d="M466,310 L592,326 L560,420 L440,408 Z" />
+              <path class="subshape" d="M648,320 L758,340 L720,436 L608,420 Z" />
+
+              <path class="network-line ok province-line" d="M450,304 C380,238 300,220 224,208" />
+              <path class="network-line ok province-line" d="M450,304 C406,246 394,188 384,150" />
+              <path class="network-line ok province-line" d="M450,304 C458,244 490,194 528,162" />
+              <path class="network-line ok province-line" d="M450,304 C550,240 640,214 746,214" />
+              <path class="network-line ok province-line" d="M450,304 C570,280 646,284 736,298" />
+              <path class="network-line ok province-line" d="M450,304 C400,366 338,410 278,448" />
+              <path class="network-line ok province-line" d="M450,304 C454,386 458,450 468,506" />
+              <path class="network-line warn province-line" d="M450,304 C530,332 598,374 662,432" />
+              <path class="network-line warn province-line" d="M450,304 C520,350 558,396 592,470" />
+              <path class="network-line danger province-line" d="M450,304 C582,232 708,204 806,206" />
+              <path class="network-line danger province-line" d="M450,304 C608,272 746,278 838,324" />
+              <path class="network-line danger province-line" d="M450,304 C566,336 666,392 790,468" />
+
+              <g class="city-node tip-target" data-title="济南（核心）" data-lines='[["角色", "核心城市"], ["发散链路", "12 条"], ["告警链路", "3 条"], ["7天平均时延", "21.8ms"]]'>
+                <circle class="center-pulse" cx="450" cy="304" r="22"></circle>
+                <circle cx="450" cy="304" r="10" fill="#4ac2ff"></circle>
+                <text x="420" y="338">济南</text>
+              </g>
+
+              <g class="city-node tip-target" data-title="德州" data-lines='[["7天平均时延", "18.6ms"], ["超20ms占比", "32%"], ["样本数", "84"], ["状态", "正常"]]'>
+                <circle cx="224" cy="208" r="10" fill="#95ff75"></circle>
+                <text x="196" y="192">德州</text>
+              </g>
+              <g class="city-node tip-target" data-title="滨州" data-lines='[["7天平均时延", "17.9ms"], ["超20ms占比", "29%"], ["样本数", "72"], ["状态", "正常"]]'>
+                <circle cx="384" cy="150" r="10" fill="#95ff75"></circle>
+                <text x="360" y="132">滨州</text>
+              </g>
+              <g class="city-node tip-target" data-title="东营" data-lines='[["7天平均时延", "19.2ms"], ["超20ms占比", "35%"], ["样本数", "61"], ["状态", "正常"]]'>
+                <circle cx="528" cy="162" r="10" fill="#95ff75"></circle>
+                <text x="508" y="144">东营</text>
+              </g>
+              <g class="city-node tip-target" data-title="烟台" data-lines='[["7天平均时延", "25.39ms"], ["超20ms占比", "71%"], ["样本数", "84"], ["状态", "告警"]]'>
+                <circle cx="806" cy="206" r="13" fill="#ff6b6b"></circle>
+                <text x="820" y="214">烟台</text>
+              </g>
+              <g class="city-node tip-target" data-title="威海" data-lines='[["7天平均时延", "24.10ms"], ["超20ms占比", "64%"], ["样本数", "75"], ["状态", "告警"]]'>
+                <circle cx="838" cy="324" r="13" fill="#ff6b6b"></circle>
+                <text x="852" y="330">威海</text>
+              </g>
+              <g class="city-node tip-target" data-title="青岛" data-lines='[["7天平均时延", "22.84ms"], ["超20ms占比", "55%"], ["样本数", "88"], ["状态", "告警"]]'>
+                <circle cx="790" cy="468" r="13" fill="#ff6b6b"></circle>
+                <text x="806" y="474">青岛</text>
+              </g>
+              <g class="city-node tip-target" data-title="济宁" data-lines='[["7天平均时延", "18.5ms"], ["超20ms占比", "28%"], ["样本数", "69"], ["状态", "正常"]]'>
+                <circle cx="278" cy="448" r="10" fill="#95ff75"></circle>
+                <text x="250" y="472">济宁</text>
+              </g>
+              <g class="city-node tip-target" data-title="枣庄" data-lines='[["7天平均时延", "18.9ms"], ["超20ms占比", "33%"], ["样本数", "73"], ["状态", "正常"]]'>
+                <circle cx="468" cy="506" r="10" fill="#95ff75"></circle>
+                <text x="442" y="530">枣庄</text>
+              </g>
+              <g class="city-node tip-target" data-title="日照" data-lines='[["7天平均时延", "20.9ms"], ["超20ms占比", "46%"], ["样本数", "61"], ["状态", "关注"]]'>
+                <circle cx="592" cy="470" r="11" fill="#ffd24c"></circle>
+                <text x="568" y="494">日照</text>
+              </g>
+              <g class="city-node tip-target" data-title="潍坊" data-lines='[["7天平均时延", "21.6ms"], ["超20ms占比", "48%"], ["样本数", "79"], ["状态", "关注"]]'>
+                <circle cx="662" cy="432" r="11" fill="#ffd24c"></circle>
+                <text x="638" y="456">潍坊</text>
+              </g>
+
+              <text class="map-label" x="170" y="100">市际点射告警示意</text>
+              <text class="map-small" x="170" y="122">建议高亮红线，弱化非告警链路，并在右侧固定列出 Top 告警链路</text>
+            </svg>
+          </div>
+
+          <div class="legend">
+            <div class="legend-row"><span class="bar ok"></span> 正常：7天超阈值占比 &lt; 50%</div>
+            <div class="legend-row"><span class="bar warn"></span> 关注：接近阈值（如 40% ~ 49%）</div>
+            <div class="legend-row"><span class="bar danger"></span> 告警：7天超阈值占比 ≥ 50%</div>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="alert-strip">
+            <span>山东当前最严重链路：济南 → 烟台</span>
+            <span class="badge danger">71%</span>
+          </div>
+
+          <div class="side-card">
+            <h3>当前聚焦链路</h3>
+            <div class="caption">济南 → 烟台</div>
+            <div class="side-card-grid">
+              <div class="mini"><span class="k">7天平均时延</span><span class="v">25.39ms</span></div>
+              <div class="mini"><span class="k">超20ms占比</span><span class="v">71%</span></div>
+              <div class="mini"><span class="k">样本数</span><span class="v">84</span></div>
+              <div class="mini"><span class="k">最近采样</span><span class="v" style="font-size:15px;">09:31</span></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>省内告警链路 Top 5</h3>
+            <div class="list" style="margin-top:10px;">
+              <div class="list-item"><div><div class="name">济南 → 烟台</div><div class="meta">25.39ms · 超阈值占比 71%</div></div><span class="badge danger">告警</span></div>
+              <div class="list-item"><div><div class="name">济南 → 威海</div><div class="meta">24.10ms · 超阈值占比 64%</div></div><span class="badge danger">告警</span></div>
+              <div class="list-item"><div><div class="name">济南 → 青岛</div><div class="meta">22.84ms · 超阈值占比 55%</div></div><span class="badge danger">告警</span></div>
+              <div class="list-item"><div><div class="name">济南 → 日照</div><div class="meta">20.90ms · 超阈值占比 46%</div></div><span class="badge warn">关注</span></div>
+              <div class="list-item"><div><div class="name">济南 → 潍坊</div><div class="meta">21.60ms · 超阈值占比 48%</div></div><span class="badge warn">关注</span></div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>设计说明</h3>
+            <ul style="margin:8px 0 0;padding-left:18px;color:var(--muted);line-height:1.9;font-size:12px;">
+              <li>适合把“全部链路 / 仅告警链路”做成顶部切换</li>
+              <li>默认进入“仅告警链路”会更符合值守场景</li>
+              <li>红线 hover 时固定展示占比、样本数与最近时间</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="view-city">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span class="select-pill">潍坊</span>
+          <span class="chip-label">视图：</span>
+          <button class="filter-chip active city-toggle" data-mode="all">全部方向</button>
+          <button class="filter-chip city-toggle" data-mode="alert">仅告警方向</button>
+        </div>
+        <div class="toolbar-right">
+          <button class="ghost-btn active">近 7 天</button>
+          <button class="ghost-btn">按方向排序</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="stage">
+          <div class="panel-title">
+            <h2>市内关系图 · 潍坊</h2>
+            <small>方向视图：中心点到东 / 南 / 西 / 北，重点展示方向性告警</small>
+          </div>
+
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1000 680" id="city-svg">
+              <path class="map-shape" d="M288,160 L442,138 L612,168 L716,246 L730,384 L640,488 L470,530 L300,506 L212,418 L198,286 Z" />
+              <path class="subshape" d="M336,190 L470,206 L442,288 L322,262 Z" />
+              <path class="subshape" d="M504,198 L624,236 L600,312 L486,284 Z" />
+              <path class="subshape" d="M298,318 L430,330 L420,420 L304,410 Z" />
+              <path class="subshape" d="M470,334 L604,346 L590,438 L466,424 Z" />
+
+              <path class="network-line ok city-line" d="M500,320 C500,264 500,226 500,174" />
+              <path class="network-line warn city-line" d="M500,320 C406,268 330,262 254,258" />
+              <path class="network-line danger city-line" d="M500,320 C606,278 690,274 780,286" />
+              <path class="network-line danger city-line" d="M500,320 C520,404 540,472 562,560" />
+              <path class="network-line ok city-line" d="M500,320 C588,338 646,356 706,398" />
+
+              <g class="area-node tip-target" data-title="潍坊中心" data-lines='[["角色", "中心点"], ["辐射方向", "5 个"], ["告警方向", "2 个"], ["7天平均时延", "20.1ms"]]'>
+                <circle class="center-pulse" cx="500" cy="320" r="22"></circle>
+                <circle cx="500" cy="320" r="10" fill="#4ac2ff"></circle>
+                <text x="464" y="354">潍坊中心</text>
+              </g>
+              <g class="area-node tip-target" data-title="潍坊北" data-lines='[["7天平均时延", "16.8ms"], ["超20ms占比", "18%"], ["样本数", "52"], ["状态", "正常"]]'>
+                <circle cx="500" cy="174" r="10" fill="#95ff75"></circle>
+                <text x="470" y="154">潍坊北</text>
+              </g>
+              <g class="area-node tip-target" data-title="潍坊西" data-lines='[["7天平均时延", "19.7ms"], ["超20ms占比", "43%"], ["样本数", "47"], ["状态", "关注"]]'>
+                <circle cx="254" cy="258" r="11" fill="#ffd24c"></circle>
+                <text x="218" y="246">潍坊西</text>
+              </g>
+              <g class="area-node tip-target" data-title="潍坊东" data-lines='[["7天平均时延", "27.39ms"], ["超20ms占比", "68%"], ["样本数", "61"], ["状态", "告警"]]'>
+                <circle cx="780" cy="286" r="13" fill="#ff6b6b"></circle>
+                <text x="796" y="292">潍坊东</text>
+              </g>
+              <g class="area-node tip-target" data-title="潍坊南" data-lines='[["7天平均时延", "23.16ms"], ["超20ms占比", "57%"], ["样本数", "55"], ["状态", "告警"]]'>
+                <circle cx="562" cy="560" r="13" fill="#ff6b6b"></circle>
+                <text x="530" y="586">潍坊南</text>
+              </g>
+              <g class="area-node tip-target" data-title="潍坊东北" data-lines='[["7天平均时延", "17.3ms"], ["超20ms占比", "20%"], ["样本数", "41"], ["状态", "正常"]]'>
+                <circle cx="706" cy="398" r="10" fill="#95ff75"></circle>
+                <text x="720" y="404">潍坊东北</text>
+              </g>
+
+              <text class="map-label" x="210" y="102">市内方向告警示意</text>
+              <text class="map-small" x="210" y="124">建议右侧改成方向卡片，支持快速定位“哪一个方向正在持续偏高”</text>
+            </svg>
+          </div>
+
+          <div class="legend">
+            <div class="legend-row"><span class="bar ok"></span> 正常方向</div>
+            <div class="legend-row"><span class="bar warn"></span> 关注方向</div>
+            <div class="legend-row"><span class="bar danger"></span> 告警方向</div>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="alert-strip">
+            <span>当前最严重方向：潍坊东</span>
+            <span class="badge danger">68%</span>
+          </div>
+
+          <div class="side-card">
+            <h3>方向告警卡片</h3>
+            <div class="caption">这层更适合用卡片承接告警，而不只是依赖 hover</div>
+            <div class="direction-grid" style="margin-top:10px;">
+              <div class="direction-card alert">
+                <h4>潍坊东 <span class="badge danger" style="float:right;">告警</span></h4>
+                <div class="line"><span>7天平均时延</span><span>27.39ms</span></div>
+                <div class="line"><span>超20ms占比</span><span>68%</span></div>
+                <div class="line"><span>样本数</span><span>61</span></div>
+              </div>
+              <div class="direction-card alert">
+                <h4>潍坊南 <span class="badge danger" style="float:right;">告警</span></h4>
+                <div class="line"><span>7天平均时延</span><span>23.16ms</span></div>
+                <div class="line"><span>超20ms占比</span><span>57%</span></div>
+                <div class="line"><span>样本数</span><span>55</span></div>
+              </div>
+              <div class="direction-card">
+                <h4>潍坊西 <span class="badge warn" style="float:right;">关注</span></h4>
+                <div class="line"><span>7天平均时延</span><span>19.7ms</span></div>
+                <div class="line"><span>超20ms占比</span><span>43%</span></div>
+                <div class="line"><span>样本数</span><span>47</span></div>
+              </div>
+              <div class="direction-card">
+                <h4>潍坊北 <span class="badge ok" style="float:right;">正常</span></h4>
+                <div class="line"><span>7天平均时延</span><span>16.8ms</span></div>
+                <div class="line"><span>超20ms占比</span><span>18%</span></div>
+                <div class="line"><span>样本数</span><span>52</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h3>设计说明</h3>
+            <ul style="margin:8px 0 0;padding-left:18px;color:var(--muted);line-height:1.9;font-size:12px;">
+              <li>城市层建议同时保留地图与方向卡片两种表达</li>
+              <li>地图负责空间感，卡片负责快速读数与值守</li>
+              <li>正式版可加最近 24h 趋势微型 sparkline</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="footer-note">说明：这是静态原型，用于确认页面结构与告警视觉，不代表最终真实地图底图与接口字段。</div>
+  </div>
+
+  <div id="tooltip" class="tooltip"></div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const views = {
+      national: document.getElementById('view-national'),
+      province: document.getElementById('view-province'),
+      city: document.getElementById('view-city'),
+    };
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(x => x.classList.remove('active'));
+        Object.values(views).forEach(v => v.classList.remove('active'));
+        btn.classList.add('active');
+        views[btn.dataset.tab].classList.add('active');
+      });
+    });
+
+    const tooltip = document.getElementById('tooltip');
+    const tipTargets = document.querySelectorAll('.tip-target');
+
+    function renderTip(target) {
+      const title = target.dataset.title || '详情';
+      let lines = [];
+      try { lines = JSON.parse(target.dataset.lines || '[]'); } catch (e) {}
+      tooltip.innerHTML = `<div class="tt-title">${title}</div>` + lines.map(([k, v]) => `<div class="tt-row"><span>${k}</span><span>${v}</span></div>`).join('');
+    }
+
+    tipTargets.forEach(el => {
+      el.addEventListener('mouseenter', event => {
+        renderTip(el);
+        tooltip.classList.add('visible');
+      });
+      el.addEventListener('mousemove', event => {
+        tooltip.style.left = event.clientX + 'px';
+        tooltip.style.top = event.clientY + 'px';
+      });
+      el.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+    });
+
+    const provinceToggle = document.querySelectorAll('.province-toggle');
+    provinceToggle.forEach(btn => {
+      btn.addEventListener('click', () => {
+        provinceToggle.forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        const alertOnly = btn.dataset.mode === 'alert';
+        document.querySelectorAll('.province-line.ok, .province-line.warn').forEach(line => {
+          line.classList.toggle('dim', alertOnly);
+        });
+      });
+    });
+
+    const cityToggle = document.querySelectorAll('.city-toggle');
+    cityToggle.forEach(btn => {
+      btn.addEventListener('click', () => {
+        cityToggle.forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        const alertOnly = btn.dataset.mode === 'alert';
+        document.querySelectorAll('.city-line.ok, .city-line.warn').forEach(line => {
+          line.classList.toggle('dim', alertOnly);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
