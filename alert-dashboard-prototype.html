@@ -9,8 +9,8 @@
       --text: #dbe7ff;
       --muted: #9db6da;
       --danger: #ff8b63;
-      --warn: #e0a43d;
-      --normal: #546483;
+      --warn: #d39a38;
+      --normal: #556784;
       --shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
       --table-bg: rgba(8, 36, 87, 0.94);
       --table-head: rgba(22, 72, 143, 0.72);
@@ -79,10 +79,10 @@
     .table-panel {
       position: absolute;
       top: 42px;
-      right: 38px;
-      width: min(620px, 40%);
-      height: 58%;
-      min-height: 320px;
+      right: 34px;
+      width: min(520px, 34%);
+      height: 52%;
+      min-height: 280px;
       background: var(--table-bg);
       border: 1px solid var(--table-border);
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
@@ -95,14 +95,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
-      padding: 12px 14px 8px;
+      gap: 10px;
+      padding: 11px 12px 8px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
       background: linear-gradient(180deg, rgba(11, 38, 88, 0.96), rgba(10, 32, 74, 0.86));
     }
 
     .table-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
       color: #fff;
       margin-bottom: 3px;
@@ -111,12 +111,12 @@
     .table-sub {
       font-size: 11px;
       color: rgba(214, 228, 255, 0.78);
-      line-height: 1.45;
+      line-height: 1.4;
     }
 
     .table-stats {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       justify-content: flex-end;
     }
@@ -126,7 +126,7 @@
       background: rgba(255,255,255,0.05);
       color: #ddebff;
       border-radius: 999px;
-      padding: 5px 9px;
+      padding: 4px 8px;
       font-size: 11px;
       white-space: nowrap;
     }
@@ -134,12 +134,12 @@
     .table-header,
     .table-row {
       display: grid;
-      grid-template-columns: 74px 1.55fr 1.15fr 86px;
+      grid-template-columns: 66px 92px 1fr 74px 74px;
       align-items: center;
     }
 
     .table-header {
-      min-height: 44px;
+      min-height: 40px;
       background: var(--table-head);
       border-bottom: 1px solid rgba(255,255,255,0.06);
       color: #8dccff;
@@ -149,7 +149,7 @@
 
     .table-header > div,
     .table-row > div {
-      padding: 0 12px;
+      padding: 0 10px;
     }
 
     .table-header > div:not(:last-child),
@@ -167,10 +167,10 @@
     .table-track { width: 100%; }
 
     .table-row {
-      min-height: 68px;
+      min-height: 60px;
       border-bottom: 1px solid var(--table-line);
       color: #eef5ff;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .index-wrap {
@@ -180,55 +180,49 @@
     }
 
     .index-circle {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: 2px solid rgba(104, 193, 255, 0.9);
       color: #dbf4ff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
-      box-shadow: inset 0 0 14px rgba(0, 162, 255, 0.25), 0 0 14px rgba(0, 122, 255, 0.18);
+      font-size: 13px;
+      box-shadow: inset 0 0 10px rgba(0, 162, 255, 0.22), 0 0 10px rgba(0, 122, 255, 0.15);
       background: radial-gradient(circle at 35% 35%, rgba(86, 171, 255, 0.5), rgba(15, 71, 143, 0.4));
     }
 
-    .object-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .province-cell,
+    .alert-cell,
+    .ratio-cell,
+    .state-cell {
       min-width: 0;
     }
 
-    .object-cell .main {
-      font-size: 14px;
+    .province-cell .main,
+    .alert-cell .main {
+      font-size: 13px;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .object-cell .sub {
-      font-size: 11px;
+    .province-cell .sub,
+    .alert-cell .sub,
+    .ratio-cell .sub {
+      margin-top: 3px;
+      font-size: 10px;
       color: var(--muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .metric-cell {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      color: #eaf2ff;
-      font-size: 12px;
-      line-height: 1.35;
-      min-width: 0;
-    }
-
-    .metric-cell .muted {
-      color: var(--muted);
-      font-size: 11px;
+    .ratio-cell .main {
+      font-size: 13px;
+      color: #eef5ff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -244,10 +238,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 54px;
-      padding: 7px 10px;
+      min-width: 50px;
+      padding: 6px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 11px;
       color: #fff;
     }
 
@@ -256,13 +250,13 @@
     .status-normal { background: #4f5f7d; }
 
     .panel-footer {
-      min-height: 38px;
+      min-height: 34px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 14px;
+      padding: 0 12px;
       color: rgba(214, 228, 255, 0.72);
-      font-size: 11px;
+      font-size: 10px;
       background: rgba(6, 21, 58, 0.96);
       border-top: 1px solid rgba(255,255,255,0.05);
     }
@@ -271,8 +265,8 @@
       .table-panel {
         top: 24px;
         right: 24px;
-        width: min(620px, calc(100% - 48px));
-        height: 56%;
+        width: min(520px, calc(100% - 48px));
+        height: 50%;
       }
     }
 
@@ -282,7 +276,7 @@
       .table-panel {
         position: static;
         width: auto;
-        height: 320px;
+        height: 300px;
         margin: 12px;
       }
       .canvas-wrap { background: rgba(8, 12, 20, 0.95); }
@@ -312,7 +306,7 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">范围：全国 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
+              <div class="table-sub">范围：全国 ｜ 统计周期：近7天</div>
             </div>
             <div class="table-stats">
               <span class="stat-pill">告警总数：7</span>
@@ -320,22 +314,23 @@
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>告警对象</div>
-            <div>当前值 / 占比</div>
+            <div>告警省份</div>
+            <div>告警</div>
+            <div>占比</div>
             <div>状态</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="object-cell"><div class="main">山东</div><div class="sub">内部最严重链路：济南 → 烟台</div></div><div class="metric-cell"><div>25.39ms</div><div class="muted">内部告警 7 条 / 71%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="object-cell"><div class="main">江苏</div><div class="sub">内部最严重链路：南京 → 南通</div></div><div class="metric-cell"><div>22.30ms</div><div class="muted">内部告警 3 条 / 62%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="object-cell"><div class="main">河北</div><div class="sub">内部最严重链路：石家庄 → 秦皇岛</div></div><div class="metric-cell"><div>21.10ms</div><div class="muted">内部告警 4 条 / 59%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="object-cell"><div class="main">辽宁</div><div class="sub">内部最严重链路：沈阳 → 大连</div></div><div class="metric-cell"><div>20.40ms</div><div class="muted">内部告警 2 条 / 57%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="object-cell"><div class="main">四川</div><div class="sub">内部最严重链路：成都 → 绵阳</div></div><div class="metric-cell"><div>19.90ms</div><div class="muted">内部告警 3 条 / 58%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="object-cell"><div class="main">广东</div><div class="sub">内部最严重链路：广州 → 湛江</div></div><div class="metric-cell"><div>18.40ms</div><div class="muted">内部告警 1 条 / 52%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">省内最严重告警</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">省内最严重告警</div></div><div class="ratio-cell"><div class="main">62%</div><div class="sub">22.30ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">省内最严重告警</div></div><div class="ratio-cell"><div class="main">59%</div><div class="sub">21.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">辽宁</div></div><div class="alert-cell"><div class="main">沈阳→大连</div><div class="sub">省内最严重告警</div></div><div class="ratio-cell"><div class="main">57%</div><div class="sub">20.40ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">省内重点关注</div></div><div class="ratio-cell"><div class="main">58%</div><div class="sub">19.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">广东</div></div><div class="alert-cell"><div class="main">广州→湛江</div><div class="sub">省内重点关注</div></div><div class="ratio-cell"><div class="main">52%</div><div class="sub">18.40ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span>统一告警组件</span>
+            <span>统一告警信息</span>
             <span>Hover 暂停</span>
           </div>
         </div>
@@ -349,7 +344,7 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">范围：山东 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
+              <div class="table-sub">范围：山东 ｜ 统计周期：近7天</div>
             </div>
             <div class="table-stats">
               <span class="stat-pill">告警总数：3</span>
@@ -357,22 +352,23 @@
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>告警对象</div>
-            <div>当前值 / 占比</div>
+            <div>告警省份</div>
+            <div>告警</div>
+            <div>占比</div>
             <div>状态</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="object-cell"><div class="main">济南 → 烟台</div><div class="sub">84样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>25.39ms / 20.00ms</div><div class="muted">超阈值占比 71%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="object-cell"><div class="main">济南 → 威海</div><div class="sub">75样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>24.10ms / 20.00ms</div><div class="muted">超阈值占比 64%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="object-cell"><div class="main">济南 → 青岛</div><div class="sub">88样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>22.84ms / 20.00ms</div><div class="muted">超阈值占比 55%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="object-cell"><div class="main">济南 → 日照</div><div class="sub">61样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>20.90ms / 20.00ms</div><div class="muted">超阈值占比 46%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="object-cell"><div class="main">济南 → 潍坊</div><div class="sub">79样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>21.60ms / 20.00ms</div><div class="muted">超阈值占比 48%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="object-cell"><div class="main">济南 → 滨州</div><div class="sub">72样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>17.90ms / 20.00ms</div><div class="muted">超阈值占比 29%</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">84样本</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">75样本</div></div><div class="ratio-cell"><div class="main">64%</div><div class="sub">24.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">88样本</div></div><div class="ratio-cell"><div class="main">55%</div><div class="sub">22.84ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→日照</div><div class="sub">61样本</div></div><div class="ratio-cell"><div class="main">46%</div><div class="sub">20.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→潍坊</div><div class="sub">79样本</div></div><div class="ratio-cell"><div class="main">48%</div><div class="sub">21.60ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→滨州</div><div class="sub">72样本</div></div><div class="ratio-cell"><div class="main">29%</div><div class="sub">17.90ms</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span>统一告警组件</span>
+            <span>统一告警信息</span>
             <span>Hover 暂停</span>
           </div>
         </div>
@@ -386,7 +382,7 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">范围：山东 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
+              <div class="table-sub">范围：山东 ｜ 统计周期：近7天</div>
             </div>
             <div class="table-stats">
               <span class="stat-pill">告警总数：3</span>
@@ -394,22 +390,23 @@
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>告警对象</div>
-            <div>当前值 / 占比</div>
+            <div>告警省份</div>
+            <div>告警</div>
+            <div>占比</div>
             <div>状态</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="object-cell"><div class="main">济南 → 烟台</div><div class="sub">最严重链路 ｜ 84样本</div></div><div class="metric-cell"><div>25.39ms / 20.00ms</div><div class="muted">超阈值占比 71%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="object-cell"><div class="main">济南 → 威海</div><div class="sub">持续高时延 ｜ 75样本</div></div><div class="metric-cell"><div>24.10ms / 20.00ms</div><div class="muted">超阈值占比 64%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="object-cell"><div class="main">济南 → 青岛</div><div class="sub">持续高时延 ｜ 88样本</div></div><div class="metric-cell"><div>22.84ms / 20.00ms</div><div class="muted">超阈值占比 55%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="object-cell"><div class="main">济南 → 日照</div><div class="sub">接近阈值 ｜ 61样本</div></div><div class="metric-cell"><div>20.90ms / 20.00ms</div><div class="muted">超阈值占比 46%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="object-cell"><div class="main">济南 → 潍坊</div><div class="sub">接近阈值 ｜ 79样本</div></div><div class="metric-cell"><div>21.60ms / 20.00ms</div><div class="muted">超阈值占比 48%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="object-cell"><div class="main">济南 → 德州</div><div class="sub">一般链路 ｜ 84样本</div></div><div class="metric-cell"><div>18.60ms / 20.00ms</div><div class="muted">超阈值占比 32%</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">最严重链路</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">持续高时延</div></div><div class="ratio-cell"><div class="main">64%</div><div class="sub">24.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">持续高时延</div></div><div class="ratio-cell"><div class="main">55%</div><div class="sub">22.84ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→日照</div><div class="sub">接近阈值</div></div><div class="ratio-cell"><div class="main">46%</div><div class="sub">20.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→潍坊</div><div class="sub">接近阈值</div></div><div class="ratio-cell"><div class="main">48%</div><div class="sub">21.60ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→德州</div><div class="sub">一般链路</div></div><div class="ratio-cell"><div class="main">32%</div><div class="sub">18.60ms</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span>统一告警组件</span>
+            <span>统一告警信息</span>
             <span>Hover 暂停</span>
           </div>
         </div>
@@ -423,7 +420,7 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">范围：潍坊 ｜ 统计周期：近7天 ｜ 当前阈值：动态阈值</div>
+              <div class="table-sub">范围：山东 ｜ 统计周期：近7天</div>
             </div>
             <div class="table-stats">
               <span class="stat-pill">告警总数：2</span>
@@ -431,22 +428,23 @@
           </div>
           <div class="table-header">
             <div>序号</div>
-            <div>告警对象</div>
-            <div>当前值 / 占比</div>
+            <div>告警省份</div>
+            <div>告警</div>
+            <div>占比</div>
             <div>状态</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="object-cell"><div class="main">潍坊东</div><div class="sub">61样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>27.39ms / 20.00ms</div><div class="muted">超阈值占比 68%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="object-cell"><div class="main">潍坊南</div><div class="sub">55样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>23.16ms / 20.00ms</div><div class="muted">超阈值占比 57%</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="object-cell"><div class="main">潍坊西</div><div class="sub">47样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>19.70ms / 20.00ms</div><div class="muted">超阈值占比 43%</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="object-cell"><div class="main">潍坊北</div><div class="sub">52样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>16.80ms / 20.00ms</div><div class="muted">超阈值占比 18%</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="object-cell"><div class="main">潍坊东北</div><div class="sub">41样本 ｜ 最近 2025-08-13 16:25:20</div></div><div class="metric-cell"><div>17.30ms / 20.00ms</div><div class="muted">超阈值占比 20%</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="object-cell"><div class="main">潍坊中心</div><div class="sub">核心点位 ｜ 68样本</div></div><div class="metric-cell"><div>18.10ms / 20.00ms</div><div class="muted">超阈值占比 26%</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">潍坊东</div><div class="sub">方向告警</div></div><div class="ratio-cell"><div class="main">68%</div><div class="sub">27.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">潍坊南</div><div class="sub">方向告警</div></div><div class="ratio-cell"><div class="main">57%</div><div class="sub">23.16ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">潍坊西</div><div class="sub">方向关注</div></div><div class="ratio-cell"><div class="main">43%</div><div class="sub">19.70ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">潍坊北</div><div class="sub">一般方向</div></div><div class="ratio-cell"><div class="main">18%</div><div class="sub">16.80ms</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">潍坊东北</div><div class="sub">一般方向</div></div><div class="ratio-cell"><div class="main">20%</div><div class="sub">17.30ms</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">潍坊中心</div><div class="sub">核心点位</div></div><div class="ratio-cell"><div class="main">26%</div><div class="sub">18.10ms</div></div><div class="state-cell"><span class="status-tag status-normal">一般</span></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span>统一告警组件</span>
+            <span>统一告警信息</span>
             <span>Hover 暂停</span>
           </div>
         </div>
