@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>原大屏叠加告警框原型</title>
+  <title>原大屏叠加告警摘要卡原型</title>
   <style>
     :root {
-      --bg: #060d19;
       --text: #dbe7ff;
       --muted: #9db6da;
-      --border: rgba(143, 186, 255, 0.45);
-      --panel: rgba(50, 59, 128, 0.68);
-      --panel-deep: rgba(40, 48, 112, 0.78);
       --danger: #ff7b7b;
       --warn: #ffd75a;
       --ok: #86ff72;
       --shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+      --card-bg: linear-gradient(180deg, rgba(77, 81, 164, 0.84), rgba(61, 68, 145, 0.8));
+      --card-border: rgba(171, 199, 255, 0.66);
+      --modal-bg: rgba(17, 25, 47, 0.94);
+      --modal-border: rgba(131, 178, 255, 0.38);
     }
 
     * { box-sizing: border-box; }
@@ -58,7 +58,7 @@
 
     .rule-box {
       min-width: 360px;
-      max-width: 420px;
+      max-width: 440px;
       padding: 14px 16px;
       border: 1px solid rgba(125, 170, 255, 0.18);
       border-radius: 16px;
@@ -107,165 +107,6 @@
     .view { display: none; }
     .view.active { display: block; }
 
-    .canvas-wrap {
-      position: relative;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      background: #070d17;
-    }
-
-    .screen-image {
-      width: 100%;
-      display: block;
-    }
-
-    .overlay-box {
-      position: absolute;
-      top: 48px;
-      right: 48px;
-      width: 352px;
-      padding: 13px 15px 15px;
-      border-radius: 6px;
-      background: linear-gradient(180deg, rgba(77, 81, 164, 0.82), rgba(61, 68, 145, 0.78));
-      border: 1px solid rgba(171, 199, 255, 0.66);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
-      color: #ecf2ff;
-      backdrop-filter: blur(2px);
-    }
-
-    .overlay-box::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 6px;
-      pointer-events: none;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-    }
-
-    .overlay-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 4px;
-      letter-spacing: 0.02em;
-    }
-
-    .overlay-subtitle {
-      font-size: 11px;
-      color: rgba(218, 229, 255, 0.9);
-      line-height: 1.5;
-      margin-bottom: 6px;
-    }
-
-    .overlay-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-bottom: 10px;
-      font-size: 11px;
-      color: rgba(214, 226, 255, 0.76);
-      line-height: 1.45;
-    }
-
-    .overlay-metrics {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 12px;
-      margin-bottom: 10px;
-    }
-
-    .metric-item {
-      min-width: 0;
-    }
-
-    .metric-item .label {
-      display: block;
-      font-size: 11px;
-      color: rgba(214, 226, 255, 0.72);
-      margin-bottom: 3px;
-    }
-
-    .metric-item .value {
-      font-size: 17px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .metric-item .value.danger { color: var(--danger); }
-    .metric-item .value.warn { color: var(--warn); }
-    .metric-item .value.ok { color: var(--ok); }
-
-    .mini-divider {
-      height: 1px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
-      margin: 8px 0 10px;
-    }
-
-    .top-list-title {
-      font-size: 11px;
-      color: rgba(214, 226, 255, 0.74);
-      margin-bottom: 7px;
-      letter-spacing: 0.03em;
-    }
-
-    .top-list {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .top-item {
-      padding: 7px 8px;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .top-head {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 8px;
-      align-items: center;
-      font-size: 12px;
-      color: #f5f8ff;
-      margin-bottom: 4px;
-    }
-
-    .top-head .name {
-      min-width: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .top-head .ratio {
-      color: var(--danger);
-      font-weight: 700;
-    }
-
-    .top-head .tag {
-      color: rgba(220, 230, 255, 0.84);
-      font-size: 11px;
-    }
-
-    .top-detail {
-      font-size: 11px;
-      color: rgba(220, 230, 255, 0.82);
-      line-height: 1.5;
-    }
-
-    .design-note {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
     .switch-line {
       display: flex;
       gap: 8px;
@@ -289,6 +130,277 @@
       border-color: rgba(139, 188, 255, 0.45);
     }
 
+    .canvas-wrap {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: #070d17;
+    }
+
+    .screen-image {
+      width: 100%;
+      display: block;
+    }
+
+    .summary-card {
+      position: absolute;
+      top: 48px;
+      right: 48px;
+      width: 290px;
+      padding: 12px 14px 14px;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
+      color: #ecf2ff;
+      backdrop-filter: blur(2px);
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .card-sub {
+      font-size: 11px;
+      color: rgba(221, 231, 255, 0.84);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 11px;
+      color: rgba(217, 228, 255, 0.82);
+      margin-bottom: 10px;
+    }
+
+    .card-kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-bottom: 10px;
+    }
+
+    .kpi .label {
+      display: block;
+      font-size: 11px;
+      color: rgba(214, 226, 255, 0.72);
+      margin-bottom: 3px;
+    }
+
+    .kpi .value {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .value.danger { color: var(--danger); }
+    .value.warn { color: var(--warn); }
+    .value.ok { color: var(--ok); }
+
+    .mini-divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
+      margin: 8px 0 10px;
+    }
+
+    .top-list-title {
+      font-size: 11px;
+      color: rgba(214, 226, 255, 0.74);
+      margin-bottom: 7px;
+      letter-spacing: 0.03em;
+    }
+
+    .top-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+
+    .top-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 12px;
+      color: #f5f8ff;
+    }
+
+    .top-row .name {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-row .ratio {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .detail-btn {
+      width: 100%;
+      border: 1px solid rgba(198, 216, 255, 0.3);
+      background: rgba(15, 23, 51, 0.42);
+      color: #fff;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .detail-btn:hover {
+      background: rgba(18, 31, 67, 0.6);
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 8, 18, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 24px;
+    }
+
+    .modal-mask.open { display: flex; }
+
+    .modal {
+      width: min(1100px, 92vw);
+      max-height: 82vh;
+      overflow: hidden;
+      border-radius: 14px;
+      background: var(--modal-bg);
+      border: 1px solid var(--modal-border);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 6px;
+    }
+
+    .modal-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .close-btn {
+      border: 1px solid rgba(158, 187, 255, 0.2);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .modal-body {
+      padding: 16px 20px 18px;
+      overflow: auto;
+    }
+
+    .modal-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge.info { background: rgba(89, 146, 255, 0.16); color: #9cc6ff; }
+    .badge.danger { background: rgba(255, 123, 123, 0.14); color: #ff9393; }
+    .badge.warn { background: rgba(255, 215, 90, 0.14); color: #ffe27f; }
+
+    .table-wrap {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: rgba(111, 140, 255, 0.12);
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: #edf4ff;
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 12px;
+      color: #cfe0ff;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    td.muted { color: var(--muted); }
+    .cell-danger { color: var(--danger); font-weight: 700; }
+    .cell-warn { color: var(--warn); font-weight: 700; }
+
+    .design-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
     .footer-note {
       margin-top: 12px;
       text-align: right;
@@ -299,22 +411,24 @@
     @media (max-width: 1100px) {
       .header { flex-direction: column; }
       .rule-box { min-width: 0; max-width: none; width: 100%; }
-      .overlay-box {
+      .summary-card {
         top: 24px;
         right: 24px;
-        width: 320px;
+        width: 270px;
       }
     }
 
     @media (max-width: 760px) {
       .app { padding: 14px; }
       .header h1 { font-size: 22px; }
-      .overlay-box {
+      .summary-card {
         position: static;
         width: auto;
         margin: 12px;
       }
       .canvas-wrap { background: rgba(8, 12, 20, 0.95); }
+      .modal-mask { padding: 10px; }
+      .modal { width: 100%; max-height: 90vh; }
     }
   </style>
 </head>
@@ -322,15 +436,15 @@
   <div class="app">
     <div class="header">
       <div>
-        <h1>原大屏 + 右上告警展示框原型</h1>
-        <p>这版原型不重做大屏结构，只基于你现有全国总览、省份关系图、市区迁徙图，<br/>在右上新增一个更详细的超阈值告警展示框，用于验证“尽量少改现有页面”的方向。</p>
+        <h1>原大屏 + 告警摘要卡 / 详表弹窗原型</h1>
+        <p>这版原型按客户意思调整为：默认右上只放一个简洁摘要卡，点“查看详表”后，<br/>在屏幕中间弹出完整告警明细表，解决“Top3之外的数据在哪儿看”的问题。</p>
       </div>
       <div class="rule-box">
-        <strong>告警规则</strong>
-        <div>统计窗口：近 7 天</div>
-        <div>阈值：avgDelay &gt; 20ms</div>
-        <div>判定：超阈值样本占比 ≥ 50% 即显示告警</div>
-        <div>对象：市与市（点射状）链路、市区东南西北方向链路</div>
+        <strong>当前原型思路</strong>
+        <div>默认展示：右上摘要卡</div>
+        <div>点击动作：查看详表 → 中间弹窗</div>
+        <div>后台职责：动态阈值持续计算、结果落库</div>
+        <div>前台职责：展示统计周期、总量、Top3、详表</div>
       </div>
     </div>
 
@@ -343,33 +457,32 @@
 
     <section class="view active" id="view-national">
       <div class="switch-line">
-        <button class="mini-btn active">右上悬浮框</button>
-        <button class="mini-btn">详细摘要</button>
+        <button class="mini-btn active">摘要卡</button>
+        <button class="mini-btn">查看详表</button>
       </div>
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/national.png" alt="全国总览图" />
-        <div class="overlay-box">
-          <div class="overlay-title">近7天超阈值告警</div>
-          <div class="overlay-subtitle">规则：avgDelay &gt; 20ms 且超阈值占比 ≥ 50%</div>
-          <div class="overlay-meta">
-            <div>范围：全国</div>
-            <div>更新时间：2025-08-13 16:25:20</div>
-            <div>触发说明：当前存在 19 条持续超阈值链路，涉及 7 个省份</div>
+        <div class="summary-card">
+          <div class="card-title">动态阈值告警</div>
+          <div class="card-sub">范围：全国 ｜ 统计周期：近7天</div>
+          <div class="card-meta">
+            <span>当前阈值：动态阈值</span>
+            <span>更新时间：16:25:20</span>
           </div>
-          <div class="overlay-metrics">
-            <div class="metric-item">
+          <div class="card-kpis">
+            <div class="kpi">
               <span class="label">告警省份</span>
               <span class="value danger">7</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">告警链路</span>
               <span class="value danger">19</span>
             </div>
-            <div class="metric-item">
-              <span class="label">最严重省份</span>
+            <div class="kpi">
+              <span class="label">最高省份</span>
               <span class="value">山东</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">最高占比</span>
               <span class="value danger">71%</span>
             </div>
@@ -377,52 +490,43 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 省份</div>
           <div class="top-list">
-            <div class="top-item">
-              <div class="top-head"><span class="name">1. 山东</span><span class="ratio">71%</span><span class="tag">7条链路</span></div>
-              <div class="top-detail">最高链路：济南 → 烟台 ｜ 7天平均 25.39ms</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">2. 江苏</span><span class="ratio">62%</span><span class="tag">3条链路</span></div>
-              <div class="top-detail">最高链路：南京 → 南通 ｜ 7天平均 22.30ms</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">3. 河北</span><span class="ratio">59%</span><span class="tag">4条链路</span></div>
-              <div class="top-detail">最高链路：石家庄 → 秦皇岛 ｜ 7天平均 21.10ms</div>
-            </div>
+            <div class="top-row"><span class="name">1. 山东</span><span class="ratio">7条</span></div>
+            <div class="top-row"><span class="name">2. 河北</span><span class="ratio">4条</span></div>
+            <div class="top-row"><span class="name">3. 江苏</span><span class="ratio">3条</span></div>
           </div>
+          <button class="detail-btn" data-modal="modal-national">查看详表</button>
         </div>
       </div>
     </section>
 
     <section class="view" id="view-province-network">
       <div class="switch-line">
-        <button class="mini-btn active">右上悬浮框</button>
-        <button class="mini-btn">网状结构</button>
+        <button class="mini-btn active">摘要卡</button>
+        <button class="mini-btn">查看详表</button>
       </div>
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/province-network.png" alt="省份迁徙图网状结构" />
-        <div class="overlay-box">
-          <div class="overlay-title">山东告警摘要</div>
-          <div class="overlay-subtitle">网状视图下建议只做摘要，不打断现有连线视觉</div>
-          <div class="overlay-meta">
-            <div>范围：山东</div>
-            <div>更新时间：2025-08-13 16:25:20</div>
-            <div>触发说明：近7天内 3 条链路占比 ≥ 50%，2 条链路接近阈值</div>
+        <div class="summary-card">
+          <div class="card-title">动态阈值告警</div>
+          <div class="card-sub">范围：山东 ｜ 统计周期：近7天</div>
+          <div class="card-meta">
+            <span>当前阈值：动态阈值</span>
+            <span>更新时间：16:25:20</span>
           </div>
-          <div class="overlay-metrics">
-            <div class="metric-item">
+          <div class="card-kpis">
+            <div class="kpi">
               <span class="label">告警链路</span>
               <span class="value danger">3</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">关注链路</span>
               <span class="value warn">2</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">最严重链路</span>
-              <span class="value">济南 → 烟台</span>
+              <span class="value">济南→烟台</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">最高占比</span>
               <span class="value danger">71%</span>
             </div>
@@ -430,52 +534,43 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 链路</div>
           <div class="top-list">
-            <div class="top-item">
-              <div class="top-head"><span class="name">1. 济南 → 烟台</span><span class="ratio">71%</span><span class="tag">84样本</span></div>
-              <div class="top-detail">7天平均 25.39ms ｜ 最近 23.60ms ｜ 60/84 样本超阈值</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">2. 济南 → 威海</span><span class="ratio">64%</span><span class="tag">75样本</span></div>
-              <div class="top-detail">7天平均 24.10ms ｜ 最近 22.90ms ｜ 48/75 样本超阈值</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">3. 济南 → 青岛</span><span class="ratio">55%</span><span class="tag">88样本</span></div>
-              <div class="top-detail">7天平均 22.84ms ｜ 最近 21.70ms ｜ 48/88 样本超阈值</div>
-            </div>
+            <div class="top-row"><span class="name">1. 济南→烟台</span><span class="ratio">71%</span></div>
+            <div class="top-row"><span class="name">2. 济南→威海</span><span class="ratio">64%</span></div>
+            <div class="top-row"><span class="name">3. 济南→青岛</span><span class="ratio">55%</span></div>
           </div>
+          <button class="detail-btn" data-modal="modal-province-network">查看详表</button>
         </div>
       </div>
     </section>
 
     <section class="view" id="view-province-radial">
       <div class="switch-line">
-        <button class="mini-btn active">右上悬浮框</button>
-        <button class="mini-btn">点射结构</button>
+        <button class="mini-btn active">摘要卡</button>
+        <button class="mini-btn">查看详表</button>
       </div>
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/province-radial.png" alt="省份迁徙图点射结构" />
-        <div class="overlay-box">
-          <div class="overlay-title">山东告警摘要</div>
-          <div class="overlay-subtitle">点射视图下更适合用小框提示最严重几条链路</div>
-          <div class="overlay-meta">
-            <div>范围：山东</div>
-            <div>更新时间：2025-08-13 16:25:20</div>
-            <div>触发说明：最严重链路为济南 → 烟台，连续 7 天处于高时延告警</div>
+        <div class="summary-card">
+          <div class="card-title">动态阈值告警</div>
+          <div class="card-sub">范围：山东 ｜ 统计周期：近7天</div>
+          <div class="card-meta">
+            <span>当前阈值：动态阈值</span>
+            <span>更新时间：16:25:20</span>
           </div>
-          <div class="overlay-metrics">
-            <div class="metric-item">
+          <div class="card-kpis">
+            <div class="kpi">
               <span class="label">告警链路</span>
               <span class="value danger">3</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">关注链路</span>
               <span class="value warn">2</span>
             </div>
-            <div class="metric-item">
-              <span class="label">最高时延</span>
-              <span class="value">25.39ms</span>
+            <div class="kpi">
+              <span class="label">最严重链路</span>
+              <span class="value">济南→烟台</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">最高占比</span>
               <span class="value danger">71%</span>
             </div>
@@ -483,52 +578,43 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 链路</div>
           <div class="top-list">
-            <div class="top-item">
-              <div class="top-head"><span class="name">1. 济南 → 烟台</span><span class="ratio">71%</span><span class="tag">84样本</span></div>
-              <div class="top-detail">平均时延 25.39ms ｜ 最近 23.60ms ｜ 连续告警</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">2. 济南 → 威海</span><span class="ratio">64%</span><span class="tag">75样本</span></div>
-              <div class="top-detail">平均时延 24.10ms ｜ 最近 22.90ms ｜ 连续告警</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">3. 济南 → 青岛</span><span class="ratio">55%</span><span class="tag">88样本</span></div>
-              <div class="top-detail">平均时延 22.84ms ｜ 最近 21.70ms ｜ 连续告警</div>
-            </div>
+            <div class="top-row"><span class="name">1. 济南→烟台</span><span class="ratio">71%</span></div>
+            <div class="top-row"><span class="name">2. 济南→威海</span><span class="ratio">64%</span></div>
+            <div class="top-row"><span class="name">3. 济南→青岛</span><span class="ratio">55%</span></div>
           </div>
+          <button class="detail-btn" data-modal="modal-province-radial">查看详表</button>
         </div>
       </div>
     </section>
 
     <section class="view" id="view-city">
       <div class="switch-line">
-        <button class="mini-btn active">右上悬浮框</button>
-        <button class="mini-btn">方向摘要</button>
+        <button class="mini-btn active">摘要卡</button>
+        <button class="mini-btn">查看详表</button>
       </div>
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/city.png" alt="市区迁徙图" />
-        <div class="overlay-box">
-          <div class="overlay-title">潍坊方向告警</div>
-          <div class="overlay-subtitle">市区层只看东 / 南 / 西 / 北方向，适合做精简但更可读的详细框</div>
-          <div class="overlay-meta">
-            <div>范围：潍坊</div>
-            <div>更新时间：2025-08-13 16:25:20</div>
-            <div>触发说明：东、南两个方向近7天持续超过 20ms，西方向接近阈值</div>
+        <div class="summary-card">
+          <div class="card-title">动态阈值告警</div>
+          <div class="card-sub">范围：潍坊 ｜ 统计周期：近7天</div>
+          <div class="card-meta">
+            <span>当前阈值：动态阈值</span>
+            <span>更新时间：16:25:20</span>
           </div>
-          <div class="overlay-metrics">
-            <div class="metric-item">
+          <div class="card-kpis">
+            <div class="kpi">
               <span class="label">告警方向</span>
               <span class="value danger">2</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">关注方向</span>
               <span class="value warn">1</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">最严重方向</span>
               <span class="value">东</span>
             </div>
-            <div class="metric-item">
+            <div class="kpi">
               <span class="label">最高占比</span>
               <span class="value danger">68%</span>
             </div>
@@ -536,27 +622,155 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 方向</div>
           <div class="top-list">
-            <div class="top-item">
-              <div class="top-head"><span class="name">1. 潍坊东</span><span class="ratio">68%</span><span class="tag">61样本</span></div>
-              <div class="top-detail">平均时延 27.39ms ｜ 最近 26.40ms ｜ 41/61 样本超阈值</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">2. 潍坊南</span><span class="ratio">57%</span><span class="tag">55样本</span></div>
-              <div class="top-detail">平均时延 23.16ms ｜ 最近 22.10ms ｜ 31/55 样本超阈值</div>
-            </div>
-            <div class="top-item">
-              <div class="top-head"><span class="name">3. 潍坊西</span><span class="ratio">43%</span><span class="tag">47样本</span></div>
-              <div class="top-detail">平均时延 19.70ms ｜ 最近 19.20ms ｜ 临近告警阈值</div>
-            </div>
+            <div class="top-row"><span class="name">1. 潍坊东</span><span class="ratio">68%</span></div>
+            <div class="top-row"><span class="name">2. 潍坊南</span><span class="ratio">57%</span></div>
+            <div class="top-row"><span class="name">3. 潍坊西</span><span class="ratio">43%</span></div>
           </div>
+          <button class="detail-btn" data-modal="modal-city">查看详表</button>
         </div>
       </div>
     </section>
 
     <div class="design-note">
-      这版原型的目标是验证：<b>不改变原大屏地图、不新增右侧大面板，只在右上增加一个更详细但仍保持单框形态的告警展示框</b> 是否满足需求。
+      这版原型重点验证：<b>默认只展示简洁摘要卡，详表不塞进右上角，而是通过“查看详表”在中间弹出。</b>
     </div>
-    <div class="footer-note">静态原型文件：基于你提供的大屏截图叠加告警框，不代表最终真实地图坐标与接口联动。</div>
+    <div class="footer-note">静态原型文件：基于你提供的大屏截图叠加摘要卡与详表弹窗，不代表最终真实地图坐标与接口联动。</div>
+  </div>
+
+  <div class="modal-mask" id="modal-national">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">动态阈值告警详表</div>
+          <div class="modal-sub">范围：全国 ｜ 统计周期：近7天 ｜ 说明：前台展示后台计算后的动态阈值结果</div>
+        </div>
+        <button class="close-btn" data-close>关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-toolbar">
+          <span class="badge info">告警总数：19</span>
+          <span class="badge danger">TOP省份：山东</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>范围</th><th>对象</th><th>告警类型</th><th>当前值</th><th>动态阈值</th><th>超阈值占比</th><th>样本数</th><th>最近时间</th><th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>山东</td><td>济南 → 烟台</td><td>市际链路</td><td>25.39ms</td><td>20.00ms</td><td class="cell-danger">71%</td><td>84</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>2</td><td>山东</td><td>济南 → 威海</td><td>市际链路</td><td>24.10ms</td><td>20.00ms</td><td class="cell-danger">64%</td><td>75</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>3</td><td>山东</td><td>济南 → 青岛</td><td>市际链路</td><td>22.84ms</td><td>20.00ms</td><td class="cell-danger">55%</td><td>88</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>4</td><td>江苏</td><td>南京 → 南通</td><td>市际链路</td><td>22.30ms</td><td>20.00ms</td><td class="cell-danger">62%</td><td>79</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>5</td><td>河北</td><td>石家庄 → 秦皇岛</td><td>市际链路</td><td>21.10ms</td><td>20.00ms</td><td class="cell-danger">59%</td><td>73</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>6</td><td>潍坊</td><td>潍坊东</td><td>方向链路</td><td>27.39ms</td><td>20.00ms</td><td class="cell-danger">68%</td><td>61</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal-province-network">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">山东动态阈值告警详表</div>
+          <div class="modal-sub">范围：山东 ｜ 统计周期：近7天 ｜ 适用于当前省份网状链路明细追查</div>
+        </div>
+        <button class="close-btn" data-close>关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-toolbar">
+          <span class="badge danger">告警链路：3</span>
+          <span class="badge warn">关注链路：2</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>对象</th><th>告警类型</th><th>7天平均时延</th><th>动态阈值</th><th>超阈值占比</th><th>样本数</th><th>最近值</th><th>最近时间</th><th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>济南 → 烟台</td><td>市际链路</td><td>25.39ms</td><td>20.00ms</td><td class="cell-danger">71%</td><td>84</td><td>23.60ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>2</td><td>济南 → 威海</td><td>市际链路</td><td>24.10ms</td><td>20.00ms</td><td class="cell-danger">64%</td><td>75</td><td>22.90ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>3</td><td>济南 → 青岛</td><td>市际链路</td><td>22.84ms</td><td>20.00ms</td><td class="cell-danger">55%</td><td>88</td><td>21.70ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>4</td><td>济南 → 日照</td><td>市际链路</td><td>20.90ms</td><td>20.00ms</td><td class="cell-warn">46%</td><td>61</td><td>20.40ms</td><td>2025-08-13 16:25:20</td><td><span class="badge warn">关注</span></td></tr>
+              <tr><td>5</td><td>济南 → 潍坊</td><td>市际链路</td><td>21.60ms</td><td>20.00ms</td><td class="cell-warn">48%</td><td>79</td><td>20.80ms</td><td>2025-08-13 16:25:20</td><td><span class="badge warn">关注</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal-province-radial">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">山东动态阈值告警详表</div>
+          <div class="modal-sub">范围：山东 ｜ 统计周期：近7天 ｜ 适用于当前省份点射链路明细追查</div>
+        </div>
+        <button class="close-btn" data-close>关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-toolbar">
+          <span class="badge danger">告警链路：3</span>
+          <span class="badge warn">关注链路：2</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>对象</th><th>告警类型</th><th>7天平均时延</th><th>动态阈值</th><th>超阈值占比</th><th>样本数</th><th>最近值</th><th>最近时间</th><th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>济南 → 烟台</td><td>市际链路</td><td>25.39ms</td><td>20.00ms</td><td class="cell-danger">71%</td><td>84</td><td>23.60ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>2</td><td>济南 → 威海</td><td>市际链路</td><td>24.10ms</td><td>20.00ms</td><td class="cell-danger">64%</td><td>75</td><td>22.90ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>3</td><td>济南 → 青岛</td><td>市际链路</td><td>22.84ms</td><td>20.00ms</td><td class="cell-danger">55%</td><td>88</td><td>21.70ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>4</td><td>济南 → 日照</td><td>市际链路</td><td>20.90ms</td><td>20.00ms</td><td class="cell-warn">46%</td><td>61</td><td>20.40ms</td><td>2025-08-13 16:25:20</td><td><span class="badge warn">关注</span></td></tr>
+              <tr><td>5</td><td>济南 → 潍坊</td><td>市际链路</td><td>21.60ms</td><td>20.00ms</td><td class="cell-warn">48%</td><td>79</td><td>20.80ms</td><td>2025-08-13 16:25:20</td><td><span class="badge warn">关注</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal-city">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">潍坊动态阈值告警详表</div>
+          <div class="modal-sub">范围：潍坊 ｜ 统计周期：近7天 ｜ 适用于方向链路明细追查</div>
+        </div>
+        <button class="close-btn" data-close>关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-toolbar">
+          <span class="badge danger">告警方向：2</span>
+          <span class="badge warn">关注方向：1</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>对象</th><th>告警类型</th><th>7天平均时延</th><th>动态阈值</th><th>超阈值占比</th><th>样本数</th><th>最近值</th><th>最近时间</th><th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>潍坊东</td><td>方向链路</td><td>27.39ms</td><td>20.00ms</td><td class="cell-danger">68%</td><td>61</td><td>26.40ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>2</td><td>潍坊南</td><td>方向链路</td><td>23.16ms</td><td>20.00ms</td><td class="cell-danger">57%</td><td>55</td><td>22.10ms</td><td>2025-08-13 16:25:20</td><td><span class="badge danger">告警</span></td></tr>
+              <tr><td>3</td><td>潍坊西</td><td>方向链路</td><td>19.70ms</td><td>20.00ms</td><td class="cell-warn">43%</td><td>47</td><td>19.20ms</td><td>2025-08-13 16:25:20</td><td><span class="badge warn">关注</span></td></tr>
+              <tr><td>4</td><td>潍坊北</td><td>方向链路</td><td>16.80ms</td><td>20.00ms</td><td>18%</td><td>52</td><td>16.40ms</td><td>2025-08-13 16:25:20</td><td><span class="badge info">正常</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -575,6 +789,35 @@
         btn.classList.add('active');
         views[btn.dataset.tab].classList.add('active');
       });
+    });
+
+    const modalButtons = document.querySelectorAll('[data-modal]');
+    const closeButtons = document.querySelectorAll('[data-close]');
+    const modalMasks = document.querySelectorAll('.modal-mask');
+
+    modalButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modal = document.getElementById(btn.dataset.modal);
+        if (modal) modal.classList.add('open');
+      });
+    });
+
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.modal-mask').classList.remove('open');
+      });
+    });
+
+    modalMasks.forEach(mask => {
+      mask.addEventListener('click', (event) => {
+        if (event.target === mask) mask.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        modalMasks.forEach(mask => mask.classList.remove('open'));
+      }
     });
   </script>
 </body>
