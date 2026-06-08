@@ -122,12 +122,12 @@
 
     .overlay-box {
       position: absolute;
-      top: 56px;
-      right: 56px;
-      width: 292px;
-      padding: 12px 14px 14px;
+      top: 48px;
+      right: 48px;
+      width: 352px;
+      padding: 13px 15px 15px;
       border-radius: 6px;
-      background: linear-gradient(180deg, rgba(77, 81, 164, 0.76), rgba(61, 68, 145, 0.72));
+      background: linear-gradient(180deg, rgba(77, 81, 164, 0.82), rgba(61, 68, 145, 0.78));
       border: 1px solid rgba(171, 199, 255, 0.66);
       box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
       color: #ecf2ff;
@@ -153,9 +153,19 @@
 
     .overlay-subtitle {
       font-size: 11px;
-      color: rgba(218, 229, 255, 0.82);
+      color: rgba(218, 229, 255, 0.9);
       line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .overlay-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
       margin-bottom: 10px;
+      font-size: 11px;
+      color: rgba(214, 226, 255, 0.76);
+      line-height: 1.45;
     }
 
     .overlay-metrics {
@@ -177,10 +187,13 @@
     }
 
     .metric-item .value {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       color: #fff;
       letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .metric-item .value.danger { color: var(--danger); }
@@ -203,31 +216,47 @@
     .top-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
     }
 
-    .top-row {
+    .top-item {
+      padding: 7px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .top-head {
       display: grid;
       grid-template-columns: 1fr auto auto;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       font-size: 12px;
       color: #f5f8ff;
+      margin-bottom: 4px;
     }
 
-    .top-row .name {
+    .top-head .name {
+      min-width: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .top-row .ratio {
+    .top-head .ratio {
       color: var(--danger);
       font-weight: 700;
     }
 
-    .top-row .count {
+    .top-head .tag {
+      color: rgba(220, 230, 255, 0.84);
+      font-size: 11px;
+    }
+
+    .top-detail {
+      font-size: 11px;
       color: rgba(220, 230, 255, 0.82);
+      line-height: 1.5;
     }
 
     .design-note {
@@ -273,7 +302,7 @@
       .overlay-box {
         top: 24px;
         right: 24px;
-        width: 270px;
+        width: 320px;
       }
     }
 
@@ -294,7 +323,7 @@
     <div class="header">
       <div>
         <h1>原大屏 + 右上告警展示框原型</h1>
-        <p>这版原型不重做大屏结构，只基于你现有全国总览、省份关系图、市区迁徙图，<br/>在右上新增一个小型超阈值告警展示框，用于验证“尽量少改现有页面”的方向。</p>
+        <p>这版原型不重做大屏结构，只基于你现有全国总览、省份关系图、市区迁徙图，<br/>在右上新增一个更详细的超阈值告警展示框，用于验证“尽量少改现有页面”的方向。</p>
       </div>
       <div class="rule-box">
         <strong>告警规则</strong>
@@ -315,13 +344,18 @@
     <section class="view active" id="view-national">
       <div class="switch-line">
         <button class="mini-btn active">右上悬浮框</button>
-        <button class="mini-btn">摘要信息</button>
+        <button class="mini-btn">详细摘要</button>
       </div>
       <div class="canvas-wrap">
         <img class="screen-image" src="./prototype-assets/national.png" alt="全国总览图" />
         <div class="overlay-box">
           <div class="overlay-title">近7天超阈值告警</div>
           <div class="overlay-subtitle">规则：avgDelay &gt; 20ms 且超阈值占比 ≥ 50%</div>
+          <div class="overlay-meta">
+            <div>范围：全国</div>
+            <div>更新时间：2025-08-13 16:25:20</div>
+            <div>触发说明：当前存在 19 条持续超阈值链路，涉及 7 个省份</div>
+          </div>
           <div class="overlay-metrics">
             <div class="metric-item">
               <span class="label">告警省份</span>
@@ -332,7 +366,7 @@
               <span class="value danger">19</span>
             </div>
             <div class="metric-item">
-              <span class="label">最高省份</span>
+              <span class="label">最严重省份</span>
               <span class="value">山东</span>
             </div>
             <div class="metric-item">
@@ -343,9 +377,18 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 省份</div>
           <div class="top-list">
-            <div class="top-row"><span class="name">1. 山东</span><span class="ratio">71%</span><span class="count">7条</span></div>
-            <div class="top-row"><span class="name">2. 河北</span><span class="ratio">59%</span><span class="count">4条</span></div>
-            <div class="top-row"><span class="name">3. 江苏</span><span class="ratio">62%</span><span class="count">3条</span></div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">1. 山东</span><span class="ratio">71%</span><span class="tag">7条链路</span></div>
+              <div class="top-detail">最高链路：济南 → 烟台 ｜ 7天平均 25.39ms</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">2. 江苏</span><span class="ratio">62%</span><span class="tag">3条链路</span></div>
+              <div class="top-detail">最高链路：南京 → 南通 ｜ 7天平均 22.30ms</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">3. 河北</span><span class="ratio">59%</span><span class="tag">4条链路</span></div>
+              <div class="top-detail">最高链路：石家庄 → 秦皇岛 ｜ 7天平均 21.10ms</div>
+            </div>
           </div>
         </div>
       </div>
@@ -361,6 +404,11 @@
         <div class="overlay-box">
           <div class="overlay-title">山东告警摘要</div>
           <div class="overlay-subtitle">网状视图下建议只做摘要，不打断现有连线视觉</div>
+          <div class="overlay-meta">
+            <div>范围：山东</div>
+            <div>更新时间：2025-08-13 16:25:20</div>
+            <div>触发说明：近7天内 3 条链路占比 ≥ 50%，2 条链路接近阈值</div>
+          </div>
           <div class="overlay-metrics">
             <div class="metric-item">
               <span class="label">告警链路</span>
@@ -371,20 +419,29 @@
               <span class="value warn">2</span>
             </div>
             <div class="metric-item">
-              <span class="label">最高占比</span>
-              <span class="value danger">71%</span>
+              <span class="label">最严重链路</span>
+              <span class="value">济南 → 烟台</span>
             </div>
             <div class="metric-item">
-              <span class="label">最高时延</span>
-              <span class="value">25.39ms</span>
+              <span class="label">最高占比</span>
+              <span class="value danger">71%</span>
             </div>
           </div>
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 链路</div>
           <div class="top-list">
-            <div class="top-row"><span class="name">1. 济南 → 烟台</span><span class="ratio">71%</span><span class="count">25.39ms</span></div>
-            <div class="top-row"><span class="name">2. 济南 → 威海</span><span class="ratio">64%</span><span class="count">24.10ms</span></div>
-            <div class="top-row"><span class="name">3. 济南 → 青岛</span><span class="ratio">55%</span><span class="count">22.84ms</span></div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">1. 济南 → 烟台</span><span class="ratio">71%</span><span class="tag">84样本</span></div>
+              <div class="top-detail">7天平均 25.39ms ｜ 最近 23.60ms ｜ 60/84 样本超阈值</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">2. 济南 → 威海</span><span class="ratio">64%</span><span class="tag">75样本</span></div>
+              <div class="top-detail">7天平均 24.10ms ｜ 最近 22.90ms ｜ 48/75 样本超阈值</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">3. 济南 → 青岛</span><span class="ratio">55%</span><span class="tag">88样本</span></div>
+              <div class="top-detail">7天平均 22.84ms ｜ 最近 21.70ms ｜ 48/88 样本超阈值</div>
+            </div>
           </div>
         </div>
       </div>
@@ -400,6 +457,11 @@
         <div class="overlay-box">
           <div class="overlay-title">山东告警摘要</div>
           <div class="overlay-subtitle">点射视图下更适合用小框提示最严重几条链路</div>
+          <div class="overlay-meta">
+            <div>范围：山东</div>
+            <div>更新时间：2025-08-13 16:25:20</div>
+            <div>触发说明：最严重链路为济南 → 烟台，连续 7 天处于高时延告警</div>
+          </div>
           <div class="overlay-metrics">
             <div class="metric-item">
               <span class="label">告警链路</span>
@@ -410,8 +472,8 @@
               <span class="value warn">2</span>
             </div>
             <div class="metric-item">
-              <span class="label">最严重链路</span>
-              <span class="value">济南→烟台</span>
+              <span class="label">最高时延</span>
+              <span class="value">25.39ms</span>
             </div>
             <div class="metric-item">
               <span class="label">最高占比</span>
@@ -421,9 +483,18 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 链路</div>
           <div class="top-list">
-            <div class="top-row"><span class="name">1. 济南 → 烟台</span><span class="ratio">71%</span><span class="count">84样本</span></div>
-            <div class="top-row"><span class="name">2. 济南 → 威海</span><span class="ratio">64%</span><span class="count">75样本</span></div>
-            <div class="top-row"><span class="name">3. 济南 → 青岛</span><span class="ratio">55%</span><span class="count">88样本</span></div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">1. 济南 → 烟台</span><span class="ratio">71%</span><span class="tag">84样本</span></div>
+              <div class="top-detail">平均时延 25.39ms ｜ 最近 23.60ms ｜ 连续告警</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">2. 济南 → 威海</span><span class="ratio">64%</span><span class="tag">75样本</span></div>
+              <div class="top-detail">平均时延 24.10ms ｜ 最近 22.90ms ｜ 连续告警</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">3. 济南 → 青岛</span><span class="ratio">55%</span><span class="tag">88样本</span></div>
+              <div class="top-detail">平均时延 22.84ms ｜ 最近 21.70ms ｜ 连续告警</div>
+            </div>
           </div>
         </div>
       </div>
@@ -438,7 +509,12 @@
         <img class="screen-image" src="./prototype-assets/city.png" alt="市区迁徙图" />
         <div class="overlay-box">
           <div class="overlay-title">潍坊方向告警</div>
-          <div class="overlay-subtitle">市区层只看东 / 南 / 西 / 北方向，适合做更精简的摘要框</div>
+          <div class="overlay-subtitle">市区层只看东 / 南 / 西 / 北方向，适合做精简但更可读的详细框</div>
+          <div class="overlay-meta">
+            <div>范围：潍坊</div>
+            <div>更新时间：2025-08-13 16:25:20</div>
+            <div>触发说明：东、南两个方向近7天持续超过 20ms，西方向接近阈值</div>
+          </div>
           <div class="overlay-metrics">
             <div class="metric-item">
               <span class="label">告警方向</span>
@@ -460,16 +536,25 @@
           <div class="mini-divider"></div>
           <div class="top-list-title">TOP 3 方向</div>
           <div class="top-list">
-            <div class="top-row"><span class="name">1. 潍坊东</span><span class="ratio">68%</span><span class="count">27.39ms</span></div>
-            <div class="top-row"><span class="name">2. 潍坊南</span><span class="ratio">57%</span><span class="count">23.16ms</span></div>
-            <div class="top-row"><span class="name">3. 潍坊西</span><span class="ratio">43%</span><span class="count">19.70ms</span></div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">1. 潍坊东</span><span class="ratio">68%</span><span class="tag">61样本</span></div>
+              <div class="top-detail">平均时延 27.39ms ｜ 最近 26.40ms ｜ 41/61 样本超阈值</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">2. 潍坊南</span><span class="ratio">57%</span><span class="tag">55样本</span></div>
+              <div class="top-detail">平均时延 23.16ms ｜ 最近 22.10ms ｜ 31/55 样本超阈值</div>
+            </div>
+            <div class="top-item">
+              <div class="top-head"><span class="name">3. 潍坊西</span><span class="ratio">43%</span><span class="tag">47样本</span></div>
+              <div class="top-detail">平均时延 19.70ms ｜ 最近 19.20ms ｜ 临近告警阈值</div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <div class="design-note">
-      这版原型的目标是验证：<b>不改变原大屏地图、不新增右侧大面板，只在右上增加一个风格贴近现有 tooltip 的告警展示框</b> 是否满足需求。
+      这版原型的目标是验证：<b>不改变原大屏地图、不新增右侧大面板，只在右上增加一个更详细但仍保持单框形态的告警展示框</b> 是否满足需求。
     </div>
     <div class="footer-note">静态原型文件：基于你提供的大屏截图叠加告警框，不代表最终真实地图坐标与接口联动。</div>
   </div>
