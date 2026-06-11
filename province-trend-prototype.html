@@ -163,9 +163,10 @@
 
   <!-- 数据说明 -->
   <div class="data-note">
-    <b>查询策略说明：</b>原始探测数据（<code>DetectionRecord</code>）每天 10K+ 条，直接扫表压力大。
-    后端 Celery 每 10 分钟聚合一次写入 <code>DetectionAnalysisResult</code>（每天每省 ~144 条），30 天约 6.5 万条。
-    本接口在此聚合表基础上，<b>按 province + 日期 再次分组求均值</b>，最终返回 <b>省份数 × 天数</b> 条（约 15×30=450 条），前端只拿汇总数据。
+    <b>查询策略说明：</b>新模块直接基于 <code>DetectionRecord</code>（原始探测表，10K+/天）。
+    后端 API 按日期范围过滤（30天≈30万条），JOIN <code>DetectionTaskDictionary</code>（dest_az → province），
+    <b>GROUP BY 省份 + 日期</b> 求 AVG(avg_delay) / AVG(loss_packet_rate)，
+    最终返回 <b>省份数 × 天数</b> 条（约 15×30=450 条），前端只拿汇总数据，不碰原始记录。
   </div>
 
   <!-- 筛选栏 -->
