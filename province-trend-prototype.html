@@ -3,270 +3,236 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>各省趋势均值大屏</title>
+  <title>各省趋势均值 — 原型预览</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <style>
-    :root {
-      --text: #dbe7ff;
-      --muted: #9db6da;
-      --danger: #ff8b63;
-      --warn: #d39a38;
-      --ok: #55b87a;
-      --shadow: 0 18px 48px rgba(0,0,0,0.38);
-      --card-bg: rgba(8,36,87,0.88);
-      --card-border: rgba(97,155,255,0.25);
-      --tab-bg: rgba(10,22,42,0.78);
-      --head-bg: rgba(22,72,143,0.72);
-    }
+    /* ── 沿用 Vue 项目 Element UI 风格 ── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      min-height: 100vh;
-      color: var(--text);
-      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: #060b16;
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background: #f5f7fa;
+      color: #606266;
+      font-size: 14px;
+      line-height: 1.5;
     }
-    .app { max-width: 1600px; margin: 0 auto; padding: 16px 18px 24px; }
+    .page { max-width: 1520px; margin: 0 auto; padding: 20px; }
 
-    /* ── Header ── */
-    .header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-    .header h1 { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; }
-    .header h1 span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 10px; }
-    .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
-    /* tabs */
-    .range-tabs { display: flex; gap: 6px; }
-    .range-tab {
-      border: 1px solid rgba(122,175,255,0.18);
-      background: var(--tab-bg);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 6px 16px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .range-tab.active {
-      color: #fff;
-      border-color: rgba(122,182,255,0.48);
-      background: linear-gradient(180deg, rgba(56,99,205,0.55), rgba(34,56,117,0.8));
-      box-shadow: 0 4px 14px rgba(43,87,201,0.24);
-    }
-
-    /* province pills */
-    .province-bar { display: flex; flex-wrap: wrap; gap: 5px; max-width: 600px; }
-    .prov-pill {
-      border: 1px solid rgba(122,175,255,0.15);
-      background: rgba(10,22,42,0.6);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .prov-pill.active {
-      color: #fff;
-      background: rgba(56,99,205,0.45);
-      border-color: rgba(122,182,255,0.5);
-    }
-    .prov-actions { display: flex; gap: 4px; }
-    .prov-actions button {
-      border: none;
-      background: rgba(255,255,255,0.06);
-      color: var(--muted);
+    /* ── 顶部筛选栏 ── */
+    .filter-bar {
+      background: #fff;
       border-radius: 4px;
-      padding: 3px 8px;
-      font-size: 11px;
-      cursor: pointer;
+      padding: 18px 20px 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
-    .prov-actions button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+    .filter-row:last-child { margin-bottom: 0; }
+    .filter-label { font-size: 14px; color: #606266; white-space: nowrap; }
 
-    /* metric toggle */
-    .metric-toggle { display: flex; gap: 4px; margin-left: 8px; }
-    .metric-btn {
-      border: 1px solid rgba(122,175,255,0.15);
-      background: rgba(10,22,42,0.6);
-      color: var(--muted);
-      border-radius: 6px;
-      padding: 4px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
+    /* el-button style */
+    .el-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid #dcdfe6; border-radius: 4px;
+      padding: 8px 16px; font-size: 13px; cursor: pointer;
+      transition: all .2s; background: #fff; color: #606266;
+      height: 32px;
     }
-    .metric-btn.active {
-      color: #fff;
-      background: rgba(56,99,205,0.5);
-      border-color: rgba(122,182,255,0.4);
+    .el-btn:hover { color: #409EFF; border-color: #c6e2ff; background: #ecf5ff; }
+    .el-btn--primary { background: #409EFF; border-color: #409EFF; color: #fff; }
+    .el-btn--primary:hover { background: #66b1ff; border-color: #66b1ff; color: #fff; }
+    .el-btn--danger { background: #fff; border-color: #f56c6c; color: #f56c6c; }
+    .el-btn--danger:hover { background: #fef0f0; }
+    .el-btn--small { padding: 5px 12px; font-size: 12px; height: 28px; }
+
+    /* el-radio-group style */
+    .el-radio-group { display: inline-flex; }
+    .el-radio-group .radio-item {
+      border: 1px solid #dcdfe6; padding: 7px 16px; font-size: 13px;
+      cursor: pointer; transition: all .2s; color: #606266;
+      background: #fff; margin-right: -1px;
+    }
+    .el-radio-group .radio-item:first-child { border-radius: 4px 0 0 4px; }
+    .el-radio-group .radio-item:last-child { border-radius: 0 4px 4px 0; }
+    .el-radio-group .radio-item.active {
+      background: #409EFF; border-color: #409EFF; color: #fff; z-index: 1;
+      position: relative;
     }
 
-    /* ── Cards ── */
+    /* province checkbox pills */
+    .prov-check {
+      display: inline-flex; align-items: center; gap: 4px;
+      border: 1px solid #e4e7ed; border-radius: 3px;
+      padding: 4px 10px; font-size: 12px; cursor: pointer;
+      transition: all .2s; user-select: none; color: #909399; background: #fff;
+    }
+    .prov-check.active { background: #ecf5ff; border-color: #b3d8ff; color: #409EFF; }
+    .prov-check:hover { border-color: #409EFF; }
+
+    /* ── 卡片 ── */
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
       overflow: hidden;
     }
-    .card-head {
-      padding: 12px 16px 10px;
-      background: linear-gradient(180deg, rgba(11,38,88,0.96), rgba(10,32,74,0.86));
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .card-header {
+      padding: 14px 20px 12px;
+      border-bottom: 1px solid #ebeef5;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .card-title { font-size: 14px; font-weight: 700; color: #fff; }
-    .card-sub { font-size: 11px; color: rgba(214,228,255,0.65); margin-top: 2px; }
+    .card-title { font-size: 15px; font-weight: 600; color: #303133; }
+    .card-sub { font-size: 12px; color: #909399; margin-top: 2px; }
+    .card-body { padding: 16px 20px; }
 
-    /* ── Layout ── */
-    .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; margin-bottom: 16px; }
-    .chart-wrap { height: 420px; }
-    .ranking-body { padding: 0; max-height: 380px; overflow-y: auto; }
-    .ranking-row {
-      display: grid;
-      grid-template-columns: 32px 80px 1fr 64px;
-      align-items: center;
-      height: 44px;
-      border-bottom: 1px solid rgba(114,164,255,0.06);
-      font-size: 12px;
-      transition: background 0.15s;
+    /* ── 网格布局 ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
+    @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── ECharts 容器 ── */
+    .chart-box { height: 380px; width: 100%; }
+
+    /* ── 排行表 ── */
+    .rank-table { width: 100%; }
+    .rank-row {
+      display: grid; grid-template-columns: 36px 72px 1fr 72px;
+      align-items: center; height: 40px;
+      border-bottom: 1px solid #ebeef5;
+      font-size: 13px;
     }
-    .ranking-row:hover { background: rgba(255,255,255,0.03); }
+    .rank-row:last-child { border-bottom: none; }
+    .rank-row:hover { background: #f5f7fa; }
     .rank-num {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: #dbf4ff;
-      margin-left: 4px;
+      width: 22px; height: 22px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; margin: 0 auto;
     }
-    .rank-1 { background: linear-gradient(135deg, #ff6b35, #cf4b1e); color: #fff; }
-    .rank-2 { background: linear-gradient(135deg, #d39a38, #b87d1e); color: #fff; }
-    .rank-3 { background: linear-gradient(135deg, #6b9fdf, #4a7ec4); color: #fff; }
-    .rank-other { background: rgba(255,255,255,0.08); }
-    .prov-name { color: #eef5ff; font-weight: 500; }
-    .bar-cell { padding: 0 8px; }
-    .bar-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-    .bar-delay { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-    .bar-loss { background: linear-gradient(90deg, #22c55e, #86efac); }
-    .val-cell { text-align: right; padding-right: 12px; color: #eef5ff; font-weight: 600; font-size: 13px; }
+    .r1 { background: #f56c6c; color: #fff; }
+    .r2 { background: #e6a23c; color: #fff; }
+    .r3 { background: #409EFF; color: #fff; }
+    .rn { background: #ebeef5; color: #909399; }
+    .rank-prov { color: #303133; font-weight: 500; }
+    .rank-bar { padding: 0 6px; }
+    .bar-track { height: 8px; border-radius: 4px; background: #ebeef5; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width .4s ease; }
+    .bar-fill.delay { background: linear-gradient(90deg, #409EFF, #79bbff); }
+    .bar-fill.loss { background: linear-gradient(90deg, #67c23a, #95d475); }
+    .rank-val { text-align: right; padding-right: 10px; color: #303133; font-weight: 500; font-size: 13px; }
 
-    /* ── Heatmap ── */
-    .heatmap-wrap { overflow-x: auto; }
-    .heatmap { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .heatmap th {
-      padding: 6px 4px;
-      color: var(--muted);
-      font-weight: 600;
-      background: var(--head-bg);
-      position: sticky;
-      top: 0;
-      white-space: nowrap;
+    /* ── 热力表 ── */
+    .hm-wrap { overflow-x: auto; max-height: 480px; }
+    .hm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .hm-table th {
+      position: sticky; top: 0; z-index: 2;
+      background: #ecebee; color: #909399; font-weight: 600;
+      padding: 8px 4px; white-space: nowrap; border-bottom: 1px solid #ebeef5;
     }
-    .heatmap th:first-child { text-align: left; padding-left: 10px; min-width: 60px; position: sticky; left: 0; z-index: 2; }
-    .heatmap td { text-align: center; padding: 0; height: 32px; min-width: 52px; }
-    .heatmap td:first-child {
-      text-align: left;
-      padding-left: 10px;
-      color: #eef5ff;
-      font-weight: 500;
-      background: rgba(8,36,87,0.95);
-      position: sticky;
-      left: 0;
-      z-index: 1;
-      white-space: nowrap;
+    .hm-table th:first-child { text-align: left; padding-left: 12px; min-width: 56px; position: sticky; left: 0; z-index: 3; background: #ecebee; }
+    .hm-table td {
+      text-align: center; height: 30px; min-width: 48px; padding: 0;
+      border-bottom: 1px solid #f0f2f5;
     }
-    .heatmap .cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      border-radius: 3px;
-      margin: 2px;
-      font-size: 10px;
-      color: rgba(255,255,255,0.85);
-      cursor: default;
-      transition: transform 0.15s;
+    .hm-table td:first-child {
+      text-align: left; padding-left: 12px; font-weight: 500; color: #303133;
+      background: #fff; position: sticky; left: 0; z-index: 1; white-space: nowrap;
     }
-    .heatmap .cell:hover { transform: scale(1.08); z-index: 3; }
-    .hm-table { max-height: 420px; overflow-y: auto; }
+    .hm-cell {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: calc(100% - 4px); height: 24px; border-radius: 3px;
+      margin: 2px; font-size: 10px; color: #fff;
+      cursor: default; transition: transform .12s;
+    }
+    .hm-cell:hover { transform: scale(1.1); z-index: 4; }
 
-    /* responsive */
-    @media (max-width: 1100px) {
-      .main-grid { grid-template-columns: 1fr; }
+    /* ── el-table style ── */
+    .el-table { width: 100%; border: 1px solid #ebeef5; border-radius: 4px; }
+    .el-table th { background: #ecebee; color: #909399; font-weight: 600; font-size: 13px; padding: 10px 0; text-align: center; border-bottom: 1px solid #ebeef5; }
+    .el-table td { padding: 8px 0; text-align: center; border-bottom: 1px solid #ebeef5; font-size: 13px; color: #606266; }
+    .el-table tr:hover td { background: #f5f7fa; }
+
+    /* ── 数据说明 ── */
+    .data-note {
+      font-size: 12px; color: #909399; background: #fdf6ec; border: 1px solid #faecd8;
+      border-radius: 4px; padding: 8px 14px; margin-bottom: 14px;
     }
+    .data-note b { color: #e6a23c; }
   </style>
 </head>
 <body>
-<div class="app">
-  <!-- Header -->
-  <div class="header">
-    <h1>各省网络质量趋势均值 <span>Cloud Network Quality Trend</span></h1>
-    <div class="controls">
-      <div class="range-tabs" id="rangeTabs"></div>
-      <div class="metric-toggle" id="metricToggle"></div>
+<div class="page">
+
+  <!-- 数据说明 -->
+  <div class="data-note">
+    <b>查询策略说明：</b>后端已有 <code>DetectionAnalysisResult</code> 聚合表（每天每省一条），7天/14天/30天均值直接查此表，
+    每次请求最多返回 <b>省份数 × 天数</b> 条记录（约 15×30=450 条），不对 10K/天的原始表做全量扫描。
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar">
+    <div class="filter-row">
+      <span class="filter-label">统计周期：</span>
+      <div class="el-radio-group" id="rangeGroup"></div>
+      <span class="filter-label" style="margin-left:16px;">指标：</span>
+      <div class="el-radio-group" id="metricGroup"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">省份：</span>
+      <button class="el-btn el-btn--small" onclick="selectAll()">全选</button>
+      <button class="el-btn el-btn--small el-btn--danger" onclick="selectNone()">清空</button>
+      <div id="provBar" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
     </div>
   </div>
 
-  <!-- Province filter -->
-  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-    <div class="prov-actions">
-      <button onclick="selectAll()">全选</button>
-      <button onclick="selectNone()">清空</button>
-    </div>
-    <div class="province-bar" id="provinceBar"></div>
-  </div>
-
-  <!-- Main area -->
-  <div class="main-grid">
+  <!-- 主区域：图表 + 排行 -->
+  <div class="grid-2">
     <div class="card">
-      <div class="card-head">
-        <div><div class="card-title" id="chartTitle">各省趋势对比</div><div class="card-sub" id="chartSub">平均时延 & 平均丢包率</div></div>
+      <div class="card-header">
+        <div>
+          <div class="card-title">趋势对比</div>
+          <div class="card-sub" id="chartSub">各省平均时延变化</div>
+        </div>
       </div>
-      <div class="chart-wrap" id="chartMain"></div>
+      <div class="card-body"><div class="chart-box" id="chartMain"></div></div>
     </div>
+
     <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">省份排行</div><div class="card-sub" id="rankSub">按选定周期均值排序</div></div>
+      <div class="card-header">
+        <div>
+          <div class="card-title">省份排行</div>
+          <div class="card-sub" id="rankSub">按选定周期均值降序</div>
+        </div>
       </div>
-      <div class="ranking-body" id="rankingBody"></div>
+      <div class="card-body" style="padding:0; max-height:420px; overflow-y:auto;" id="rankBody"></div>
     </div>
   </div>
 
-  <!-- Heatmap -->
+  <!-- 热力矩阵 -->
   <div class="card">
-    <div class="card-head">
-      <div><div class="card-title" id="hmTitle">每日明细矩阵</div><div class="card-sub" id="hmSub">省份 × 日期，颜色编码指标</div></div>
+    <div class="card-header">
+      <div>
+        <div class="card-title">每日明细矩阵</div>
+        <div class="card-sub" id="hmSub">省份 × 日期，颜色越深指标越高</div>
+      </div>
     </div>
-    <div class="hm-table" id="heatmapWrap"></div>
+    <div class="card-body" style="padding:0;">
+      <div class="hm-wrap" id="hmWrap"></div>
+    </div>
   </div>
 </div>
 
 <script>
 /* ════════════════════════════════════════════
-   Mock Data  —  15 provinces × 30 days
+   Mock Data — 模拟 DetectionAnalysisResult 表
+   每省每天 1 条聚合结果（与后端 model 字段对齐）
    ════════════════════════════════════════════ */
 const PROVINCES = ['山东','江苏','浙江','广东','四川','河南','河北','湖北','湖南','福建','安徽','辽宁','陕西','云南','贵州'];
 const RANGES = [
-  { label: '近 7 天', days: 7 },
-  { label: '近 14 天', days: 14 },
-  { label: '近 30 天', days: 30 },
+  { label: '7 天', days: 7 },
+  { label: '14 天', days: 14 },
+  { label: '30 天', days: 30 },
 ];
 
-// Seed-based pseudo-random for consistency
-function seededRand(seed) {
-  let s = seed;
-  return function() {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-
-// Generate dates
+// 生成 30 天日期
 const today = new Date('2026-06-11');
 const allDates = [];
 for (let i = 29; i >= 0; i--) {
@@ -275,245 +241,224 @@ for (let i = 29; i >= 0; i--) {
   allDates.push(d.toISOString().slice(0, 10));
 }
 
-// Generate per-province per-day data
-const DATA = {};
+// 伪随机种子
+function srand(seed) {
+  let s = seed;
+  return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+}
+
+// 每省每天一条：与 DetectionAnalysisResult 字段一致
+const MOCK_DATA = {};
 PROVINCES.forEach((prov, pi) => {
-  const rng = seededRand(pi * 137 + 42);
-  const baseDelay = 8 + rng() * 18;     // 8-26 ms baseline
-  const baseLoss  = 0.1 + rng() * 3.5;  // 0.1-3.6% baseline
-  DATA[prov] = allDates.map((date, di) => {
+  const rng = srand(pi * 137 + 42);
+  const baseDelay = 8 + rng() * 18;
+  const baseLoss  = 0.1 + rng() * 3.5;
+  MOCK_DATA[prov] = allDates.map((date, di) => {
     const trend = Math.sin(di / 5 + pi) * 3;
     const jitter = (rng() - 0.5) * 6;
     const delay = Math.max(2, +(baseDelay + trend + jitter).toFixed(2));
     const lossJitter = (rng() - 0.5) * 1.5;
     const loss = Math.max(0, +(baseLoss + Math.sin(di / 7 + pi) * 0.8 + lossJitter).toFixed(2));
-    return { date, delay, loss };
+    return { province: prov, date, avg_delay: delay, avg_loss_rate: loss, analysis_type: 'province' };
   });
 });
 
 /* ════════════════════════════════════════════
    State
    ════════════════════════════════════════════ */
-let currentRange = 0;          // index into RANGES
-let currentMetric = 'delay';   // 'delay' | 'loss'
-let activeProvinces = new Set(PROVINCES);
+let curRange = 0;
+let curMetric = 'delay'; // 'delay' | 'loss'
+let activeProv = new Set(PROVINCES);
 
 /* ════════════════════════════════════════════
-   Render helpers
+   Render
    ════════════════════════════════════════════ */
 function getSlice() {
-  const days = RANGES[currentRange].days;
+  const days = RANGES[curRange].days;
   const dates = allDates.slice(-days);
   const slice = {};
-  PROVINCES.forEach(p => {
-    slice[p] = DATA[p].slice(-days);
-  });
+  PROVINCES.forEach(p => { slice[p] = MOCK_DATA[p].slice(-days); });
   return { dates, slice, days };
 }
 
-function avg(arr, key) {
+function avgField(arr, field) {
   if (!arr.length) return 0;
-  return +(arr.reduce((s, d) => s + d[key], 0) / arr.length).toFixed(2);
+  return +(arr.reduce((s, d) => s + d[field], 0) / arr.length).toFixed(2);
 }
 
-/* ── Tabs ── */
-function renderRangeTabs() {
-  const el = document.getElementById('rangeTabs');
-  el.innerHTML = RANGES.map((r, i) =>
-    `<div class="range-tab ${i === currentRange ? 'active' : ''}" onclick="setRange(${i})">${r.label}</div>`
+// ── Radio Group ──
+function renderRadioGroup(elId, items, activeIdx, onChange) {
+  const el = document.getElementById(elId);
+  el.innerHTML = items.map((item, i) =>
+    `<div class="radio-item ${i === activeIdx ? 'active' : ''}" onclick="(${onChange})(${i})">${item.label}</div>`
   ).join('');
 }
 
-function renderMetricToggle() {
-  const el = document.getElementById('metricToggle');
-  el.innerHTML = [
-    { key: 'delay', label: '时延(ms)' },
-    { key: 'loss', label: '丢包率(%)' },
-  ].map(m =>
-    `<div class="metric-btn ${m.key === currentMetric ? 'active' : ''}" onclick="setMetric('${m.key}')">${m.label}</div>`
-  ).join('');
-}
-
-/* ── Province pills ── */
-function renderProvinceBar() {
-  const el = document.getElementById('provinceBar');
+// ── Province Pills ──
+function renderProvBar() {
+  const el = document.getElementById('provBar');
   el.innerHTML = PROVINCES.map(p =>
-    `<div class="prov-pill ${activeProvinces.has(p) ? 'active' : ''}" onclick="toggleProv('${p}')">${p}</div>`
+    `<div class="prov-check ${activeProv.has(p) ? 'active' : ''}" onclick="toggleProv('${p}')">${p}</div>`
   ).join('');
 }
 
-function selectAll() { activeProvinces = new Set(PROVINCES); refresh(); }
-function selectNone() { activeProvinces.clear(); refresh(); }
-function toggleProv(p) {
-  if (activeProvinces.has(p)) activeProvinces.delete(p); else activeProvinces.add(p);
-  refresh();
-}
+function selectAll() { activeProv = new Set(PROVINCES); refresh(); }
+function selectNone() { activeProv.clear(); refresh(); }
+function toggleProv(p) { activeProv.has(p) ? activeProv.delete(p) : activeProv.add(p); refresh(); }
 
-/* ── ECharts ── */
+// ── ECharts ──
 let chart = null;
 function renderChart() {
   if (!chart) chart = echarts.init(document.getElementById('chartMain'));
   const { dates, slice } = getSlice();
-  const shown = [...activeProvinces];
+  const shown = [...activeProv];
+  const key = curMetric === 'delay' ? 'avg_delay' : 'avg_loss_rate';
+  const unit = curMetric === 'delay' ? 'ms' : '%';
+  const colorPalette = ['#409EFF','#67C23A','#E6A23C','#F56C6C','#909399','#b37feb','#36cfc9','#ff85c0','#ffc53d','#73d13d','#40a9ff','#ff7875','#597ef7','#ff9c6e','#5cdbd3'];
 
-  // Build series for selected metric
   const series = shown.map((p, i) => ({
-    name: p,
-    type: 'line',
-    smooth: true,
-    symbol: 'circle',
-    symbolSize: 5,
+    name: p, type: 'line', smooth: true, symbol: 'circle', symbolSize: 5,
     lineStyle: { width: 2 },
-    areaStyle: { opacity: 0.04 },
-    data: slice[p].map(d => d[currentMetric]),
+    itemStyle: { color: colorPalette[i % colorPalette.length] },
+    data: slice[p].map(d => d[key]),
   }));
 
-  // National average line
+  // 全国均值
   const natAvg = dates.map((_, di) => {
-    const vals = shown.map(p => slice[p][di][currentMetric]);
+    const vals = shown.map(p => slice[p][di][key]).filter(v => v != null);
     return vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : 0;
   });
   series.push({
-    name: '全国均值',
-    type: 'line',
-    lineStyle: { type: 'dashed', width: 2, color: '#fff' },
-    symbol: 'none',
-    itemStyle: { color: '#fff' },
-    data: natAvg,
+    name: '全国均值', type: 'line', lineStyle: { type: 'dashed', width: 2, color: '#303133' },
+    symbol: 'none', itemStyle: { color: '#303133' }, data: natAvg,
   });
 
-  const unit = currentMetric === 'delay' ? 'ms' : '%';
-  const option = {
+  chart.setOption({
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(8,36,87,0.95)',
-      borderColor: 'rgba(97,155,255,0.3)',
-      textStyle: { color: '#dbe7ff', fontSize: 12 },
-      formatter: function(params) {
-        let s = `<b>${params[0].axisValue}</b><br/>`;
+      backgroundColor: '#fff',
+      borderColor: '#ebeef5',
+      borderWidth: 1,
+      textStyle: { color: '#606266', fontSize: 12 },
+      formatter: params => {
+        let s = `<b style="color:#303133">${params[0].axisValue}</b><br/>`;
         params.forEach(p => {
-          s += `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:4px;"></span>${p.seriesName}: <b>${p.value}</b>${unit}<br/>`;
+          s += `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:4px;"></span>${p.seriesName}: <b>${p.value}</b> ${unit}<br/>`;
         });
         return s;
       }
     },
-    legend: {
-      type: 'scroll',
-      bottom: 0,
-      textStyle: { color: '#9db6da', fontSize: 11 },
-      pageTextStyle: { color: '#9db6da' },
-    },
-    grid: { top: 30, right: 20, bottom: 50, left: 50 },
+    legend: { type: 'scroll', bottom: 0, textStyle: { color: '#909399', fontSize: 11 } },
+    grid: { top: 20, right: 16, bottom: 46, left: 46 },
     xAxis: {
-      type: 'category',
-      data: dates.map(d => d.slice(5)),
-      axisLine: { lineStyle: { color: 'rgba(97,155,255,0.2)' } },
-      axisLabel: { color: '#9db6da', fontSize: 11 },
+      type: 'category', data: dates.map(d => d.slice(5)),
+      axisLine: { lineStyle: { color: '#dcdfe6' } },
+      axisLabel: { color: '#909399', fontSize: 11 },
     },
     yAxis: {
-      type: 'value',
-      name: currentMetric === 'delay' ? '时延(ms)' : '丢包率(%)',
-      nameTextStyle: { color: '#9db6da', fontSize: 11 },
-      axisLine: { show: false },
-      splitLine: { lineStyle: { color: 'rgba(97,155,255,0.08)' } },
-      axisLabel: { color: '#9db6da', fontSize: 11 },
+      type: 'value', name: curMetric === 'delay' ? '时延(ms)' : '丢包率(%)',
+      nameTextStyle: { color: '#909399', fontSize: 11 },
+      splitLine: { lineStyle: { color: '#ebeef5' } },
+      axisLabel: { color: '#909399', fontSize: 11 },
     },
-    series,
-    animationDuration: 600,
-  };
-  chart.setOption(option, true);
+    series, animationDuration: 400,
+  }, true);
+
   document.getElementById('chartSub').textContent =
-    currentMetric === 'delay' ? '平均时延趋势（ms）' : '平均丢包率趋势（%）';
+    curMetric === 'delay' ? '各省平均时延变化（ms）' : '各省平均丢包率变化（%）';
 }
 
-/* ── Ranking ── */
+// ── 排行 ──
 function renderRanking() {
   const { slice, days } = getSlice();
-  const shown = [...activeProvinces];
-  const rows = shown.map(p => ({
-    prov: p,
-    delay: avg(slice[p], 'delay'),
-    loss: avg(slice[p], 'loss'),
-  }));
+  const shown = [...activeProv];
+  const key = curMetric === 'delay' ? 'avg_delay' : 'avg_loss_rate';
+  const unit = curMetric === 'delay' ? ' ms' : ' %';
+  const rows = shown.map(p => ({ prov: p, val: avgField(slice[p], key) }));
+  rows.sort((a, b) => b.val - a.val);
+  const maxVal = rows.length ? rows[0].val : 1;
+  const barCls = curMetric === 'delay' ? 'delay' : 'loss';
 
-  const sortKey = currentMetric;
-  rows.sort((a, b) => b[sortKey] - a[sortKey]);
-  const maxVal = rows.length ? rows[0][sortKey] : 1;
-
-  const el = document.getElementById('rankingBody');
-  el.innerHTML = rows.map((r, i) => {
-    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
-    const pct = maxVal > 0 ? (r[sortKey] / maxVal * 100) : 0;
-    const barClass = sortKey === 'delay' ? 'bar-delay' : 'bar-loss';
-    const val = sortKey === 'delay' ? r.delay + ' ms' : r.loss + ' %';
-    return `<div class="ranking-row">
-      <div style="text-align:center;"><span class="rank-num ${rankClass}">${i + 1}</span></div>
-      <div class="prov-name">${r.prov}</div>
-      <div class="bar-cell"><div class="bar-track"><div class="bar-fill ${barClass}" style="width:${pct}%"></div></div></div>
-      <div class="val-cell">${val}</div>
+  const el = document.getElementById('rankBody');
+  el.innerHTML = `<div class="rank-table">${rows.map((r, i) => {
+    const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
+    const pct = maxVal > 0 ? (r.val / maxVal * 100) : 0;
+    return `<div class="rank-row">
+      <div><span class="rank-num ${rc}">${i + 1}</span></div>
+      <div class="rank-prov">${r.prov}</div>
+      <div class="rank-bar"><div class="bar-track"><div class="bar-fill ${barCls}" style="width:${pct}%"></div></div></div>
+      <div class="rank-val">${r.val}${unit}</div>
     </div>`;
-  }).join('');
-  document.getElementById('rankSub').textContent = `按 ${days} 天${sortKey === 'delay' ? '平均时延' : '平均丢包率'}排序`;
+  }).join('')}</div>`;
+
+  document.getElementById('rankSub').textContent = `近 ${days} 天，按${curMetric === 'delay' ? '平均时延' : '平均丢包率'}降序`;
 }
 
-/* ── Heatmap ── */
+// ── 热力矩阵 ──
 function renderHeatmap() {
   const { dates, slice } = getSlice();
-  const shown = [...activeProvinces];
-  const key = currentMetric;
-  const unit = key === 'delay' ? 'ms' : '%';
+  const shown = [...activeProv];
+  const key = curMetric === 'delay' ? 'avg_delay' : 'avg_loss_rate';
+  const unit = curMetric === 'delay' ? 'ms' : '%';
 
-  // compute min/max for color scale
-  let allVals = [];
-  shown.forEach(p => slice[p].forEach(d => allVals.push(d[key])));
-  const vmin = Math.min(...allVals);
-  const vmax = Math.max(...allVals);
+  let allV = [];
+  shown.forEach(p => slice[p].forEach(d => allV.push(d[key])));
+  const vmin = Math.min(...allV), vmax = Math.max(...allV);
 
   function cellColor(v) {
     const t = vmax > vmin ? (v - vmin) / (vmax - vmin) : 0;
-    // gradient: green (low) → yellow → red (high)
-    const r = Math.round(t < 0.5 ? t * 2 * 220 : 220);
-    const g = Math.round(t < 0.5 ? 180 : 180 - (t - 0.5) * 2 * 160);
-    const b = Math.round(t < 0.5 ? 60 : 60 - (t - 0.5) * 2 * 50);
-    return `rgb(${r},${g},${b})`;
+    // 蓝色系渐变（与 Element UI 主色一致）：浅蓝 → #409EFF → 深蓝
+    if (t < 0.5) {
+      const s = t * 2;
+      const r = Math.round(198 + (64 - 198) * s);
+      const g = Math.round(226 + (158 - 226) * s);
+      const b = Math.round(255 + (255 - 255) * s);
+      return `rgb(${r},${g},${b})`;
+    } else {
+      const s = (t - 0.5) * 2;
+      const r = Math.round(64 + (30 - 64) * s);
+      const g = Math.round(158 + (80 - 158) * s);
+      const b = Math.round(255 + (180 - 255) * s);
+      return `rgb(${r},${g},${b})`;
+    }
   }
 
-  let html = '<table class="heatmap"><thead><tr><th>省份</th>';
+  let html = '<table class="hm-table"><thead><tr><th>省份</th>';
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
   html += '</tr></thead><tbody>';
-
   shown.forEach(p => {
     html += `<tr><td>${p}</td>`;
     slice[p].forEach(d => {
       const v = d[key];
-      html += `<td><div class="cell" style="background:${cellColor(v)}" title="${p} ${d.date}\n${key === 'delay' ? '时延' : '丢包率'}: ${v}${unit}">${v}</div></td>`;
+      html += `<td><div class="hm-cell" style="background:${cellColor(v)}" title="${p} ${d.date}\n${curMetric === 'delay' ? '时延' : '丢包率'}: ${v}${unit}">${v}</div></td>`;
     });
     html += '</tr>';
   });
   html += '</tbody></table>';
 
-  document.getElementById('heatmapWrap').innerHTML = html;
+  document.getElementById('hmWrap').innerHTML = html;
   document.getElementById('hmSub').textContent =
-    currentMetric === 'delay' ? '平均时延（ms），绿→红 = 低→高' : '平均丢包率（%），绿→红 = 低→高';
+    curMetric === 'delay' ? '平均时延（ms），颜色越深 = 越高' : '平均丢包率（%），颜色越深 = 越高';
 }
 
 /* ════════════════════════════════════════════
-   Actions
+   Actions & Init
    ════════════════════════════════════════════ */
-function setRange(i) { currentRange = i; refresh(); }
-function setMetric(m) { currentMetric = m; refresh(); }
+function setRange(i) { curRange = i; refresh(); }
+function setMetric(m) { curMetric = m; refresh(); }
+
 function refresh() {
-  renderRangeTabs();
-  renderMetricToggle();
-  renderProvinceBar();
+  renderRadioGroup('rangeGroup', RANGES, curRange, setRange);
+  renderRadioGroup('metricGroup', [
+    { label: '平均时延(ms)' }, { label: '平均丢包率(%)' }
+  ], curMetric === 'delay' ? 0 : 1, i => setMetric(i === 0 ? 'delay' : 'loss'));
+  renderProvBar();
   renderChart();
   renderRanking();
   renderHeatmap();
 }
 
 window.addEventListener('resize', () => { if (chart) chart.resize(); });
-
-// Init
 refresh();
 </script>
 </body>
