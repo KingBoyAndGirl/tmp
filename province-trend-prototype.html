@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>各省趋势均值大屏</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <style>
+    :root {
+      --text: #dbe7ff;
+      --muted: #9db6da;
+      --danger: #ff8b63;
+      --warn: #d39a38;
+      --ok: #55b87a;
+      --shadow: 0 18px 48px rgba(0,0,0,0.38);
+      --card-bg: rgba(8,36,87,0.88);
+      --card-border: rgba(97,155,255,0.25);
+      --tab-bg: rgba(10,22,42,0.78);
+      --head-bg: rgba(22,72,143,0.72);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #060b16;
+    }
+    .app { max-width: 1600px; margin: 0 auto; padding: 16px 18px 24px; }
+
+    /* ── Header ── */
+    .header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .header h1 { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+    .header h1 span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 10px; }
+    .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    /* tabs */
+    .range-tabs { display: flex; gap: 6px; }
+    .range-tab {
+      border: 1px solid rgba(122,175,255,0.18);
+      background: var(--tab-bg);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .range-tab.active {
+      color: #fff;
+      border-color: rgba(122,182,255,0.48);
+      background: linear-gradient(180deg, rgba(56,99,205,0.55), rgba(34,56,117,0.8));
+      box-shadow: 0 4px 14px rgba(43,87,201,0.24);
+    }
+
+    /* province pills */
+    .province-bar { display: flex; flex-wrap: wrap; gap: 5px; max-width: 600px; }
+    .prov-pill {
+      border: 1px solid rgba(122,175,255,0.15);
+      background: rgba(10,22,42,0.6);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .prov-pill.active {
+      color: #fff;
+      background: rgba(56,99,205,0.45);
+      border-color: rgba(122,182,255,0.5);
+    }
+    .prov-actions { display: flex; gap: 4px; }
+    .prov-actions button {
+      border: none;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .prov-actions button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* metric toggle */
+    .metric-toggle { display: flex; gap: 4px; margin-left: 8px; }
+    .metric-btn {
+      border: 1px solid rgba(122,175,255,0.15);
+      background: rgba(10,22,42,0.6);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .metric-btn.active {
+      color: #fff;
+      background: rgba(56,99,205,0.5);
+      border-color: rgba(122,182,255,0.4);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 12px 16px 10px;
+      background: linear-gradient(180deg, rgba(11,38,88,0.96), rgba(10,32,74,0.86));
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .card-sub { font-size: 11px; color: rgba(214,228,255,0.65); margin-top: 2px; }
+
+    /* ── Layout ── */
+    .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; margin-bottom: 16px; }
+    .chart-wrap { height: 420px; }
+    .ranking-body { padding: 0; max-height: 380px; overflow-y: auto; }
+    .ranking-row {
+      display: grid;
+      grid-template-columns: 32px 80px 1fr 64px;
+      align-items: center;
+      height: 44px;
+      border-bottom: 1px solid rgba(114,164,255,0.06);
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+    .ranking-row:hover { background: rgba(255,255,255,0.03); }
+    .rank-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #dbf4ff;
+      margin-left: 4px;
+    }
+    .rank-1 { background: linear-gradient(135deg, #ff6b35, #cf4b1e); color: #fff; }
+    .rank-2 { background: linear-gradient(135deg, #d39a38, #b87d1e); color: #fff; }
+    .rank-3 { background: linear-gradient(135deg, #6b9fdf, #4a7ec4); color: #fff; }
+    .rank-other { background: rgba(255,255,255,0.08); }
+    .prov-name { color: #eef5ff; font-weight: 500; }
+    .bar-cell { padding: 0 8px; }
+    .bar-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .bar-delay { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .bar-loss { background: linear-gradient(90deg, #22c55e, #86efac); }
+    .val-cell { text-align: right; padding-right: 12px; color: #eef5ff; font-weight: 600; font-size: 13px; }
+
+    /* ── Heatmap ── */
+    .heatmap-wrap { overflow-x: auto; }
+    .heatmap { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .heatmap th {
+      padding: 6px 4px;
+      color: var(--muted);
+      font-weight: 600;
+      background: var(--head-bg);
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+    .heatmap th:first-child { text-align: left; padding-left: 10px; min-width: 60px; position: sticky; left: 0; z-index: 2; }
+    .heatmap td { text-align: center; padding: 0; height: 32px; min-width: 52px; }
+    .heatmap td:first-child {
+      text-align: left;
+      padding-left: 10px;
+      color: #eef5ff;
+      font-weight: 500;
+      background: rgba(8,36,87,0.95);
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .heatmap .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      border-radius: 3px;
+      margin: 2px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.85);
+      cursor: default;
+      transition: transform 0.15s;
+    }
+    .heatmap .cell:hover { transform: scale(1.08); z-index: 3; }
+    .hm-table { max-height: 420px; overflow-y: auto; }
+
+    /* responsive */
+    @media (max-width: 1100px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>各省网络质量趋势均值 <span>Cloud Network Quality Trend</span></h1>
+    <div class="controls">
+      <div class="range-tabs" id="rangeTabs"></div>
+      <div class="metric-toggle" id="metricToggle"></div>
+    </div>
+  </div>
+
+  <!-- Province filter -->
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <div class="prov-actions">
+      <button onclick="selectAll()">全选</button>
+      <button onclick="selectNone()">清空</button>
+    </div>
+    <div class="province-bar" id="provinceBar"></div>
+  </div>
+
+  <!-- Main area -->
+  <div class="main-grid">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title" id="chartTitle">各省趋势对比</div><div class="card-sub" id="chartSub">平均时延 & 平均丢包率</div></div>
+      </div>
+      <div class="chart-wrap" id="chartMain"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">省份排行</div><div class="card-sub" id="rankSub">按选定周期均值排序</div></div>
+      </div>
+      <div class="ranking-body" id="rankingBody"></div>
+    </div>
+  </div>
+
+  <!-- Heatmap -->
+  <div class="card">
+    <div class="card-head">
+      <div><div class="card-title" id="hmTitle">每日明细矩阵</div><div class="card-sub" id="hmSub">省份 × 日期，颜色编码指标</div></div>
+    </div>
+    <div class="hm-table" id="heatmapWrap"></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   Mock Data  —  15 provinces × 30 days
+   ════════════════════════════════════════════ */
+const PROVINCES = ['山东','江苏','浙江','广东','四川','河南','河北','湖北','湖南','福建','安徽','辽宁','陕西','云南','贵州'];
+const RANGES = [
+  { label: '近 7 天', days: 7 },
+  { label: '近 14 天', days: 14 },
+  { label: '近 30 天', days: 30 },
+];
+
+// Seed-based pseudo-random for consistency
+function seededRand(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+// Generate dates
+const today = new Date('2026-06-11');
+const allDates = [];
+for (let i = 29; i >= 0; i--) {
+  const d = new Date(today);
+  d.setDate(d.getDate() - i);
+  allDates.push(d.toISOString().slice(0, 10));
+}
+
+// Generate per-province per-day data
+const DATA = {};
+PROVINCES.forEach((prov, pi) => {
+  const rng = seededRand(pi * 137 + 42);
+  const baseDelay = 8 + rng() * 18;     // 8-26 ms baseline
+  const baseLoss  = 0.1 + rng() * 3.5;  // 0.1-3.6% baseline
+  DATA[prov] = allDates.map((date, di) => {
+    const trend = Math.sin(di / 5 + pi) * 3;
+    const jitter = (rng() - 0.5) * 6;
+    const delay = Math.max(2, +(baseDelay + trend + jitter).toFixed(2));
+    const lossJitter = (rng() - 0.5) * 1.5;
+    const loss = Math.max(0, +(baseLoss + Math.sin(di / 7 + pi) * 0.8 + lossJitter).toFixed(2));
+    return { date, delay, loss };
+  });
+});
+
+/* ════════════════════════════════════════════
+   State
+   ════════════════════════════════════════════ */
+let currentRange = 0;          // index into RANGES
+let currentMetric = 'delay';   // 'delay' | 'loss'
+let activeProvinces = new Set(PROVINCES);
+
+/* ════════════════════════════════════════════
+   Render helpers
+   ════════════════════════════════════════════ */
+function getSlice() {
+  const days = RANGES[currentRange].days;
+  const dates = allDates.slice(-days);
+  const slice = {};
+  PROVINCES.forEach(p => {
+    slice[p] = DATA[p].slice(-days);
+  });
+  return { dates, slice, days };
+}
+
+function avg(arr, key) {
+  if (!arr.length) return 0;
+  return +(arr.reduce((s, d) => s + d[key], 0) / arr.length).toFixed(2);
+}
+
+/* ── Tabs ── */
+function renderRangeTabs() {
+  const el = document.getElementById('rangeTabs');
+  el.innerHTML = RANGES.map((r, i) =>
+    `<div class="range-tab ${i === currentRange ? 'active' : ''}" onclick="setRange(${i})">${r.label}</div>`
+  ).join('');
+}
+
+function renderMetricToggle() {
+  const el = document.getElementById('metricToggle');
+  el.innerHTML = [
+    { key: 'delay', label: '时延(ms)' },
+    { key: 'loss', label: '丢包率(%)' },
+  ].map(m =>
+    `<div class="metric-btn ${m.key === currentMetric ? 'active' : ''}" onclick="setMetric('${m.key}')">${m.label}</div>`
+  ).join('');
+}
+
+/* ── Province pills ── */
+function renderProvinceBar() {
+  const el = document.getElementById('provinceBar');
+  el.innerHTML = PROVINCES.map(p =>
+    `<div class="prov-pill ${activeProvinces.has(p) ? 'active' : ''}" onclick="toggleProv('${p}')">${p}</div>`
+  ).join('');
+}
+
+function selectAll() { activeProvinces = new Set(PROVINCES); refresh(); }
+function selectNone() { activeProvinces.clear(); refresh(); }
+function toggleProv(p) {
+  if (activeProvinces.has(p)) activeProvinces.delete(p); else activeProvinces.add(p);
+  refresh();
+}
+
+/* ── ECharts ── */
+let chart = null;
+function renderChart() {
+  if (!chart) chart = echarts.init(document.getElementById('chartMain'));
+  const { dates, slice } = getSlice();
+  const shown = [...activeProvinces];
+
+  // Build series for selected metric
+  const series = shown.map((p, i) => ({
+    name: p,
+    type: 'line',
+    smooth: true,
+    symbol: 'circle',
+    symbolSize: 5,
+    lineStyle: { width: 2 },
+    areaStyle: { opacity: 0.04 },
+    data: slice[p].map(d => d[currentMetric]),
+  }));
+
+  // National average line
+  const natAvg = dates.map((_, di) => {
+    const vals = shown.map(p => slice[p][di][currentMetric]);
+    return vals.length ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : 0;
+  });
+  series.push({
+    name: '全国均值',
+    type: 'line',
+    lineStyle: { type: 'dashed', width: 2, color: '#fff' },
+    symbol: 'none',
+    itemStyle: { color: '#fff' },
+    data: natAvg,
+  });
+
+  const unit = currentMetric === 'delay' ? 'ms' : '%';
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(8,36,87,0.95)',
+      borderColor: 'rgba(97,155,255,0.3)',
+      textStyle: { color: '#dbe7ff', fontSize: 12 },
+      formatter: function(params) {
+        let s = `<b>${params[0].axisValue}</b><br/>`;
+        params.forEach(p => {
+          s += `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:4px;"></span>${p.seriesName}: <b>${p.value}</b>${unit}<br/>`;
+        });
+        return s;
+      }
+    },
+    legend: {
+      type: 'scroll',
+      bottom: 0,
+      textStyle: { color: '#9db6da', fontSize: 11 },
+      pageTextStyle: { color: '#9db6da' },
+    },
+    grid: { top: 30, right: 20, bottom: 50, left: 50 },
+    xAxis: {
+      type: 'category',
+      data: dates.map(d => d.slice(5)),
+      axisLine: { lineStyle: { color: 'rgba(97,155,255,0.2)' } },
+      axisLabel: { color: '#9db6da', fontSize: 11 },
+    },
+    yAxis: {
+      type: 'value',
+      name: currentMetric === 'delay' ? '时延(ms)' : '丢包率(%)',
+      nameTextStyle: { color: '#9db6da', fontSize: 11 },
+      axisLine: { show: false },
+      splitLine: { lineStyle: { color: 'rgba(97,155,255,0.08)' } },
+      axisLabel: { color: '#9db6da', fontSize: 11 },
+    },
+    series,
+    animationDuration: 600,
+  };
+  chart.setOption(option, true);
+  document.getElementById('chartSub').textContent =
+    currentMetric === 'delay' ? '平均时延趋势（ms）' : '平均丢包率趋势（%）';
+}
+
+/* ── Ranking ── */
+function renderRanking() {
+  const { slice, days } = getSlice();
+  const shown = [...activeProvinces];
+  const rows = shown.map(p => ({
+    prov: p,
+    delay: avg(slice[p], 'delay'),
+    loss: avg(slice[p], 'loss'),
+  }));
+
+  const sortKey = currentMetric;
+  rows.sort((a, b) => b[sortKey] - a[sortKey]);
+  const maxVal = rows.length ? rows[0][sortKey] : 1;
+
+  const el = document.getElementById('rankingBody');
+  el.innerHTML = rows.map((r, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
+    const pct = maxVal > 0 ? (r[sortKey] / maxVal * 100) : 0;
+    const barClass = sortKey === 'delay' ? 'bar-delay' : 'bar-loss';
+    const val = sortKey === 'delay' ? r.delay + ' ms' : r.loss + ' %';
+    return `<div class="ranking-row">
+      <div style="text-align:center;"><span class="rank-num ${rankClass}">${i + 1}</span></div>
+      <div class="prov-name">${r.prov}</div>
+      <div class="bar-cell"><div class="bar-track"><div class="bar-fill ${barClass}" style="width:${pct}%"></div></div></div>
+      <div class="val-cell">${val}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('rankSub').textContent = `按 ${days} 天${sortKey === 'delay' ? '平均时延' : '平均丢包率'}排序`;
+}
+
+/* ── Heatmap ── */
+function renderHeatmap() {
+  const { dates, slice } = getSlice();
+  const shown = [...activeProvinces];
+  const key = currentMetric;
+  const unit = key === 'delay' ? 'ms' : '%';
+
+  // compute min/max for color scale
+  let allVals = [];
+  shown.forEach(p => slice[p].forEach(d => allVals.push(d[key])));
+  const vmin = Math.min(...allVals);
+  const vmax = Math.max(...allVals);
+
+  function cellColor(v) {
+    const t = vmax > vmin ? (v - vmin) / (vmax - vmin) : 0;
+    // gradient: green (low) → yellow → red (high)
+    const r = Math.round(t < 0.5 ? t * 2 * 220 : 220);
+    const g = Math.round(t < 0.5 ? 180 : 180 - (t - 0.5) * 2 * 160);
+    const b = Math.round(t < 0.5 ? 60 : 60 - (t - 0.5) * 2 * 50);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  let html = '<table class="heatmap"><thead><tr><th>省份</th>';
+  dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  shown.forEach(p => {
+    html += `<tr><td>${p}</td>`;
+    slice[p].forEach(d => {
+      const v = d[key];
+      html += `<td><div class="cell" style="background:${cellColor(v)}" title="${p} ${d.date}\n${key === 'delay' ? '时延' : '丢包率'}: ${v}${unit}">${v}</div></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+
+  document.getElementById('heatmapWrap').innerHTML = html;
+  document.getElementById('hmSub').textContent =
+    currentMetric === 'delay' ? '平均时延（ms），绿→红 = 低→高' : '平均丢包率（%），绿→红 = 低→高';
+}
+
+/* ════════════════════════════════════════════
+   Actions
+   ════════════════════════════════════════════ */
+function setRange(i) { currentRange = i; refresh(); }
+function setMetric(m) { currentMetric = m; refresh(); }
+function refresh() {
+  renderRangeTabs();
+  renderMetricToggle();
+  renderProvinceBar();
+  renderChart();
+  renderRanking();
+  renderHeatmap();
+}
+
+window.addEventListener('resize', () => { if (chart) chart.resize(); });
+
+// Init
+refresh();
+</script>
+</body>
+</html>
