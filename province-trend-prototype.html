@@ -97,7 +97,14 @@
       cursor: pointer; transition: background .15s;
     }
     .rank-row:hover { background: #f5f7fa; }
-    .rank-row.highlight { background: #ecf5ff; }
+    .rank-row.hover-highlight {
+      background: #f0f7ff;
+      box-shadow: inset 3px 0 0 #409EFF;
+    }
+    .rank-row.lock-highlight {
+      background: #ecf5ff;
+      box-shadow: inset 4px 0 0 #1f78ff;
+    }
     .rank-row.dimmed { opacity: 0.35; }
     .rank-num {
       width: 20px; height: 20px; border-radius: 50%;
@@ -413,6 +420,14 @@ function getActiveSeriesName() {
   return hoverName || highlightName;
 }
 
+function scrollRankingToActive() {
+  if (!hoverName) return;
+  const wrap = document.getElementById('rankBody');
+  const row = wrap && wrap.querySelector(`[data-rank-name="${hoverName}"]`);
+  if (!wrap || !row) return;
+  row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
 function getLegendFormatter() {
   return name => {
     const activeName = getActiveSeriesName();
@@ -431,6 +446,7 @@ function getLegendRich() {
 
 function syncHoverLinkedViews() {
   renderRanking();
+  scrollRankingToActive();
   if (!chart) return;
   chart.setOption({
     legend: {
@@ -495,25 +511,43 @@ function renderChart() {
   // 颜色：高亮/普通/灰色
   const palette = ['#409EFF','#67C23A','#E6A23C','#F56C6C','#909399','#b37feb','#36cfc9','#ff85c0','#ffc53d','#73d13d','#40a9ff','#ff7875','#597ef7','#ff9c6e','#5cdbd3'];
 
+  const activeHoverName = hoverName;
+  const activeLockName = highlightName;
   const series = names.map((name, i) => {
-    const isHighlighted = highlightName === null || highlightName === name;
+    const isHovered = activeHoverName === name;
+    const isLocked = activeLockName === name;
+    const hasHover = !!activeHoverName;
+    const hasLock = !!activeLockName;
+    const isDimmedByHover = hasHover && !isHovered;
+    const isDimmedByLock = !hasHover && hasLock && !isLocked;
+    const isDimmed = isDimmedByHover || isDimmedByLock;
+    const baseColor = palette[i % palette.length];
     return {
       name, type: 'line', smooth: true, symbol: 'circle', triggerLineEvent: true,
-      symbolSize: isHighlighted ? 8 : 4,
+      symbolSize: isHovered ? 10 : isLocked ? 8 : 4,
       showSymbol: true,
-      z: isHighlighted ? 3 : 1,
-      lineStyle: { width: isHighlighted ? 3.5 : 1.2, opacity: isHighlighted ? 1 : 0.15 },
-      itemStyle: { color: isHighlighted ? palette[i % palette.length] : '#dcdfe6', opacity: isHighlighted ? 1 : 0.35 },
+      z: isHovered ? 5 : isLocked ? 4 : 1,
+      lineStyle: {
+        width: isHovered ? 5.5 : isLocked ? 3.8 : 1.2,
+        opacity: isDimmed ? 0.08 : isLocked ? 1 : 0.9,
+        color: isLocked && !isHovered ? '#1f78ff' : baseColor,
+      },
+      itemStyle: {
+        color: isLocked && !isHovered ? '#1f78ff' : baseColor,
+        opacity: isDimmed ? 0.16 : 1,
+        borderWidth: isHovered ? 2 : isLocked ? 1 : 0,
+        borderColor: '#fff'
+      },
       emphasis: {
         focus: 'series',
         blurScope: 'coordinateSystem',
         scale: true,
-        lineStyle: { width: 5, opacity: 1 },
+        lineStyle: { width: 5.5, opacity: 1 },
         itemStyle: { borderWidth: 2, borderColor: '#fff', opacity: 1 }
       },
       blur: {
-        lineStyle: { opacity: 0.06 },
-        itemStyle: { opacity: 0.12 }
+        lineStyle: { opacity: hasHover ? 0.06 : hasLock ? 0.08 : 0.12 },
+        itemStyle: { opacity: hasHover ? 0.12 : hasLock ? 0.16 : 0.2 }
       },
       data: data[name].map(d => d.avg_delay),
     };
@@ -664,12 +698,13 @@ function renderRanking() {
     </div>
     ${rows.map((r, i) => {
       const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
+      const isHover = hoverName === r.name;
+      const isLock = !hoverName && highlightName === r.name;
       const activeName = getActiveSeriesName();
-      const isHigh = activeName === r.name;
-      const isDim = activeName && !isHigh;
-      const rowClass = isHigh ? 'highlight' : isDim ? 'dimmed' : '';
+      const isDim = activeName && !isHover && !isLock;
+      const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
       const clickAttr = !drillProvince ? `onclick="drillDown('${r.name}')"` : '';
-      return `<div class="rank-row ${rowClass}" ${clickAttr}>
+      return `<div class="rank-row ${rowClass}" data-rank-name="${r.name}" ${clickAttr}>
         <div><span class="rank-num ${rc}">${i + 1}</span></div>
         <div class="rank-prov">${r.name}</div>
         <div></div>
