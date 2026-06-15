@@ -176,7 +176,7 @@
       <div class="card-header">
         <div>
           <div class="card-title" id="chartTitle">近 7 天趋势对比</div>
-          <div class="card-sub" id="chartSub">点击折线可高亮单省</div>
+          <div class="card-sub" id="chartSub">点击图例可高亮单省</div>
         </div>
       </div>
       <div class="card-body"><div class="chart-box" id="chartMain"></div></div>
@@ -519,20 +519,25 @@ function renderChart() {
     }]
   });
 
-  // 点击折线 → 高亮该线，其他置灰（只注册一次）
+  // 图例点击 → 高亮该线，其他置灰（只注册一次）
   if (!chartInited) {
     chartInited = true;
-    chart.on('click', params => {
-      if (params.componentType === 'series' && !params.seriesName.startsWith('动态阈值')) {
-        highlightName = highlightName === params.seriesName ? null : params.seriesName;
-        refresh();
+    chart.on('legendselectchanged', params => {
+      const selected = Object.entries(params.selected).filter(([k, v]) => v && !k.startsWith('动态阈值'));
+      if (selected.length === 1) {
+        highlightName = selected[0][0];
+      } else {
+        highlightName = null;
       }
+      // 阻止默认的图例隐藏行为，改用自定义高亮
+      chart.dispatchAction({ type: 'legendAllSelect' });
+      refresh();
     });
   }
 
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 地市趋势` : '近 7 天趋势对比';
   document.getElementById('chartSub').textContent = drillProvince
-    ? '点击折线可高亮单个地市'
+    ? '点击图例可高亮单个地市'
     : '点击折线可高亮单省';
 }
 
