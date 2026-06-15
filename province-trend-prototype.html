@@ -730,6 +730,7 @@ function renderHeatmap() {
 
   let html = '<table class="hm-table"><thead><tr><th>名称</th>';
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
+  html += '<th>动态阈值</th>';
   html += '</tr></thead><tbody>';
   names.forEach(name => {
     const isHover = hoverName === name;
@@ -737,11 +738,13 @@ function renderHeatmap() {
     const activeName = getActiveSeriesName();
     const isDim = activeName && !isHover && !isLock;
     const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
+    const threshold = getThreshold(name, data[name]);
     html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td>${name}</td>`;
     data[name].forEach(d => {
       const v = d.avg_delay;
       html += `<td><div class="hm-cell" style="background:${heatmapColor(v)}" title="${name} ${d.date}\n时延: ${v}ms">${v}</div></td>`;
     });
+    html += `<td><div class="hm-cell" style="background:rgba(144,147,153,0.88)" title="${name} 动态阈值\n阈值: ${threshold}ms">${threshold}</div></td>`;
     html += '</tr>';
   });
   html += '</tbody></table>';
