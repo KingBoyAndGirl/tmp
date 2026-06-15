@@ -155,8 +155,6 @@
     </div>
     <div class="filter-row" id="provBarRow">
       <span class="filter-label">省份：</span>
-      <button class="el-btn" onclick="selectAll()">全选</button>
-      <button class="el-btn el-btn--danger" onclick="selectNone()">清空</button>
       <div id="provBar" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
     </div>
   </div>
@@ -178,7 +176,7 @@
       <div class="card-header">
         <div>
           <div class="card-title" id="chartTitle">近 7 天趋势对比</div>
-          <div class="card-sub" id="chartSub">点击省份可下钻到地市 · 点击图例可高亮单省</div>
+          <div class="card-sub" id="chartSub">点击折线可高亮单省</div>
         </div>
       </div>
       <div class="card-body"><div class="chart-box" id="chartMain"></div></div>
@@ -353,9 +351,8 @@ PROVINCES.forEach(prov => {
    State
    ════════════════════════════════════════════ */
 let curMetric = 'delay';
-let activeProv = new Set(PROVINCES);
 let drillProvince = null;  // null = 省级视图, string = 地市级视图
-let highlightProv = null;  // 点击图例高亮
+let highlightName = null;  // 点击折线高亮
 
 /* ════════════════════════════════════════════
    Helpers
@@ -388,13 +385,16 @@ function avg(arr) {
 
 function getVisibleData() {
   if (drillProvince) {
-    // 下钻视图：显示该省各地市 + 各探测点
+    // 下钻视图：只显示该省各地市级聚合数据（不含探测点明细）
     const raw = CITY_DATA[drillProvince];
-    return raw; // { '济南市': [...], '济南市-最北点': [...], ... }
+    const cities = {};
+    Object.entries(raw).forEach(([key, arr]) => {
+      if (!key.includes('-')) cities[key] = arr; // 只取"济南市"，跳过"济南市-最北点"
+    });
+    return cities;
   }
-  const provs = {};
-  [...activeProv].forEach(p => { provs[p] = PROV_DATA[p]; });
-  return provs;
+  // 省级视图：全部省份
+  return PROV_DATA;
 }
 
 function getThreshold(name, data) {
@@ -416,21 +416,18 @@ function renderProvBar() {
   if (drillProvince) { row.style.display = 'none'; return; }
   row.style.display = 'flex';
   document.getElementById('provBar').innerHTML = PROVINCES.map(p =>
-    `<div class="prov-check ${activeProv.has(p) ? 'active' : ''}" onclick="toggleProv('${p}')">${p}</div>`
+    `<div class="prov-check" onclick="drillDown('${p}')">${p}</div>`
   ).join('');
 }
 
 function renderBreadcrumb() {
   const el = document.getElementById('breadcrumb');
-  if (!drillProvince) { el.innerHTML = ''; return; }
+  if (!drillProvince) { el.innerHTML = `<span style="color:#303133;font-weight:500;">全国</span>`; return; }
   el.innerHTML = `<a onclick="drillUp()">全国</a><span class="sep">/</span><span style="color:#303133;font-weight:500;">${drillProvince}</span>`;
 }
 
-function selectAll() { activeProv = new Set(PROVINCES); refresh(); }
-function selectNone() { activeProv.clear(); refresh(); }
-function toggleProv(p) { activeProv.has(p) ? activeProv.delete(p) : activeProv.add(p); refresh(); }
-function drillUp() { drillProvince = null; highlightProv = null; refresh(); }
-function drillDown(prov) { drillProvince = prov; highlightProv = null; refresh(); }
+function drillUp() { drillProvince = null; highlightName = null; refresh(); }
+function drillDown(prov) { drillProvince = prov; highlightName = null; refresh(); }
 
 // ── ECharts ──
 let chart = null;
@@ -444,10 +441,10 @@ function renderChart() {
   const palette = ['#409EFF','#67C23A','#E6A23C','#F56C6C','#909399','#b37feb','#36cfc9','#ff85c0','#ffc53d','#73d13d','#40a9ff','#ff7875','#597ef7','#ff9c6e','#5cdbd3'];
 
   const series = names.map((name, i) => {
-    const isHighlighted = highlightProv === null || highlightProv === name;
+    const isHighlighted = highlightName === null || highlightName === name;
     return {
       name, type: 'line', smooth: true, symbol: 'circle', symbolSize: isHighlighted ? 5 : 2,
-      lineStyle: { width: isHighlighted ? 2.5 : 1, opacity: isHighlighted ? 1 : 0.2 },
+      lineStyle: { width: isHighlighted ? 2.5 : 1, opacity: isHighlighted ? 1 : 0.15 },
       itemStyle: { color: isHighlighted ? palette[i % palette.length] : '#dcdfe6' },
       emphasis: { lineStyle: { width: 3 } },
       data: data[name].map(d => d.avg_delay),
@@ -520,31 +517,18 @@ function renderChart() {
     }]
   });
 
-  // 图例点击 → 高亮单省
-  chart.on('legendselectchanged', params => {
-    const selected = Object.entries(params.selected).filter(([k, v]) => v && !k.startsWith('动态阈值'));
-    if (selected.length === 1) {
-      highlightProv = selected[0][0];
-    } else {
-      highlightProv = null;
-    }
-    refresh();
-  });
-
-  // 点击图表中的省份名 → 下钻
+  // 点击折线 → 高亮该线，其他置灰
   chart.on('click', params => {
     if (params.componentType === 'series' && !params.seriesName.startsWith('动态阈值')) {
-      const name = params.seriesName;
-      if (!drillProvince && PROVINCES_DATA[name]) {
-        drillDown(name);
-      }
+      highlightName = highlightName === params.seriesName ? null : params.seriesName;
+      refresh();
     }
   });
 
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 地市趋势` : '近 7 天趋势对比';
   document.getElementById('chartSub').textContent = drillProvince
-    ? '点击图例可高亮单条方向'
-    : '点击省份可下钻到地市 · 点击图例可高亮单省';
+    ? '点击折线可高亮单个地市'
+    : '点击折线可高亮单省';
 }
 
 // ── 排行 ──
@@ -570,8 +554,8 @@ function renderRanking() {
     </div>
     ${rows.map((r, i) => {
       const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
-      const isHigh = highlightProv === r.name;
-      const isDim = highlightProv && !isHigh;
+      const isHigh = highlightName === r.name;
+      const isDim = highlightName && !isHigh;
       const rowClass = isHigh ? 'highlight' : isDim ? 'dimmed' : '';
       const clickAttr = !drillProvince ? `onclick="drillDown('${r.name}')"` : '';
       return `<div class="rank-row ${rowClass}" ${clickAttr}>
@@ -612,7 +596,7 @@ function renderHeatmap() {
   html += '</tbody></table>';
   document.getElementById('hmWrap').innerHTML = html;
   document.getElementById('hmSub').textContent = drillProvince
-    ? `${drillProvince} 各方向 × 日期`
+    ? `${drillProvince} 各地市 × 日期`
     : '省份 × 日期，颜色编码时延级别';
 }
 
