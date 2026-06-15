@@ -61,6 +61,17 @@
     .el-select:hover { border-color: #c0c4cc; }
     .el-select:focus { border-color: #409EFF; box-shadow: 0 0 0 2px rgba(64,158,255,0.12); }
 
+    .el-input {
+      width: 140px; height: 32px;
+      border: 1px solid #dcdfe6; border-radius: 4px;
+      background: #fff; color: #606266; font-size: 13px;
+      padding: 0 12px; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .el-input:hover { border-color: #c0c4cc; }
+    .el-input:focus { border-color: #409EFF; box-shadow: 0 0 0 2px rgba(64,158,255,0.12); }
+    .filter-hint { font-size: 12px; color: #909399; }
+
     /* ── 面包屑 ── */
     .breadcrumb {
       font-size: 13px; color: #909399; margin-bottom: 14px;
@@ -180,6 +191,9 @@
     <div class="filter-row" id="provBarRow">
       <span class="filter-label">省份：</span>
       <select id="provSelect" class="el-select" onchange="onProvinceSelectChange(this.value)"></select>
+      <span class="filter-label">告警阈值：</span>
+      <input id="alertThresholdInput" class="el-input" type="number" min="0" step="1" value="30" onchange="onAlertThresholdChange(this.value)" />
+      <span class="filter-hint">高于此值判定为告警</span>
     </div>
   </div>
 
@@ -378,6 +392,7 @@ let curMetric = 'delay';
 let drillProvince = null;  // null = 省级视图, string = 地市级视图
 let highlightName = null;  // 点击折线高亮
 let hoverName = null;      // 鼠标悬停的折线
+let alertThreshold = 30;   // 固定告警阈值(ms)
 
 /* ════════════════════════════════════════════
    Helpers
@@ -425,6 +440,10 @@ function getVisibleData() {
 function getThreshold(name, data) {
   const val = avg(data);
   return +(val * 1.5).toFixed(2);
+}
+
+function getAlertThreshold() {
+  return Number(alertThreshold) || 0;
 }
 
 function getActiveSeriesName() {
@@ -490,6 +509,14 @@ function onProvinceSelectChange(value) {
     return;
   }
   drillDown(value);
+}
+
+function onAlertThresholdChange(value) {
+  const next = Number(value);
+  alertThreshold = Number.isFinite(next) && next >= 0 ? next : 0;
+  const input = document.getElementById('alertThresholdInput');
+  if (input) input.value = alertThreshold;
+  refresh();
 }
 
 // ── ECharts ──
@@ -580,7 +607,7 @@ function renderChart() {
           } else {
             const v = p.value;
             const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${delayColor(v)};margin-right:4px;"></span>`;
-            const threshold = getThreshold(p.seriesName, data[p.seriesName]);
+            const threshold = getAlertThreshold();
             const over = v > threshold ? ' ⚠️' : '';
             s += `${dot}${p.seriesName}: <b>${v}</b>${unit}${over}<br/>`;
           }
@@ -685,7 +712,7 @@ function renderRanking() {
     const avgVal = avg(data[name]);
     const threshold = +(avgVal * 1.5).toFixed(2);
     const maxDay = Math.max(...data[name].map(d => d.avg_delay));
-    const isAlert = maxDay > threshold;
+    const isAlert = maxDay > getAlertThreshold();
     return { name, avgVal, threshold, maxDay, isAlert };
   });
 
@@ -716,8 +743,8 @@ function renderRanking() {
   </div>`;
 
   document.getElementById('rankSub').textContent = drillProvince
-    ? `${drillProvince} 地市排行`
-    : '按 7 日均值动态阈值降序（均值×1.5）';
+    ? `${drillProvince} 地市排行（告警阈值：${getAlertThreshold()}ms）`
+    : `按 7 日均值动态阈值降序（均值×1.5，告警阈值：${getAlertThreshold()}ms）`;
 }
 
 // ── 热力矩阵 ──
