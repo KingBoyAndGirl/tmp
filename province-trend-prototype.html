@@ -99,7 +99,7 @@
 
     .chart-box { height: 400px; width: 100%; }
 
-    /* ── 排行表（含动态阈值列） ── */
+    /* ── 排行表（含7天均值列） ── */
     .rank-table { width: 100%; }
     .rank-row {
       display: grid; grid-template-columns: 32px 64px 1fr 68px 68px 56px;
@@ -205,7 +205,6 @@
     <span><span class="legend-dot" style="background:#67c23a;"></span> 0-20ms 绿区（正常）</span>
     <span><span class="legend-dot" style="background:#e6a23c;"></span> 20-30ms 黄区（关注）</span>
     <span><span class="legend-dot" style="background:#f56c6c;"></span> &gt;30ms 红区（告警）</span>
-    <span><span class="legend-dot" style="background:#909399;"></span> ----- 7日均值动态阈值</span>
   </div>
 
   <!-- 图表 + 排行 -->
@@ -223,7 +222,7 @@
       <div class="card-header">
         <div>
           <div class="card-title">省份排行</div>
-          <div class="card-sub" id="rankSub">按 7 日均值动态阈值降序</div>
+          <div class="card-sub" id="rankSub">按 7 天均值降序</div>
         </div>
       </div>
       <div class="card-body" style="padding:0;max-height:440px;overflow-y:auto;" id="rankBody"></div>
@@ -434,11 +433,6 @@ function getVisibleData() {
   return PROV_DATA;
 }
 
-function getThreshold(name, data) {
-  const val = avg(data);
-  return +(val * 1.5).toFixed(2);
-}
-
 function getAlertThreshold() {
   return Number(alertThreshold) || 0;
 }
@@ -577,17 +571,6 @@ function renderChart() {
     };
   });
 
-  // 动态阈值虚线（当前选中/全部的 7 日均值 × 1.5）
-  const allVals = names.map(n => avg(data[n]));
-  const globalAvg = allVals.length ? +(allVals.reduce((a, b) => a + b, 0) / allVals.length).toFixed(2) : 0;
-  const globalThreshold = +(globalAvg * 1.5).toFixed(2);
-  series.push({
-    name: `动态阈值(${globalThreshold}ms)`, type: 'line',
-    lineStyle: { type: 'dashed', width: 1.5, color: '#909399' },
-    symbol: 'none', itemStyle: { color: '#909399' },
-    data: dates.map(() => globalThreshold),
-  });
-
   chart.setOption({
     tooltip: {
       trigger: 'axis', backgroundColor: '#fff', borderColor: '#ebeef5', borderWidth: 1,
@@ -599,15 +582,11 @@ function renderChart() {
         if (!activeParams.length) return '';
         let s = `<b style="color:#303133">${activeParams[0].axisValue}</b><br/>`;
         activeParams.forEach(p => {
-          if (p.seriesName.startsWith('动态阈值')) {
-            s += `<span style="color:#909399;">- - -</span> ${p.seriesName}<br/>`;
-          } else {
-            const v = p.value;
-            const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${delayColor(v)};margin-right:4px;"></span>`;
-            const threshold = getAlertThreshold();
-            const over = v > threshold ? ' ⚠️' : '';
-            s += `${dot}${p.seriesName}: <b>${v}</b>${unit}${over}<br/>`;
-          }
+          const v = p.value;
+          const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${delayColor(v)};margin-right:4px;"></span>`;
+          const threshold = getAlertThreshold();
+          const over = v > threshold ? ' ⚠️' : '';
+          s += `${dot}${p.seriesName}: <b>${v}</b>${unit}${over}<br/>`;
         });
         return s;
       }
@@ -652,18 +631,18 @@ function renderChart() {
   if (!chartInited) {
     chartInited = true;
     chart.on('click', params => {
-      if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
+      if (!params || params.componentType !== 'series') return;
       toggleHighlight(params.seriesName);
     });
 
     chart.on('mouseover', params => {
-      if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
+      if (!params || params.componentType !== 'series') return;
       hoverName = params.seriesName;
       syncHoverLinkedViews();
     });
 
     chart.on('mouseout', params => {
-      if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
+      if (!params || params.componentType !== 'series') return;
       if (hoverName === params.seriesName) {
         hoverName = null;
         syncHoverLinkedViews();
@@ -685,7 +664,7 @@ function renderChart() {
 
     chart.on('legendselectchanged', params => {
       if (legendLock) return;  // setOption 触发的回环直接跳过
-      const selected = Object.entries(params.selected).filter(([k, v]) => v && !k.startsWith('动态阈值'));
+      const selected = Object.entries(params.selected).filter(([k, v]) => v);
       highlightName = selected.length === 1 ? selected[0][0] : null;
       legendLock = true;
       refresh();
@@ -707,10 +686,9 @@ function renderRanking() {
 
   const rows = names.map(name => {
     const avgVal = avg(data[name]);
-    const threshold = +(avgVal * 1.5).toFixed(2);
     const maxDay = Math.max(...data[name].map(d => d.avg_delay));
     const isAlert = maxDay > getAlertThreshold();
-    return { name, avgVal, threshold, maxDay, isAlert };
+    return { name, avgVal, maxDay, isAlert };
   });
 
   rows.sort((a, b) => b.avgVal - a.avgVal);
@@ -718,7 +696,7 @@ function renderRanking() {
   const el = document.getElementById('rankBody');
   el.innerHTML = `<div class="rank-table">
     <div class="rank-row" style="font-weight:600;color:#909399;font-size:11px;border-bottom:2px solid #ebeef5;cursor:default;">
-      <div>#</div><div>名称</div><div></div><div>7日均值</div><div>动态阈值</div><div>状态</div>
+      <div>#</div><div>名称</div><div></div><div>7天均值</div><div>峰值</div><div>状态</div>
     </div>
     ${rows.map((r, i) => {
       const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
@@ -733,7 +711,7 @@ function renderRanking() {
         <div class="rank-prov">${r.name}</div>
         <div></div>
         <div class="rank-val" style="color:${delayColor(r.avgVal)}">${r.avgVal}${unit}</div>
-        <div class="rank-threshold ${r.isAlert ? 'rank-alert' : 'rank-normal'}">${r.threshold}</div>
+        <div class="rank-threshold ${r.isAlert ? 'rank-alert' : 'rank-normal'}">${r.maxDay}ms</div>
         <div><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
       </div>`;
     }).join('')}
@@ -741,7 +719,7 @@ function renderRanking() {
 
   document.getElementById('rankSub').textContent = drillProvince
     ? `${drillProvince} 地市排行（告警阈值：${getAlertThreshold()}ms）`
-    : `按 7 日均值动态阈值降序（均值×1.5，告警阈值：${getAlertThreshold()}ms）`;
+    : `按 7 天均值降序（告警阈值：${getAlertThreshold()}ms）`;
 }
 
 // ── 热力矩阵 ──
@@ -754,7 +732,6 @@ function renderHeatmap() {
 
   let html = '<table class="hm-table"><thead><tr><th>名称</th>';
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
-  html += '<th>动态阈值</th>';
   html += '</tr></thead><tbody>';
   names.forEach(name => {
     const isHover = hoverName === name;
@@ -762,13 +739,11 @@ function renderHeatmap() {
     const activeName = getActiveSeriesName();
     const isDim = activeName && !isHover && !isLock;
     const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
-    const threshold = getThreshold(name, data[name]);
     html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td>${name}</td>`;
     data[name].forEach(d => {
       const v = d.avg_delay;
       html += `<td><div class="hm-cell" style="background:${heatmapColor(v)}" title="${name} ${d.date}\n时延: ${v}ms">${v}</div></td>`;
     });
-    html += `<td><div class="hm-cell" style="background:rgba(144,147,153,0.88)" title="${name} 动态阈值\n阈值: ${threshold}ms">${threshold}</div></td>`;
     html += '</tr>';
   });
   html += '</tbody></table>';
