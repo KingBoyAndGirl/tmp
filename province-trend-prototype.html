@@ -428,30 +428,27 @@ function scrollRankingToActive() {
   row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-function getLegendFormatter() {
-  return name => {
-    const activeName = getActiveSeriesName();
-    const styleName = !activeName ? 'legend-normal' : name === activeName ? 'legend-active' : 'legend-dim';
-    return `{${styleName}|${name}}`;
-  };
-}
-
-function getLegendRich() {
-  return {
-    'legend-normal': { color: '#909399', fontSize: 11, fontWeight: 400 },
-    'legend-active': { color: '#303133', fontSize: 11, fontWeight: 600 },
-    'legend-dim': { color: '#c0c4cc', fontSize: 11, fontWeight: 400 },
-  };
+function getLegendData(names) {
+  const activeName = getActiveSeriesName();
+  return names.map(name => ({
+    name,
+    textStyle: !activeName
+      ? { color: '#909399', fontSize: 11, fontWeight: 400 }
+      : name === activeName
+        ? { color: '#303133', fontSize: 11, fontWeight: 600 }
+        : { color: '#c0c4cc', fontSize: 11, fontWeight: 400 }
+  }));
 }
 
 function syncHoverLinkedViews() {
   renderRanking();
   scrollRankingToActive();
   if (!chart) return;
+  const names = Object.keys(getVisibleData());
   chart.setOption({
     legend: {
-      formatter: getLegendFormatter(),
-      textStyle: { rich: getLegendRich() },
+      data: getLegendData(names),
+      textStyle: { color: '#909399', fontSize: 11 },
     }
   });
 }
@@ -590,8 +587,8 @@ function renderChart() {
     },
     legend: {
       type: 'scroll', bottom: 0,
-      formatter: getLegendFormatter(),
-      textStyle: { rich: getLegendRich() },
+      data: getLegendData(names),
+      textStyle: { color: '#909399', fontSize: 11 },
       selected: names.reduce((o, n) => { o[n] = true; return o; }, {}),
     },
     grid: { top: 24, right: 20, bottom: 50, left: 50 },
