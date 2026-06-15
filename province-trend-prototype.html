@@ -433,6 +433,12 @@ function drillDown(prov) { drillProvince = prov; highlightName = null; refresh()
 let chart = null;
 let chartInited = false;
 let legendLock = false;  // 防止 setOption 触发 legendselectchanged 回环
+
+function toggleHighlight(name) {
+  highlightName = highlightName === name ? null : name;
+  refresh();
+}
+
 function renderChart() {
   if (!chart) chart = echarts.init(document.getElementById('chartMain'));
   const data = getVisibleData();
@@ -523,14 +529,22 @@ function renderChart() {
   // 图例点击 → 高亮该线，其他置灰（只注册一次，带锁防回环）
   if (!chartInited) {
     chartInited = true;
+    chart.on('click', params => {
+      if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
+      toggleHighlight(params.seriesName);
+    });
+
+    chart.getZr().on('click', event => {
+      if (event.target) return;
+      if (highlightName === null) return;
+      highlightName = null;
+      refresh();
+    });
+
     chart.on('legendselectchanged', params => {
       if (legendLock) return;  // setOption 触发的回环直接跳过
       const selected = Object.entries(params.selected).filter(([k, v]) => v && !k.startsWith('动态阈值'));
-      if (selected.length === 1) {
-        highlightName = selected[0][0];
-      } else {
-        highlightName = null;
-      }
+      highlightName = selected.length === 1 ? selected[0][0] : null;
       legendLock = true;
       refresh();
       legendLock = false;
@@ -539,8 +553,8 @@ function renderChart() {
 
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 地市趋势` : '近 7 天趋势对比';
   document.getElementById('chartSub').textContent = drillProvince
-    ? '点击图例可高亮单个地市'
-    : '点击折线可高亮单省';
+    ? '点击地市折线或图例高亮，其他地市置灰'
+    : '点击省份折线或图例高亮，其他省份置灰';
 }
 
 // ── 排行 ──
