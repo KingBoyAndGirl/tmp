@@ -353,6 +353,7 @@ PROVINCES.forEach(prov => {
 let curMetric = 'delay';
 let drillProvince = null;  // null = 省级视图, string = 地市级视图
 let highlightName = null;  // 点击折线高亮
+let hoverName = null;      // 鼠标悬停的折线
 
 /* ════════════════════════════════════════════
    Helpers
@@ -488,8 +489,12 @@ function renderChart() {
       trigger: 'axis', backgroundColor: '#fff', borderColor: '#ebeef5', borderWidth: 1,
       textStyle: { color: '#606266', fontSize: 12 },
       formatter: params => {
-        let s = `<b style="color:#303133">${params[0].axisValue}</b><br/>`;
-        params.forEach(p => {
+        const activeParams = hoverName
+          ? params.filter(p => p.seriesName === hoverName || p.seriesName.startsWith('动态阈值'))
+          : params;
+        if (!activeParams.length) return '';
+        let s = `<b style="color:#303133">${activeParams[0].axisValue}</b><br/>`;
+        activeParams.forEach(p => {
           if (p.seriesName.startsWith('动态阈值')) {
             s += `<span style="color:#909399;">- - -</span> ${p.seriesName}<br/>`;
           } else {
@@ -544,6 +549,20 @@ function renderChart() {
     chart.on('click', params => {
       if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
       toggleHighlight(params.seriesName);
+    });
+
+    chart.on('mouseover', params => {
+      if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
+      hoverName = params.seriesName;
+    });
+
+    chart.on('mouseout', params => {
+      if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
+      if (hoverName === params.seriesName) hoverName = null;
+    });
+
+    chart.on('globalout', () => {
+      hoverName = null;
     });
 
     chart.getZr().on('click', event => {
