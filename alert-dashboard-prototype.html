@@ -134,7 +134,7 @@
     .table-header,
     .table-row {
       display: grid;
-      grid-template-columns: 66px 92px 1fr 74px 74px;
+      grid-template-columns: 50px 72px 1fr 80px 80px;
       align-items: center;
     }
 
@@ -195,8 +195,8 @@
 
     .province-cell,
     .alert-cell,
-    .ratio-cell,
-    .state-cell {
+    .delay-cell,
+    .loss-cell {
       min-width: 0;
     }
 
@@ -210,8 +210,7 @@
     }
 
     .province-cell .sub,
-    .alert-cell .sub,
-    .ratio-cell .sub {
+    .alert-cell .sub {
       margin-top: 3px;
       font-size: 10px;
       color: var(--muted);
@@ -220,34 +219,14 @@
       text-overflow: ellipsis;
     }
 
-    .ratio-cell .main {
+    .delay-cell .main,
+    .loss-cell .main {
       font-size: 13px;
       color: #eef5ff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
-    .state-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .status-tag {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 50px;
-      padding: 6px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      color: #fff;
-    }
-
-    .status-danger { background: #cf8732; }
-    .status-warn { background: #8d6f3a; }
-    .status-normal { background: #4f5f7d; }
 
     .panel-footer {
       min-height: 34px;
@@ -316,17 +295,17 @@
             <div>序号</div>
             <div>告警省份</div>
             <div>告警方向</div>
-            <div>占比</div>
-            <div>状态</div>
+            <div>时延</div>
+            <div>丢包率</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">64%</div><div class="sub">24.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">55%</div><div class="sub">22.84ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">62%</div><div class="sub">22.30ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">59%</div><div class="sub">21.10ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">58%</div><div class="sub">19.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
             </div>
           </div>
           <div class="panel-footer"><span>所有层级始终显示同一份告警榜</span><span>Hover 暂停</span></div>
@@ -351,17 +330,17 @@
             <div>序号</div>
             <div>告警省份</div>
             <div>告警方向</div>
-            <div>占比</div>
-            <div>状态</div>
+            <div>时延</div>
+            <div>丢包率</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">64%</div><div class="sub">24.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">55%</div><div class="sub">22.84ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">62%</div><div class="sub">22.30ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">59%</div><div class="sub">21.10ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">58%</div><div class="sub">19.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
             </div>
           </div>
           <div class="panel-footer"><span>所有层级始终显示同一份告警榜</span><span>Hover 暂停</span></div>
@@ -386,17 +365,17 @@
             <div>序号</div>
             <div>告警省份</div>
             <div>告警方向</div>
-            <div>占比</div>
-            <div>状态</div>
+            <div>时延</div>
+            <div>丢包率</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">64%</div><div class="sub">24.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">55%</div><div class="sub">22.84ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">62%</div><div class="sub">22.30ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">59%</div><div class="sub">21.10ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">58%</div><div class="sub">19.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
             </div>
           </div>
           <div class="panel-footer"><span>所有层级始终显示同一份告警榜</span><span>Hover 暂停</span></div>
@@ -421,17 +400,17 @@
             <div>序号</div>
             <div>告警省份</div>
             <div>告警方向</div>
-            <div>占比</div>
-            <div>状态</div>
+            <div>时延</div>
+            <div>丢包率</div>
           </div>
           <div class="table-body auto-scroll">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">71%</div><div class="sub">25.39ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">64%</div><div class="sub">24.10ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">55%</div><div class="sub">22.84ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">62%</div><div class="sub">22.30ms</div></div><div class="state-cell"><span class="status-tag status-danger">告警</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">59%</div><div class="sub">21.10ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="ratio-cell"><div class="main">58%</div><div class="sub">19.90ms</div></div><div class="state-cell"><span class="status-tag status-warn">关注</span></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div><div class="sub">固定全局榜</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
             </div>
           </div>
           <div class="panel-footer"><span>所有层级始终显示同一份告警榜</span><span>Hover 暂停</span></div>
