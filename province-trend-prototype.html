@@ -431,22 +431,6 @@ function getActiveSeriesName() {
   return hoverName || highlightName;
 }
 
-function scrollRankingToActive() {
-  if (!hoverName) return;
-  const wrap = document.getElementById('rankBody');
-  const row = wrap && wrap.querySelector(`[data-rank-name="${hoverName}"]`);
-  if (!wrap || !row) return;
-  row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-}
-
-function scrollHeatmapToActive() {
-  if (!hoverName) return;
-  const wrap = document.getElementById('hmWrap');
-  const row = wrap && wrap.querySelector(`[data-hm-name="${hoverName}"]`);
-  if (!wrap || !row) return;
-  row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-}
-
 function getLegendData(names) {
   const activeName = getActiveSeriesName();
   return names.map(name => ({
@@ -462,8 +446,6 @@ function getLegendData(names) {
 function syncHoverLinkedViews() {
   renderRanking();
   renderHeatmap();
-  scrollRankingToActive();
-  scrollHeatmapToActive();
   if (!chart) return;
   const names = Object.keys(getVisibleData());
   chart.setOption({
