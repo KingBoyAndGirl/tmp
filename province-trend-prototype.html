@@ -452,10 +452,22 @@ function renderChart() {
     const isHighlighted = highlightName === null || highlightName === name;
     return {
       name, type: 'line', smooth: true, symbol: 'circle', triggerLineEvent: true,
-      symbolSize: isHighlighted ? 8 : 3,
-      lineStyle: { width: isHighlighted ? 2.5 : 1, opacity: isHighlighted ? 1 : 0.15 },
-      itemStyle: { color: isHighlighted ? palette[i % palette.length] : '#dcdfe6' },
-      emphasis: { lineStyle: { width: 3 }, scale: true },
+      symbolSize: isHighlighted ? 8 : 4,
+      showSymbol: true,
+      z: isHighlighted ? 3 : 1,
+      lineStyle: { width: isHighlighted ? 3.5 : 1.2, opacity: isHighlighted ? 1 : 0.15 },
+      itemStyle: { color: isHighlighted ? palette[i % palette.length] : '#dcdfe6', opacity: isHighlighted ? 1 : 0.35 },
+      emphasis: {
+        focus: 'series',
+        blurScope: 'coordinateSystem',
+        scale: true,
+        lineStyle: { width: 5, opacity: 1 },
+        itemStyle: { borderWidth: 2, borderColor: '#fff', opacity: 1 }
+      },
+      blur: {
+        lineStyle: { opacity: 0.06 },
+        itemStyle: { opacity: 0.12 }
+      },
       data: data[name].map(d => d.avg_delay),
     };
   });
