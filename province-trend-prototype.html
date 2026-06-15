@@ -432,6 +432,7 @@ function drillDown(prov) { drillProvince = prov; highlightName = null; refresh()
 // ── ECharts ──
 let chart = null;
 let chartInited = false;
+let legendLock = false;  // 防止 setOption 触发 legendselectchanged 回环
 function renderChart() {
   if (!chart) chart = echarts.init(document.getElementById('chartMain'));
   const data = getVisibleData();
@@ -519,17 +520,20 @@ function renderChart() {
     }]
   });
 
-  // 图例点击 → 高亮该线，其他置灰（只注册一次）
+  // 图例点击 → 高亮该线，其他置灰（只注册一次，带锁防回环）
   if (!chartInited) {
     chartInited = true;
     chart.on('legendselectchanged', params => {
+      if (legendLock) return;  // setOption 触发的回环直接跳过
       const selected = Object.entries(params.selected).filter(([k, v]) => v && !k.startsWith('动态阈值'));
       if (selected.length === 1) {
         highlightName = selected[0][0];
       } else {
         highlightName = null;
       }
+      legendLock = true;
       refresh();
+      legendLock = false;
     });
   }
 
