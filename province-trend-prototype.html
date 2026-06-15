@@ -409,6 +409,37 @@ function getThreshold(name, data) {
   return +(val * 1.5).toFixed(2);
 }
 
+function getActiveSeriesName() {
+  return hoverName || highlightName;
+}
+
+function getLegendFormatter() {
+  return name => {
+    const activeName = getActiveSeriesName();
+    const styleName = !activeName ? 'legend-normal' : name === activeName ? 'legend-active' : 'legend-dim';
+    return `{${styleName}|${name}}`;
+  };
+}
+
+function getLegendRich() {
+  return {
+    'legend-normal': { color: '#909399', fontSize: 11, fontWeight: 400 },
+    'legend-active': { color: '#303133', fontSize: 11, fontWeight: 600 },
+    'legend-dim': { color: '#c0c4cc', fontSize: 11, fontWeight: 400 },
+  };
+}
+
+function syncHoverLinkedViews() {
+  renderRanking();
+  if (!chart) return;
+  chart.setOption({
+    legend: {
+      formatter: getLegendFormatter(),
+      textStyle: { rich: getLegendRich() },
+    }
+  });
+}
+
 /* ════════════════════════════════════════════
    Render
    ════════════════════════════════════════════ */
@@ -505,7 +536,7 @@ function renderChart() {
       textStyle: { color: '#606266', fontSize: 12 },
       formatter: params => {
         const activeParams = hoverName
-          ? params.filter(p => p.seriesName === hoverName || p.seriesName.startsWith('动态阈值'))
+          ? params.filter(p => p.seriesName === hoverName)
           : params;
         if (!activeParams.length) return '';
         let s = `<b style="color:#303133">${activeParams[0].axisValue}</b><br/>`;
@@ -525,7 +556,8 @@ function renderChart() {
     },
     legend: {
       type: 'scroll', bottom: 0,
-      textStyle: { color: '#909399', fontSize: 11 },
+      formatter: getLegendFormatter(),
+      textStyle: { rich: getLegendRich() },
       selected: names.reduce((o, n) => { o[n] = true; return o; }, {}),
     },
     grid: { top: 24, right: 20, bottom: 50, left: 50 },
@@ -569,15 +601,21 @@ function renderChart() {
     chart.on('mouseover', params => {
       if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
       hoverName = params.seriesName;
+      syncHoverLinkedViews();
     });
 
     chart.on('mouseout', params => {
       if (!params || params.componentType !== 'series' || params.seriesName.startsWith('动态阈值')) return;
-      if (hoverName === params.seriesName) hoverName = null;
+      if (hoverName === params.seriesName) {
+        hoverName = null;
+        syncHoverLinkedViews();
+      }
     });
 
     chart.on('globalout', () => {
+      if (hoverName === null) return;
       hoverName = null;
+      syncHoverLinkedViews();
     });
 
     chart.getZr().on('click', event => {
@@ -626,8 +664,9 @@ function renderRanking() {
     </div>
     ${rows.map((r, i) => {
       const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
-      const isHigh = highlightName === r.name;
-      const isDim = highlightName && !isHigh;
+      const activeName = getActiveSeriesName();
+      const isHigh = activeName === r.name;
+      const isDim = activeName && !isHigh;
       const rowClass = isHigh ? 'highlight' : isDim ? 'dimmed' : '';
       const clickAttr = !drillProvince ? `onclick="drillDown('${r.name}')"` : '';
       return `<div class="rank-row ${rowClass}" ${clickAttr}>
