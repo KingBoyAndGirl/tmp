@@ -208,60 +208,94 @@
 
 <script>
 /* ════════════════════════════════════════════
-   Mock Data — 模拟 DetectionRecord GROUP BY 查询
-   省级：province × 7天
-   地市级：province+city × 7天（下钻用）
+   Mock Data — 对齐真实 DetectionRecord 结构
+   destResourcePool = 省份（如"山东省"）
+   destAz = 目的地市+方向点（如"德州市-最北点"）
+   GROUP BY destResourcePool → 省级
+   GROUP BY destAz 提取城市名 → 地市级下钻
    ════════════════════════════════════════════ */
 const PROVINCES_DATA = {
   '山东': { baseDelay: 14, cities: {
-    '济南': { base: 12, dests: ['烟台','威海','青岛','淄博'] },
-    '青岛': { base: 13, dests: ['烟台','威海'] },
-    '烟台': { base: 15, dests: ['威海'] },
+    '济南市': { base: 12, points: ['最北点','最东点','最西点','最南点'] },
+    '青岛市': { base: 13, points: ['最北点','最东点'] },
+    '烟台市': { base: 15, points: ['最北点','最南点'] },
+    '潍坊市': { base: 14, points: ['最北点','最南点'] },
+    '临沂市': { base: 13, points: ['最西点','最东点'] },
+    '威海市': { base: 16, points: ['最西点','最东点'] },
+    '德州市': { base: 11, points: ['最北点','最南点'] },
+    '淄博市': { base: 12, points: ['最北点','最南点'] },
+    '日照市': { base: 14, points: ['最北点','最南点'] },
   }},
   '江苏': { baseDelay: 12, cities: {
-    '南京': { base: 11, dests: ['南通','苏州','无锡'] },
-    '苏州': { base: 10, dests: ['南通'] },
+    '南京市': { base: 11, points: ['最北点','最南点'] },
+    '苏州市': { base: 10, points: ['最东点','最西点'] },
+    '南通市': { base: 13, points: ['最北点','最南点'] },
+    '无锡市': { base: 10, points: ['最北点','最南点'] },
   }},
   '浙江': { baseDelay: 11, cities: {
-    '杭州': { base: 10, dests: ['宁波','温州'] },
-    '宁波': { base: 9, dests: ['温州'] },
+    '杭州市': { base: 10, points: ['最北点','最南点'] },
+    '宁波市': { base: 9, points: ['最东点','最西点'] },
+    '温州市': { base: 12, points: ['最北点','最南点'] },
   }},
   '广东': { baseDelay: 10, cities: {
-    '广州': { base: 9, dests: ['深圳','东莞'] },
-    '深圳': { base: 8, dests: ['东莞'] },
+    '广州市': { base: 9, points: ['最北点','最南点'] },
+    '深圳市': { base: 8, points: ['最东点','最西点'] },
+    '东莞市': { base: 11, points: ['最北点','最南点'] },
   }},
   '四川': { baseDelay: 16, cities: {
-    '成都': { base: 15, dests: ['绵阳','德阳','乐山'] },
+    '成都市': { base: 15, points: ['最北点','最南点','最东点'] },
+    '绵阳市': { base: 17, points: ['最北点','最南点'] },
+    '德阳市': { base: 16, points: ['最北点','最南点'] },
   }},
   '河南': { baseDelay: 13, cities: {
-    '郑州': { base: 12, dests: ['洛阳','开封'] },
+    '郑州市': { base: 12, points: ['最北点','最南点'] },
+    '洛阳市': { base: 14, points: ['最北点','最南点'] },
+    '开封市': { base: 13, points: ['最北点','最南点'] },
   }},
   '河北': { baseDelay: 14, cities: {
-    '石家庄': { base: 13, dests: ['秦皇岛','唐山'] },
+    '石家庄市': { base: 13, points: ['最北点','最南点'] },
+    '秦皇岛市': { base: 15, points: ['最北点','最南点'] },
+    '唐山市': { base: 14, points: ['最北点','最南点'] },
   }},
   '湖北': { baseDelay: 12, cities: {
-    '武汉': { base: 11, dests: ['宜昌','襄阳'] },
+    '武汉市': { base: 11, points: ['最北点','最南点'] },
+    '宜昌市': { base: 13, points: ['最北点','最南点'] },
+    '襄阳市': { base: 12, points: ['最北点','最南点'] },
   }},
   '湖南': { baseDelay: 13, cities: {
-    '长沙': { base: 12, dests: ['株洲','湘潭'] },
+    '长沙市': { base: 12, points: ['最北点','最南点'] },
+    '株洲市': { base: 14, points: ['最北点','最南点'] },
+    '湘潭市': { base: 13, points: ['最北点','最南点'] },
   }},
   '福建': { baseDelay: 11, cities: {
-    '福州': { base: 10, dests: ['厦门','泉州'] },
+    '福州市': { base: 10, points: ['最北点','最南点'] },
+    '厦门市': { base: 9, points: ['最东点','最西点'] },
+    '泉州市': { base: 11, points: ['最北点','最南点'] },
   }},
   '安徽': { baseDelay: 12, cities: {
-    '合肥': { base: 11, dests: ['芜湖','蚌埠'] },
+    '合肥市': { base: 11, points: ['最北点','最南点'] },
+    '芜湖市': { base: 13, points: ['最北点','最南点'] },
+    '蚌埠市': { base: 12, points: ['最北点','最南点'] },
   }},
   '辽宁': { baseDelay: 15, cities: {
-    '沈阳': { base: 14, dests: ['大连','鞍山'] },
+    '沈阳市': { base: 14, points: ['最北点','最南点'] },
+    '大连市': { base: 13, points: ['最东点','最西点'] },
+    '鞍山市': { base: 16, points: ['最北点','最南点'] },
   }},
   '陕西': { baseDelay: 14, cities: {
-    '西安': { base: 13, dests: ['咸阳','宝鸡'] },
+    '西安市': { base: 13, points: ['最北点','最南点'] },
+    '咸阳市': { base: 15, points: ['最北点','最南点'] },
+    '宝鸡市': { base: 14, points: ['最北点','最南点'] },
   }},
   '云南': { baseDelay: 18, cities: {
-    '昆明': { base: 17, dests: ['曲靖','玉溪'] },
+    '昆明市': { base: 17, points: ['最北点','最南点'] },
+    '曲靖市': { base: 19, points: ['最北点','最南点'] },
+    '玉溪市': { base: 18, points: ['最北点','最南点'] },
   }},
   '贵州': { baseDelay: 20, cities: {
-    '贵阳': { base: 19, dests: ['遵义','六盘水'] },
+    '贵阳市': { base: 19, points: ['最北点','最南点'] },
+    '遵义市': { base: 21, points: ['最北点','最南点'] },
+    '六盘水市': { base: 22, points: ['最北点','最南点'] },
   }},
 };
 
@@ -290,24 +324,26 @@ PROVINCES.forEach((prov, pi) => {
 });
 
 // 生成地市级 mock 数据（下钻用）
+// 每个地市 = 该城市所有探测点的 AVG(avg_delay)
 const CITY_DATA = {};
 PROVINCES.forEach(prov => {
   const cities = PROVINCES_DATA[prov].cities;
   CITY_DATA[prov] = {};
   Object.entries(cities).forEach(([city, info], ci) => {
     const rng = srand(PROVINCES.indexOf(prov) * 1000 + ci * 137 + 42);
+    // 城市级 = 所有探测点聚合后的均值
     CITY_DATA[prov][city] = dates.map((date, di) => {
       const trend = Math.sin(di / 3 + ci) * 2;
       const jitter = (rng() - 0.5) * 4;
       return { date, avg_delay: Math.max(2, +(info.base + trend + jitter).toFixed(2)) };
     });
-    // 生成该城市下各方向的数据
-    info.dests.forEach((dest, di2) => {
-      const rng2 = srand(PROVINCES.indexOf(prov) * 1000 + ci * 100 + di2 * 17 + 42);
-      const key = `${city}→${dest}`;
-      CITY_DATA[prov][key] = dates.map((date, ddi) => {
+    // 每个探测点（如"济南市-最北点"）独立数据
+    info.points.forEach((point, pi) => {
+      const rng2 = srand(PROVINCES.indexOf(prov) * 1000 + ci * 100 + pi * 17 + 42);
+      const pointKey = `${city.replace('市','')}-${point}`;
+      CITY_DATA[prov][pointKey] = dates.map((date, ddi) => {
         const jitter = (rng2() - 0.5) * 6;
-        return { date, avg_delay: Math.max(2, +(info.base + 2 + Math.sin(ddi / 4) * 3 + jitter).toFixed(2)) };
+        return { date, avg_delay: Math.max(2, +(info.base + 1.5 + Math.sin(ddi / 4 + pi) * 3 + jitter).toFixed(2)) };
       });
     });
   });
@@ -352,12 +388,9 @@ function avg(arr) {
 
 function getVisibleData() {
   if (drillProvince) {
-    const cities = {};
+    // 下钻视图：显示该省各地市 + 各探测点
     const raw = CITY_DATA[drillProvince];
-    Object.entries(raw).forEach(([key, arr]) => {
-      if (key.includes('→')) cities[key] = arr;
-    });
-    return cities;
+    return raw; // { '济南市': [...], '济南市-最北点': [...], ... }
   }
   const provs = {};
   [...activeProv].forEach(p => { provs[p] = PROV_DATA[p]; });
