@@ -529,8 +529,6 @@ function renderChart() {
       } else {
         highlightName = null;
       }
-      // 阻止默认的图例隐藏行为，改用自定义高亮
-      chart.dispatchAction({ type: 'legendAllSelect' });
       refresh();
     });
   }
