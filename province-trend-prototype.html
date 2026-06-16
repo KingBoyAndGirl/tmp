@@ -100,15 +100,15 @@
     .chart-box { height: 400px; width: 100%; }
 
     /* ── 排行表（含7天均值列） ── */
-    .rank-table { width: 100%; min-width: 0; }
+    .rank-table { width: 100%; min-width: 0; padding-right: 6px; }
     .rank-row {
-      display: grid; grid-template-columns: 36px minmax(76px, 1.15fr) minmax(84px, 0.9fr) minmax(74px, 0.8fr) minmax(58px, 0.6fr) 84px;
+      display: grid; grid-template-columns: 40px minmax(96px, 1.2fr) minmax(88px, 0.95fr) minmax(78px, 0.82fr) minmax(62px, 0.65fr) 98px;
       align-items: center; min-height: 42px;
       border-bottom: 1px solid #ebeef5; font-size: 12px;
       cursor: pointer; transition: background .15s;
-      column-gap: 4px;
+      column-gap: 8px;
       width: 100%; min-width: 0;
-      padding: 0 12px 0 8px;
+      padding: 0 18px 0 12px;
     }
     .rank-row:hover { background: #f5f7fa; }
     .rank-row.hover-highlight {
@@ -132,7 +132,7 @@
     .rank-prov { color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
     .rank-val { text-align: right; padding-right: 4px; color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; min-width: 0; }
     .rank-threshold { text-align: right; padding-right: 4px; font-size: 11px; white-space: nowrap; min-width: 0; }
-    .rank-status { display: flex; align-items: center; justify-content: center; min-width: 0; }
+    .rank-status { display: flex; align-items: center; justify-content: flex-end; min-width: 0; padding-right: 2px; }
     .rank-alert { color: #f56c6c; font-weight: 600; }
     .rank-normal { color: #67c23a; }
     .rank-tag {
@@ -262,7 +262,7 @@
           <div class="card-sub" id="rankSub">按 7 天均值降序</div>
         </div>
       </div>
-      <div class="card-body" style="padding:0;max-height:440px;overflow-y:auto;overflow-x:hidden;" id="rankBody"></div>
+      <div class="card-body" style="padding:0;max-height:440px;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;" id="rankBody"></div>
     </div>
   </div>
 
