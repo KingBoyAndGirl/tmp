@@ -92,9 +92,9 @@
     }
     .card-title { font-size: 15px; font-weight: 600; color: #303133; }
     .card-sub { font-size: 12px; color: #909399; margin-top: 2px; }
-    .card-body { padding: 16px 20px; }
+    .card-body { padding: 16px 20px; min-width: 0; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 420px; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) 520px; gap: 16px; }
     @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
 
     .chart-box { height: 400px; width: 100%; }
@@ -102,7 +102,7 @@
     /* ── 排行表（含7天均值列） ── */
     .rank-table { width: 100%; }
     .rank-row {
-      display: grid; grid-template-columns: 32px 92px 1fr 78px 78px 62px 64px;
+      display: grid; grid-template-columns: 40px 108px minmax(88px, 1fr) 92px 92px 72px 80px;
       align-items: center; min-height: 42px;
       border-bottom: 1px solid #ebeef5; font-size: 12px;
       cursor: pointer; transition: background .15s;
