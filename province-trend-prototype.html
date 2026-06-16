@@ -402,14 +402,34 @@ function clampValue(value, min, max) { return Math.max(min, Math.min(max, +Numbe
 function deriveLossBase(baseDelay, offset = 0) { return clampValue(baseDelay * 1.35 + offset, 2, 72); }
 
 const SOURCE_ENDPOINTS = [
-  { srcResourcePool: '华南源端资源池', srcAz: '广州源端可用区A' },
-  { srcResourcePool: '华东源端资源池', srcAz: '上海源端可用区B' },
-  { srcResourcePool: '华北源端资源池', srcAz: '北京源端可用区A' },
-  { srcResourcePool: '西南源端资源池', srcAz: '成都源端可用区B' },
+  { srcResourcePool: '山东-省建边缘云', srcAz: '边缘可用区-聊城1' },
+  { srcResourcePool: '山东-省建边缘云', srcAz: '边缘可用区-济南1' },
+  { srcResourcePool: '山东-省建边缘云', srcAz: '边缘可用区-青岛1' },
+  { srcResourcePool: '山东-省建边缘云', srcAz: '边缘可用区-烟台1' },
+  { srcResourcePool: '山东-省建边缘云', srcAz: '边缘可用区-临沂1' },
 ];
 
+function normalizeCityName(raw) {
+  if (!raw) return '';
+  const match = String(raw).match(/([一-龥]{2,}(?:自治州|地区|盟|市|州|县|区))/);
+  if (match) return match[1];
+  const fallback = String(raw).match(/([一-龥]{2,})/);
+  return fallback ? `${fallback[1]}市` : String(raw);
+}
+
+function extractSourceCity(srcAz) {
+  const match = String(srcAz || '').match(/-([一-龥]{2,})\d*/);
+  return match ? `${match[1]}市` : normalizeCityName(srcAz);
+}
+
+function extractDestCity(destResourcePool, destAz) {
+  const fromAz = String(destAz || '').match(/([一-龥]{2,}(?:自治州|地区|盟|市))/);
+  if (fromAz) return fromAz[1];
+  return normalizeCityName(destResourcePool);
+}
+
 function formatDrillLinkName(link) {
-  return `${link.srcResourcePool}/${link.srcAz} → ${link.destResourcePool}/${link.destAz}`;
+  return `${extractSourceCity(link.srcAz)}到${extractDestCity(link.destResourcePool, link.destAz)}`;
 }
 
 // 生成省级 mock 数据
@@ -859,10 +879,10 @@ function renderChart() {
     });
   }
 
-  document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源端资源池/可用区到目的端资源池/可用区${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
+  document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源市到目的市${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
   document.getElementById('chartSub').textContent = drillProvince
-    ? `点击链路${cfg.shortLabel}折线或图例高亮，其他链路置灰`
-    : `点击省份${cfg.shortLabel}折线高亮，双击可下钻到目的端链路`;
+    ? `点击城市链路${cfg.shortLabel}折线或图例高亮，其他链路置灰`
+    : `点击省份${cfg.shortLabel}折线高亮，双击可下钻到城市链路`;
 }
 
 // ── 排行 ──
@@ -911,7 +931,7 @@ function renderRanking() {
   </div>`;
 
   document.getElementById('rankSub').textContent = drillProvince
-    ? `${drillProvince} 源端→目的端排行（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`
+    ? `${drillProvince} 城市链路排行（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`
     : `按 7 天均值降序（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`;
 }
 
@@ -948,7 +968,7 @@ ${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}">${formatMetricNumber(v)}
   html += '</tbody></table>';
   document.getElementById('hmWrap').innerHTML = html;
   document.getElementById('hmSub').textContent = drillProvince
-    ? `${drillProvince} 源端→目的端 × 日期（${cfg.label}）`
+    ? `${drillProvince} 城市链路 × 日期（${cfg.label}）`
     : `省份 × 日期，颜色编码${cfg.label}级别`;
 }
 
