@@ -140,23 +140,23 @@
     .tag-normal { background: #67c23a; }
 
     /* ── 热力表 ── */
-    .hm-wrap { overflow: auto; max-height: 480px; }
+    .hm-wrap { overflow: auto; max-height: 520px; border-top: 1px solid #ebeef5; }
     .hm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .hm-table th {
       position: sticky; top: 0; z-index: 2;
       background: #ecebee; color: #909399; font-weight: 600;
-      padding: 8px 4px; white-space: nowrap; border-bottom: 1px solid #ebeef5;
+      padding: 10px 8px; white-space: nowrap; border-bottom: 1px solid #dfe6f0; box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset;
     }
-    .hm-table th:first-child { text-align: left; padding-left: 12px; min-width: 56px; position: sticky; left: 0; z-index: 3; background: #ecebee; }
-    .hm-table td { text-align: center; height: 30px; min-width: 48px; padding: 0; border-bottom: 1px solid #f0f2f5; }
+    .hm-table th:first-child { text-align: left; padding-left: 12px; min-width: 88px; position: sticky; left: 0; z-index: 5; background: #ecebee; box-shadow: 2px 0 8px rgba(31,120,255,0.08); }
+    .hm-table td { text-align: center; height: 38px; min-width: 64px; padding: 0; border-bottom: 1px solid #f0f2f5; }
     .hm-table td:first-child {
       text-align: left; padding-left: 12px; font-weight: 500; color: #303133;
-      background: #fff; position: sticky; left: 0; z-index: 1; white-space: nowrap;
+      background: #fff; position: sticky; left: 0; z-index: 4; white-space: nowrap; box-shadow: 2px 0 8px rgba(31,120,255,0.06);
     }
     .hm-cell {
       display: inline-flex; align-items: center; justify-content: center;
-      width: calc(100% - 4px); height: 24px; border-radius: 3px;
-      margin: 2px; font-size: 10px; color: #303133; font-weight: 600;
+      width: calc(100% - 6px); height: 30px; border-radius: 4px;
+      margin: 3px; font-size: 12px; color: #303133; font-weight: 600;
       cursor: default; transition: transform .12s;
     }
     .hm-cell:hover { transform: scale(1.1); z-index: 4; }
@@ -272,15 +272,15 @@ const PROVINCES_DATA = {
     '宁波市': { base: 9, points: ['最东点','最西点'] },
     '温州市': { base: 12, points: ['最北点','最南点'] },
   }},
-  '广东': { baseDelay: 10, cities: {
-    '广州市': { base: 9, points: ['最北点','最南点'] },
-    '深圳市': { base: 8, points: ['最东点','最西点'] },
-    '东莞市': { base: 11, points: ['最北点','最南点'] },
+  '广东': { baseDelay: 23, cities: {
+    '广州市': { base: 24, points: ['最北点','最南点'] },
+    '深圳市': { base: 27, points: ['最东点','最西点'] },
+    '东莞市': { base: 22, points: ['最北点','最南点'] },
   }},
-  '四川': { baseDelay: 16, cities: {
-    '成都市': { base: 15, points: ['最北点','最南点','最东点'] },
-    '绵阳市': { base: 17, points: ['最北点','最南点'] },
-    '德阳市': { base: 16, points: ['最北点','最南点'] },
+  '四川': { baseDelay: 28, cities: {
+    '成都市': { base: 29, points: ['最北点','最南点','最东点'] },
+    '绵阳市': { base: 31, points: ['最北点','最南点'] },
+    '德阳市': { base: 27, points: ['最北点','最南点'] },
   }},
   '河南': { baseDelay: 13, cities: {
     '郑州市': { base: 12, points: ['最北点','最南点'] },
@@ -322,15 +322,15 @@ const PROVINCES_DATA = {
     '咸阳市': { base: 15, points: ['最北点','最南点'] },
     '宝鸡市': { base: 14, points: ['最北点','最南点'] },
   }},
-  '云南': { baseDelay: 18, cities: {
-    '昆明市': { base: 17, points: ['最北点','最南点'] },
-    '曲靖市': { base: 19, points: ['最北点','最南点'] },
-    '玉溪市': { base: 18, points: ['最北点','最南点'] },
+  '云南': { baseDelay: 31, cities: {
+    '昆明市': { base: 30, points: ['最北点','最南点'] },
+    '曲靖市': { base: 34, points: ['最北点','最南点'] },
+    '玉溪市': { base: 32, points: ['最北点','最南点'] },
   }},
-  '贵州': { baseDelay: 20, cities: {
-    '贵阳市': { base: 19, points: ['最北点','最南点'] },
-    '遵义市': { base: 21, points: ['最北点','最南点'] },
-    '六盘水市': { base: 22, points: ['最北点','最南点'] },
+  '贵州': { baseDelay: 34, cities: {
+    '贵阳市': { base: 33, points: ['最北点','最南点'] },
+    '遵义市': { base: 36, points: ['最北点','最南点'] },
+    '六盘水市': { base: 38, points: ['最北点','最南点'] },
   }},
 };
 
@@ -353,7 +353,7 @@ PROVINCES.forEach((prov, pi) => {
   const base = PROVINCES_DATA[prov].baseDelay;
   PROV_DATA[prov] = dates.map((date, di) => {
     const trend = Math.sin(di / 3 + pi) * 2.5;
-    const jitter = (rng() - 0.5) * 5;
+    const jitter = (rng() - 0.5) * 7;
     return { date, avg_delay: Math.max(3, +(base + trend + jitter).toFixed(2)) };
   });
 });
@@ -369,7 +369,7 @@ PROVINCES.forEach(prov => {
     // 城市级 = 所有探测点聚合后的均值
     CITY_DATA[prov][city] = dates.map((date, di) => {
       const trend = Math.sin(di / 3 + ci) * 2;
-      const jitter = (rng() - 0.5) * 4;
+      const jitter = (rng() - 0.5) * 6;
       return { date, avg_delay: Math.max(2, +(info.base + trend + jitter).toFixed(2)) };
     });
     // 每个探测点（如"济南市-最北点"）独立数据
@@ -377,7 +377,7 @@ PROVINCES.forEach(prov => {
       const rng2 = srand(PROVINCES.indexOf(prov) * 1000 + ci * 100 + pi * 17 + 42);
       const pointKey = `${city.replace('市','')}-${point}`;
       CITY_DATA[prov][pointKey] = dates.map((date, ddi) => {
-        const jitter = (rng2() - 0.5) * 6;
+        const jitter = (rng2() - 0.5) * 8;
         return { date, avg_delay: Math.max(2, +(info.base + 1.5 + Math.sin(ddi / 4 + pi) * 3 + jitter).toFixed(2)) };
       });
     });
