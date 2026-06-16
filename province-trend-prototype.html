@@ -401,6 +401,17 @@ function srand(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647
 function clampValue(value, min, max) { return Math.max(min, Math.min(max, +Number(value).toFixed(2))); }
 function deriveLossBase(baseDelay, offset = 0) { return clampValue(baseDelay * 1.35 + offset, 2, 72); }
 
+const SOURCE_ENDPOINTS = [
+  { srcResourcePool: '华南源端资源池', srcAz: '广州源端可用区A' },
+  { srcResourcePool: '华东源端资源池', srcAz: '上海源端可用区B' },
+  { srcResourcePool: '华北源端资源池', srcAz: '北京源端可用区A' },
+  { srcResourcePool: '西南源端资源池', srcAz: '成都源端可用区B' },
+];
+
+function formatDrillLinkName(link) {
+  return `${link.srcResourcePool}/${link.srcAz} → ${link.destResourcePool}/${link.destAz}`;
+}
+
 // 生成省级 mock 数据
 const PROV_DATA = {};
 PROVINCES.forEach((prov, pi) => {
@@ -443,7 +454,13 @@ PROVINCES.forEach(prov => {
 
     info.points.forEach((point, pi) => {
       const rng2 = srand(PROVINCES.indexOf(prov) * 1000 + ci * 100 + pi * 17 + 42);
-      const pointKey = `${city.replace('市','')}-${point}`;
+      const source = SOURCE_ENDPOINTS[(PROVINCES.indexOf(prov) + ci + pi) % SOURCE_ENDPOINTS.length];
+      const pointKey = formatDrillLinkName({
+        srcResourcePool: source.srcResourcePool,
+        srcAz: source.srcAz,
+        destResourcePool: city,
+        destAz: point,
+      });
       const pointLossBase = deriveLossBase(info.base + 1.5, pi * 2 - 1);
       CITY_DATA[prov][pointKey] = dates.map((date, ddi) => {
         const delayJitter = (rng2() - 0.5) * 8;
@@ -559,18 +576,12 @@ function getAlertCount(arr) {
   return arr.filter(item => getMetricValue(item) > threshold).length;
 }
 
-const DRILL_SOURCE_LABEL = '源端';
-
-function formatDrillLinkName(destKey) {
-  return `${DRILL_SOURCE_LABEL} → ${destKey}`;
-}
-
 function getVisibleData() {
   if (drillProvince) {
     const raw = CITY_DATA[drillProvince];
     const links = {};
     Object.entries(raw).forEach(([key, arr]) => {
-      if (key.includes('-')) links[formatDrillLinkName(key)] = arr;
+      if (key.includes('→')) links[key] = arr;
     });
     return links;
   }
@@ -848,7 +859,7 @@ function renderChart() {
     });
   }
 
-  document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源端到目的端${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
+  document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源端资源池/可用区到目的端资源池/可用区${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
   document.getElementById('chartSub').textContent = drillProvince
     ? `点击链路${cfg.shortLabel}折线或图例高亮，其他链路置灰`
     : `点击省份${cfg.shortLabel}折线高亮，双击可下钻到目的端链路`;
