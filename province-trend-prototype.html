@@ -409,9 +409,23 @@ function delayColor(v) {
 }
 
 function heatmapColor(v) {
-  if (v <= 20) return 'rgba(103,194,58,0.88)';
-  if (v <= 30) return 'rgba(230,162,60,0.88)';
-  return 'rgba(245,108,108,0.88)';
+  if (v <= 20) return 'rgba(103,194,58,0.06)';
+  if (v <= 30) return 'rgba(230,162,60,0.06)';
+  return 'rgba(245,108,108,0.06)';
+}
+
+function heatmapTextColor(v) {
+  if (v <= 20) return '#67c23a';
+  if (v <= 30) return '#e6a23c';
+  return '#f56c6c';
+}
+
+function peakColor(v) {
+  return v > getAlertThreshold() ? 'rgba(245,108,108,0.96)' : 'rgba(64,158,255,0.92)';
+}
+
+function peakTextColor(v) {
+  return v > getAlertThreshold() ? '#f56c6c' : '#409EFF';
 }
 
 function avg(arr) {
@@ -711,7 +725,7 @@ function renderRanking() {
         <div class="rank-prov">${r.name}</div>
         <div></div>
         <div class="rank-val" style="color:${delayColor(r.avgVal)}">${r.avgVal}${unit}</div>
-        <div class="rank-threshold" style="color:${r.maxDay > getAlertThreshold() ? '#f56c6c' : delayColor(r.maxDay)};font-weight:${r.maxDay > getAlertThreshold() ? '600' : '500'};">${r.maxDay}ms</div>
+        <div class="rank-threshold" style="color:${peakTextColor(r.maxDay)};font-weight:${r.maxDay > getAlertThreshold() ? '600' : '500'};">${r.maxDay}ms</div>
         <div><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
       </div>`;
     }).join('')}
@@ -746,7 +760,7 @@ function renderHeatmap() {
       const v = d.avg_delay;
       html += `<td><div class="hm-cell" style="background:${heatmapColor(v)}" title="${name} ${d.date}\n时延: ${v}ms">${v}</div></td>`;
     });
-    html += `<td><div class="hm-cell" style="background:${peak > getAlertThreshold() ? 'rgba(245,108,108,0.96)' : heatmapColor(peak)}" title="${name} 峰值\n峰值: ${peak}ms">${peak}</div></td>`;
+    html += `<td><div class="hm-cell" style="background:${peakColor(peak)}" title="${name} 峰值\n峰值: ${peak}ms">${peak}</div></td>`;
     html += '</tr>';
   });
   html += '</tbody></table>';
