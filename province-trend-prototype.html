@@ -102,10 +102,11 @@
     /* ── 排行表（含7天均值列） ── */
     .rank-table { width: 100%; }
     .rank-row {
-      display: grid; grid-template-columns: 32px 64px 1fr 68px 68px 56px;
-      align-items: center; height: 38px;
+      display: grid; grid-template-columns: 32px 92px 1fr 78px 78px 62px 64px;
+      align-items: center; min-height: 42px;
       border-bottom: 1px solid #ebeef5; font-size: 12px;
       cursor: pointer; transition: background .15s;
+      column-gap: 4px;
     }
     .rank-row:hover { background: #f5f7fa; }
     .rank-row.hover-highlight {
@@ -126,15 +127,19 @@
     .r2 { background: #e6a23c; color: #fff; }
     .r3 { background: #409EFF; color: #fff; }
     .rn { background: #ebeef5; color: #909399; }
-    .rank-prov { color: #303133; font-weight: 500; font-size: 12px; }
-    .rank-val { text-align: right; padding-right: 6px; color: #303133; font-weight: 500; font-size: 12px; }
-    .rank-threshold { text-align: right; padding-right: 6px; font-size: 11px; }
+    .rank-prov { color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rank-val { text-align: right; padding-right: 6px; color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; }
+    .rank-threshold { text-align: right; padding-right: 6px; font-size: 11px; white-space: nowrap; }
+    .rank-status { display: flex; align-items: center; justify-content: center; }
     .rank-alert { color: #f56c6c; font-weight: 600; }
     .rank-normal { color: #67c23a; }
     .rank-tag {
       display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 3px; font-size: 10px; font-weight: 600;
-      padding: 2px 6px; color: #fff;
+      min-width: 38px; height: 24px;
+      border-radius: 12px; font-size: 11px; font-weight: 600;
+      padding: 0 10px; color: #fff; line-height: 1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      white-space: nowrap;
     }
     .tag-alert { background: #f56c6c; }
     .tag-normal { background: #67c23a; }
@@ -761,7 +766,7 @@ function renderRanking() {
         <div class="rank-val" style="color:${delayColor(r.avgVal)}">${r.avgVal}${unit}</div>
         <div class="rank-threshold" style="color:${peakTextColor(r.maxDay)};font-weight:${r.maxDay > getAlertThreshold() ? '600' : '500'};">${r.maxDay}ms</div>
         <div class="rank-threshold" style="color:${r.alertCount > 0 ? '#f56c6c' : '#909399'};font-weight:${r.alertCount > 0 ? '600' : '500'};">${r.alertCount}</div>
-        <div><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
+        <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
       </div>`;
     }).join('')}
   </div>`;
