@@ -559,14 +559,20 @@ function getAlertCount(arr) {
   return arr.filter(item => getMetricValue(item) > threshold).length;
 }
 
+const DRILL_SOURCE_LABEL = '源端';
+
+function formatDrillLinkName(destKey) {
+  return `${DRILL_SOURCE_LABEL} → ${destKey}`;
+}
+
 function getVisibleData() {
   if (drillProvince) {
     const raw = CITY_DATA[drillProvince];
-    const cities = {};
+    const links = {};
     Object.entries(raw).forEach(([key, arr]) => {
-      if (!key.includes('-')) cities[key] = arr;
+      if (key.includes('-')) links[formatDrillLinkName(key)] = arr;
     });
-    return cities;
+    return links;
   }
   return PROV_DATA;
 }
@@ -842,10 +848,10 @@ function renderChart() {
     });
   }
 
-  document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — ${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
+  document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源端到目的端${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
   document.getElementById('chartSub').textContent = drillProvince
-    ? `点击地市${cfg.shortLabel}折线或图例高亮，其他地市置灰`
-    : `点击省份${cfg.shortLabel}折线高亮，双击可下钻到地市`;
+    ? `点击链路${cfg.shortLabel}折线或图例高亮，其他链路置灰`
+    : `点击省份${cfg.shortLabel}折线高亮，双击可下钻到目的端链路`;
 }
 
 // ── 排行 ──
@@ -894,7 +900,7 @@ function renderRanking() {
   </div>`;
 
   document.getElementById('rankSub').textContent = drillProvince
-    ? `${drillProvince} 地市排行（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`
+    ? `${drillProvince} 源端→目的端排行（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`
     : `按 7 天均值降序（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`;
 }
 
@@ -931,7 +937,7 @@ ${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}">${formatMetricNumber(v)}
   html += '</tbody></table>';
   document.getElementById('hmWrap').innerHTML = html;
   document.getElementById('hmSub').textContent = drillProvince
-    ? `${drillProvince} 各地市 × 日期（${cfg.label}）`
+    ? `${drillProvince} 源端→目的端 × 日期（${cfg.label}）`
     : `省份 × 日期，颜色编码${cfg.label}级别`;
 }
 
