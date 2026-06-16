@@ -705,6 +705,13 @@ function renderChart() {
       toggleHighlight(params.seriesName);
     });
 
+    chart.on('dblclick', params => {
+      if (!params || params.componentType !== 'series') return;
+      if (drillProvince) return;
+      if (!PROVINCES_DATA[params.seriesName]) return;
+      drillDown(params.seriesName);
+    });
+
     chart.on('mouseover', params => {
       if (!params || params.componentType !== 'series') return;
       hoverName = params.seriesName;
@@ -745,7 +752,7 @@ function renderChart() {
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 地市趋势` : '近 7 天趋势对比';
   document.getElementById('chartSub').textContent = drillProvince
     ? '点击地市折线或图例高亮，其他地市置灰'
-    : '点击省份折线或图例高亮，其他省份置灰';
+    : '点击省份折线高亮，双击可下钻到地市';
 }
 
 // ── 排行 ──
