@@ -94,19 +94,21 @@
     .card-sub { font-size: 12px; color: #909399; margin-top: 2px; }
     .card-body { padding: 16px 20px; min-width: 0; }
 
-    .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) 540px; gap: 16px; }
     @media (max-width: 1100px) { .grid-2 { grid-template-columns: 1fr; } }
 
     .chart-box { height: 400px; width: 100%; }
 
     /* ── 排行表（含7天均值列） ── */
-    .rank-table { width: 100%; }
+    .rank-table { width: 100%; min-width: 0; }
     .rank-row {
-      display: grid; grid-template-columns: 40px 148px 96px 88px 68px 100px;
+      display: grid; grid-template-columns: 36px minmax(76px, 1.15fr) minmax(84px, 0.9fr) minmax(74px, 0.8fr) minmax(58px, 0.6fr) 84px;
       align-items: center; min-height: 42px;
       border-bottom: 1px solid #ebeef5; font-size: 12px;
       cursor: pointer; transition: background .15s;
       column-gap: 4px;
+      width: 100%; min-width: 0;
+      padding: 0 12px 0 8px;
     }
     .rank-row:hover { background: #f5f7fa; }
     .rank-row.hover-highlight {
@@ -127,10 +129,10 @@
     .r2 { background: #e6a23c; color: #fff; }
     .r3 { background: #409EFF; color: #fff; }
     .rn { background: #ebeef5; color: #909399; }
-    .rank-prov { color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .rank-val { text-align: right; padding-right: 6px; color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; }
-    .rank-threshold { text-align: right; padding-right: 6px; font-size: 11px; white-space: nowrap; }
-    .rank-status { display: flex; align-items: center; justify-content: center; }
+    .rank-prov { color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .rank-val { text-align: right; padding-right: 4px; color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; min-width: 0; }
+    .rank-threshold { text-align: right; padding-right: 4px; font-size: 11px; white-space: nowrap; min-width: 0; }
+    .rank-status { display: flex; align-items: center; justify-content: center; min-width: 0; }
     .rank-alert { color: #f56c6c; font-weight: 600; }
     .rank-normal { color: #67c23a; }
     .rank-tag {
@@ -260,7 +262,7 @@
           <div class="card-sub" id="rankSub">按 7 天均值降序</div>
         </div>
       </div>
-      <div class="card-body" style="padding:0;max-height:440px;overflow-y:auto;" id="rankBody"></div>
+      <div class="card-body" style="padding:0;max-height:440px;overflow-y:auto;overflow-x:hidden;" id="rankBody"></div>
     </div>
   </div>
 
