@@ -601,7 +601,7 @@ function getVisibleData() {
     const raw = CITY_DATA[drillProvince];
     const links = {};
     Object.entries(raw).forEach(([key, arr]) => {
-      if (key.includes('→')) links[key] = arr;
+      if (key.includes('到')) links[key] = arr;
     });
     return links;
   }
