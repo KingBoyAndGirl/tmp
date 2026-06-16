@@ -711,7 +711,7 @@ function renderRanking() {
         <div class="rank-prov">${r.name}</div>
         <div></div>
         <div class="rank-val" style="color:${delayColor(r.avgVal)}">${r.avgVal}${unit}</div>
-        <div class="rank-threshold ${r.isAlert ? 'rank-alert' : 'rank-normal'}">${r.maxDay}ms</div>
+        <div class="rank-threshold" style="color:${r.maxDay > getAlertThreshold() ? '#f56c6c' : delayColor(r.maxDay)};font-weight:${r.maxDay > getAlertThreshold() ? '600' : '500'};">${r.maxDay}ms</div>
         <div><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
       </div>`;
     }).join('')}
@@ -732,6 +732,7 @@ function renderHeatmap() {
 
   let html = '<table class="hm-table"><thead><tr><th>名称</th>';
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
+  html += '<th>峰值</th>';
   html += '</tr></thead><tbody>';
   names.forEach(name => {
     const isHover = hoverName === name;
@@ -739,11 +740,13 @@ function renderHeatmap() {
     const activeName = getActiveSeriesName();
     const isDim = activeName && !isHover && !isLock;
     const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
+    const peak = Math.max(...data[name].map(d => d.avg_delay));
     html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td>${name}</td>`;
     data[name].forEach(d => {
       const v = d.avg_delay;
       html += `<td><div class="hm-cell" style="background:${heatmapColor(v)}" title="${name} ${d.date}\n时延: ${v}ms">${v}</div></td>`;
     });
+    html += `<td><div class="hm-cell" style="background:${peak > getAlertThreshold() ? 'rgba(245,108,108,0.96)' : heatmapColor(peak)}" title="${name} 峰值\n峰值: ${peak}ms">${peak}</div></td>`;
     html += '</tr>';
   });
   html += '</tbody></table>';
