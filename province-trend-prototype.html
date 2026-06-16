@@ -265,7 +265,7 @@
       <select id="provSelect" class="el-select" onchange="onProvinceSelectChange(this.value)"></select>
       <span class="filter-label">告警阈值：</span>
       <input id="alertThresholdInput" class="el-input" type="number" min="0" step="1" value="30" onchange="onAlertThresholdChange(this.value)" />
-      <span class="filter-hint">高于此值判定为告警</span>
+      
     </div>
   </div>
 
@@ -294,7 +294,7 @@
       <div class="card-header">
         <div>
           <div class="card-title">省份排行</div>
-          <div class="card-sub" id="rankSub">按 7 天均值降序</div>
+          <div class="card-sub" id="rankSub"></div>
         </div>
       </div>
       <div class="card-body" style="padding:0 8px 0 0;max-height:440px;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable both-edges;" id="rankBody"></div>
@@ -306,7 +306,7 @@
     <div class="card-header">
       <div>
         <div class="card-title">每日明细矩阵</div>
-        <div class="card-sub" id="hmSub">省份 × 日期，颜色编码时延级别</div>
+        <div class="card-sub" id="hmSub"></div>
       </div>
     </div>
     <div class="card-body" style="padding:0;"><div class="hm-wrap" id="hmWrap"></div></div>
@@ -1006,8 +1006,8 @@ function renderRanking() {
   </div>`;
 
   document.getElementById('rankSub').textContent = drillProvince
-    ? `${drillProvince} 城市链路排行（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`
-    : `按 7 天均值降序（告警阈值：${formatMetricNumber(getAlertThreshold())}${cfg.unit}）`;
+    ? `${drillProvince} 城市链路排行`
+    : '';
 }
 
 // ── 热力矩阵 ──
@@ -1043,8 +1043,8 @@ ${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}">${formatMetricNumber(v)}
   html += '</tbody></table>';
   document.getElementById('hmWrap').innerHTML = html;
   document.getElementById('hmSub').textContent = drillProvince
-    ? `${drillProvince} 城市链路 × 日期（${cfg.label}）`
-    : `省份 × 日期，颜色编码${cfg.label}级别`;
+    ? `${drillProvince} 城市链路`
+    : '';
 }
 
 function setMetric(m) { curMetric = m; refresh(); }
