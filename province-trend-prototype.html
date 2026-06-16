@@ -100,15 +100,20 @@
     .chart-box { height: 400px; width: 100%; }
 
     /* ── 排行表（含7天均值列） ── */
-    .rank-table { width: 100%; min-width: 0; padding-right: 6px; }
+    .rank-table {
+      width: calc(100% - 20px);
+      min-width: 0;
+      margin-right: 20px;
+      padding-right: 12px;
+    }
     .rank-row {
-      display: grid; grid-template-columns: 40px minmax(96px, 1.2fr) minmax(88px, 0.95fr) minmax(78px, 0.82fr) minmax(62px, 0.65fr) 98px;
+      display: grid; grid-template-columns: 40px minmax(96px, 1.18fr) minmax(84px, 0.92fr) minmax(76px, 0.8fr) minmax(60px, 0.58fr) 92px;
       align-items: center; min-height: 42px;
       border-bottom: 1px solid #ebeef5; font-size: 12px;
       cursor: pointer; transition: background .15s;
       column-gap: 8px;
       width: 100%; min-width: 0;
-      padding: 0 18px 0 12px;
+      padding: 0 10px 0 12px;
     }
     .rank-row:hover { background: #f5f7fa; }
     .rank-row.hover-highlight {
@@ -132,7 +137,7 @@
     .rank-prov { color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
     .rank-val { text-align: right; padding-right: 4px; color: #303133; font-weight: 500; font-size: 12px; white-space: nowrap; min-width: 0; }
     .rank-threshold { text-align: right; padding-right: 4px; font-size: 11px; white-space: nowrap; min-width: 0; }
-    .rank-status { display: flex; align-items: center; justify-content: flex-end; min-width: 0; padding-right: 2px; }
+    .rank-status { display: flex; align-items: center; justify-content: flex-end; min-width: 0; padding-right: 6px; }
     .rank-alert { color: #f56c6c; font-weight: 600; }
     .rank-normal { color: #67c23a; }
     .rank-tag {
@@ -143,6 +148,12 @@
       box-shadow: 0 1px 2px rgba(0,0,0,0.08);
       white-space: nowrap;
     }
+    .rank-head { font-weight: 600; color: #909399; font-size: 11px; border-bottom: 2px solid #ebeef5; cursor: default; }
+    .rank-head > div:first-child { text-align: center; }
+    .rank-head .rank-prov { font-weight: 600; color: #909399; }
+    .rank-head .rank-val,
+    .rank-head .rank-threshold { color: #909399; font-weight: 600; }
+    .rank-head .rank-status { color: #909399; font-weight: 600; }
     .tag-alert { background: #f56c6c; }
     .tag-normal { background: #67c23a; }
 
@@ -262,7 +273,7 @@
           <div class="card-sub" id="rankSub">按 7 天均值降序</div>
         </div>
       </div>
-      <div class="card-body" style="padding:0;max-height:440px;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;" id="rankBody"></div>
+      <div class="card-body" style="padding:0 8px 0 0;max-height:440px;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable both-edges;" id="rankBody"></div>
     </div>
   </div>
 
@@ -750,8 +761,13 @@ function renderRanking() {
 
   const el = document.getElementById('rankBody');
   el.innerHTML = `<div class="rank-table">
-    <div class="rank-row" style="font-weight:600;color:#909399;font-size:11px;border-bottom:2px solid #ebeef5;cursor:default;">
-      <div>#</div><div>名称</div><div>7天均值</div><div>峰值</div><div>异常点</div><div>状态</div>
+    <div class="rank-row rank-head">
+      <div>#</div>
+      <div class="rank-prov">名称</div>
+      <div class="rank-val">7天均值</div>
+      <div class="rank-threshold">峰值</div>
+      <div class="rank-threshold">异常点</div>
+      <div class="rank-status">状态</div>
     </div>
     ${rows.map((r, i) => {
       const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
