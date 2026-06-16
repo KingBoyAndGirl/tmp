@@ -734,8 +734,9 @@ function renderRanking() {
   const rows = names.map(name => {
     const avgVal = avg(data[name]);
     const maxDay = Math.max(...data[name].map(d => d.avg_delay));
+    const alertCount = data[name].filter(d => d.avg_delay > getAlertThreshold()).length;
     const isAlert = maxDay > getAlertThreshold();
-    return { name, avgVal, maxDay, isAlert };
+    return { name, avgVal, maxDay, alertCount, isAlert };
   });
 
   rows.sort((a, b) => b.avgVal - a.avgVal);
@@ -743,7 +744,7 @@ function renderRanking() {
   const el = document.getElementById('rankBody');
   el.innerHTML = `<div class="rank-table">
     <div class="rank-row" style="font-weight:600;color:#909399;font-size:11px;border-bottom:2px solid #ebeef5;cursor:default;">
-      <div>#</div><div>名称</div><div></div><div>7天均值</div><div>峰值</div><div>状态</div>
+      <div>#</div><div>名称</div><div></div><div>7天均值</div><div>峰值</div><div>异常点</div><div>状态</div>
     </div>
     ${rows.map((r, i) => {
       const rc = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : 'rn';
@@ -759,6 +760,7 @@ function renderRanking() {
         <div></div>
         <div class="rank-val" style="color:${delayColor(r.avgVal)}">${r.avgVal}${unit}</div>
         <div class="rank-threshold" style="color:${peakTextColor(r.maxDay)};font-weight:${r.maxDay > getAlertThreshold() ? '600' : '500'};">${r.maxDay}ms</div>
+        <div class="rank-threshold" style="color:${r.alertCount > 0 ? '#f56c6c' : '#909399'};font-weight:${r.alertCount > 0 ? '600' : '500'};">${r.alertCount}</div>
         <div><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
       </div>`;
     }).join('')}
@@ -788,8 +790,9 @@ function renderHeatmap() {
     const isDim = activeName && !isHover && !isLock;
     const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
     const peak = Math.max(...data[name].map(d => d.avg_delay));
-    const hasAlertPoint = data[name].some(d => d.avg_delay > getAlertThreshold());
-    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td><span class="${hasAlertPoint ? 'hm-name-alert' : ''}">${name}</span></td>`;
+    const alertCount = data[name].filter(d => d.avg_delay > getAlertThreshold()).length;
+    const hasAlertPoint = alertCount > 0;
+    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${hasAlertPoint ? `本周存在 ${alertCount} 个异常点` : '本周无异常点'}"><span class="${hasAlertPoint ? 'hm-name-alert' : ''}">${name}</span></td>`;
     data[name].forEach(d => {
       const v = d.avg_delay;
       html += `<td><div class="hm-cell" style="background:${heatmapColor(v)}" title="${name} ${d.date}\n时延: ${v}ms">${v}</div></td>`;
