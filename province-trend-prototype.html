@@ -560,6 +560,9 @@ function renderChart() {
 
   const activeHoverName = hoverName;
   const activeLockName = highlightName;
+  const allSeriesValues = names.flatMap(name => data[name].map(d => d.avg_delay));
+  const maxSeriesValue = allSeriesValues.length ? Math.max(...allSeriesValues, getAlertThreshold()) : getAlertThreshold();
+  const chartMax = Math.max(35, Math.ceil((maxSeriesValue + 2) / 5) * 5);
   const series = names.map((name, i) => {
     const isHovered = activeHoverName === name;
     const isLocked = activeLockName === name;
@@ -633,7 +636,7 @@ function renderChart() {
       axisLabel: { color: '#909399', fontSize: 11 },
     },
     yAxis: {
-      type: 'value', min: 0, max: 35,
+      type: 'value', min: 0, max: chartMax,
       name: unit,
       nameTextStyle: { color: '#909399', fontSize: 11 },
       splitLine: { lineStyle: { color: '#ebeef5' } },
@@ -650,7 +653,7 @@ function renderChart() {
         data: [
           [{ yAxis: 0, itemStyle: { color: 'rgba(103,194,58,0.06)' } }, { yAxis: 20 }],
           [{ yAxis: 20, itemStyle: { color: 'rgba(230,162,60,0.06)' } }, { yAxis: 30 }],
-          [{ yAxis: 30, itemStyle: { color: 'rgba(245,108,108,0.06)' } }, { yAxis: 35 }],
+          [{ yAxis: 30, itemStyle: { color: 'rgba(245,108,108,0.06)' } }, { yAxis: chartMax }],
         ]
       }
     }]
