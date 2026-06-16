@@ -279,7 +279,40 @@
     <span><span class="legend-dot" style="background:#f56c6c;"></span> &gt;30ms 红区（告警）</span>
   </div>
 
-  <div class="note-card">
+  <!-- 图表 + 排行 -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title" id="chartTitle">近 7 天趋势对比</div>
+          <div class="card-sub" id="chartSub">点击图例可高亮单省</div>
+        </div>
+      </div>
+      <div class="card-body"><div class="chart-box" id="chartMain"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">省份排行</div>
+          <div class="card-sub" id="rankSub">按 7 天均值降序</div>
+        </div>
+      </div>
+      <div class="card-body" style="padding:0 8px 0 0;max-height:440px;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable both-edges;" id="rankBody"></div>
+    </div>
+  </div>
+
+  <!-- 热力矩阵 -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">每日明细矩阵</div>
+        <div class="card-sub" id="hmSub">省份 × 日期，颜色编码时延级别</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;"><div class="hm-wrap" id="hmWrap"></div></div>
+  </div>
+
+    <div class="note-card">
     <div class="note-title">原型口径说明（基于 Kafka 原始样例）</div>
     <div class="note-grid">
       <div class="note-block">
@@ -333,39 +366,6 @@
         </ul>
       </div>
     </div>
-  </div>
-
-  <!-- 图表 + 排行 -->
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title" id="chartTitle">近 7 天趋势对比</div>
-          <div class="card-sub" id="chartSub">点击图例可高亮单省</div>
-        </div>
-      </div>
-      <div class="card-body"><div class="chart-box" id="chartMain"></div></div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">省份排行</div>
-          <div class="card-sub" id="rankSub">按 7 天均值降序</div>
-        </div>
-      </div>
-      <div class="card-body" style="padding:0 8px 0 0;max-height:440px;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable both-edges;" id="rankBody"></div>
-    </div>
-  </div>
-
-  <!-- 热力矩阵 -->
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-title">每日明细矩阵</div>
-        <div class="card-sub" id="hmSub">省份 × 日期，颜色编码时延级别</div>
-      </div>
-    </div>
-    <div class="card-body" style="padding:0;"><div class="hm-wrap" id="hmWrap"></div></div>
   </div>
 </div>
 
