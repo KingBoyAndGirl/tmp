@@ -326,15 +326,15 @@
       <span class="threshold-setting">
         动态阈值：
         <select id="thresholdMode" class="threshold-select" onchange="onThresholdModeChange(this.value)">
-          <option value="mixed">混合示例</option>
-          <option value="60">60%</option>
           <option value="50">50%</option>
+          <option value="60">60%</option>
           <option value="40">40%</option>
+          <option value="mixed">混合示例</option>
           <option value="custom">自定义</option>
         </select>
-        <input id="customThresholdInput" class="threshold-input" type="number" value="60" min="0" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
+        <input id="customThresholdInput" class="threshold-input" type="number" value="50" min="0" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
         <span>%</span>
-        <span class="threshold-note">当前2小时值相对7日均值偏离超过用户设置阈值即异常，例如65→50为↓23%，超过20%阈值则异常；65→40为↓38%，未超过40%阈值则正常</span>
+        <span class="threshold-note">当前2小时值相对7日均值偏离 > 用户设置阈值才异常；默认阈值50%，如↑28%应为正常</span>
       </span>
     </div>
   </div>
@@ -420,7 +420,7 @@
       <div class="note-block">
         <h4>五、动态阈值与颜色规则</h4>
         <ul>
-          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一用当前2小时值与7日均值计算实际偏离百分比；顶部控件支持混合示例、60%、50%、40%和自定义阈值。</li>
+          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一用当前2小时值与7日均值计算实际偏离百分比；顶部控件支持50%、60%、40%、混合示例和自定义阈值；默认按50%判断。</li>
           <li>背景分区规则仅用于展示当前值区间；状态列按实际偏离百分比是否超过用户设置阈值判断。</li>
           <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
           <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
@@ -431,7 +431,7 @@
         <ul>
           <li>矩阵每一行对应一个省份或一条城市链路，每一列对应一天。</li>
           <li>格子中的数字就是该对象当天的指标值；背景色按该行 7 日均值与箭头百分比动态阈值着色，超过动态阈值会追加红色描边和角标。</li>
-          <li>最后一列展示当前2小时值相对7日均值的实际箭头百分比；用户可通过顶部控件切换异常阈值或查看混合示例。</li>
+          <li>最后一列展示当前2小时值相对7日均值的实际箭头百分比；用户可通过顶部控件切换异常阈值；默认50%，低于或等于50%均正常。</li>
         </ul>
       </div>
     </div>
@@ -660,8 +660,8 @@ let curMetric = 'delay';
 let drillProvince = null;
 let highlightName = null;
 let hoverName = null;
-let thresholdMode = 'mixed';
-let customThresholdPercent = 60;
+let thresholdMode = '50';
+let customThresholdPercent = 50;
 const DEFAULT_ABNORMAL_PERCENT = 50;
 
 const METRIC_CONFIGS = {
