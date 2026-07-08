@@ -431,7 +431,7 @@
         <h4>五、动态阈值与颜色规则</h4>
         <ul>
           <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一用当前2小时值与7日均值计算实际偏离百分比；顶部输入框支持手动填写阈值并点击“设置”生效；默认按50%判断。</li>
-          <li>背景分区规则仅用于展示当前值区间；状态列按实际偏离百分比是否超过用户设置阈值判断。</li>
+          <li>背景分区规则仅用于展示当前值区间：平均时延 0-20ms 绿、20-30ms 黄、>30ms 红；丢包率 0-1% 绿、1-2% 黄、2-3% 红。状态列按实际偏离百分比是否超过用户设置阈值判断。</li>
           <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
           <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
         </ul>
@@ -553,7 +553,7 @@ for (let i = 6; i >= 0; i--) {
 
 function srand(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
 function clampValue(value, min, max) { return Math.max(min, Math.min(max, +Number(value).toFixed(2))); }
-function deriveLossBase(baseDelay, offset = 0) { return clampValue(baseDelay * 1.35 + offset, 2, 72); }
+function deriveLossBase(baseDelay, offset = 0) { return clampValue(baseDelay / 18 + offset * 0.08, 0.25, 2.8); }
 
 const SOURCE_ENDPOINTS = [
   { srcResourcePool: '山东-省建边缘云', srcAz: '边缘可用区-聊城1' },
@@ -595,12 +595,12 @@ PROVINCES.forEach((prov, pi) => {
   PROV_DATA[prov] = dates.map((date, di) => {
     const delayTrend = Math.sin(di / 3 + pi) * 2.5;
     const delayJitter = (rng() - 0.5) * 7;
-    const lossTrend = Math.sin(di / 2.6 + pi * 0.7) * 7;
-    const lossJitter = (rng() - 0.5) * 18;
+    const lossTrend = Math.sin(di / 2.6 + pi * 0.7) * 0.28;
+    const lossJitter = (rng() - 0.5) * 0.55;
     return {
       date,
       avg_delay: Math.max(3, +(baseDelay + delayTrend + delayJitter).toFixed(2)),
-      loss_rate: clampValue(baseLoss + lossTrend + lossJitter, 1, 95),
+      loss_rate: clampValue(baseLoss + lossTrend + lossJitter, 0, 3.5),
     };
   });
 });
@@ -609,17 +609,17 @@ function applyDeviationDemoRow(name, currentDelay, currentLoss) {
   if (!PROV_DATA[name]) return;
   PROV_DATA[name].forEach(item => {
     item.avg_delay = 65;
-    item.loss_rate = 65;
+    item.loss_rate = 1.5;
   });
   PROV_DATA[name][PROV_DATA[name].length - 1].avg_delay = currentDelay;
   PROV_DATA[name][PROV_DATA[name].length - 1].loss_rate = currentLoss;
 }
 
 // 明确体现默认 50% 阈值下：↑/↓ 低于 50% 正常，高于 50% 异常。
-applyDeviationDemoRow('贵州', 50, 50); // 65→50，↓23%，正常
-applyDeviationDemoRow('云南', 40, 40); // 65→40，↓38%，正常
-applyDeviationDemoRow('四川', 100, 100); // 65→100，↑54%，异常
-applyDeviationDemoRow('广东', 25, 25); // 65→25，↓62%，异常
+applyDeviationDemoRow('贵州', 50, 1.4); // 65→50，↓23%，正常
+applyDeviationDemoRow('云南', 40, 0.9); // 65→40，↓38%，正常
+applyDeviationDemoRow('四川', 100, 3.2); // 65→100，↑54%，异常
+applyDeviationDemoRow('广东', 25, 0.4); // 65→25，↓62%，异常
 
 // 生成地市级 mock 数据（下钻用）
 // 每个地市 = 该城市所有探测点的 AVG(avg_delay / loss_rate)
@@ -633,12 +633,12 @@ PROVINCES.forEach(prov => {
     CITY_DATA[prov][city] = dates.map((date, di) => {
       const delayTrend = Math.sin(di / 3 + ci) * 2;
       const delayJitter = (rng() - 0.5) * 6;
-      const lossTrend = Math.sin(di / 2.4 + ci * 0.8) * 6.5;
-      const lossJitter = (rng() - 0.5) * 16;
+      const lossTrend = Math.sin(di / 2.4 + ci * 0.8) * 0.24;
+      const lossJitter = (rng() - 0.5) * 0.5;
       return {
         date,
         avg_delay: Math.max(2, +(info.base + delayTrend + delayJitter).toFixed(2)),
-        loss_rate: clampValue(cityLossBase + lossTrend + lossJitter, 1, 95),
+        loss_rate: clampValue(cityLossBase + lossTrend + lossJitter, 0, 3.5),
       };
     });
 
@@ -654,11 +654,11 @@ PROVINCES.forEach(prov => {
       const pointLossBase = deriveLossBase(info.base + 1.5, pi * 2 - 1);
       CITY_DATA[prov][pointKey] = dates.map((date, ddi) => {
         const delayJitter = (rng2() - 0.5) * 8;
-        const lossJitter = (rng2() - 0.5) * 18;
+        const lossJitter = (rng2() - 0.5) * 0.5;
         return {
           date,
           avg_delay: Math.max(2, +(info.base + 1.5 + Math.sin(ddi / 4 + pi) * 3 + delayJitter).toFixed(2)),
-          loss_rate: clampValue(pointLossBase + Math.sin(ddi / 3.2 + pi) * 7.5 + lossJitter, 1, 95),
+          loss_rate: clampValue(pointLossBase + Math.sin(ddi / 3.2 + pi) * 0.28 + lossJitter, 0, 3.5),
         };
       });
     });
@@ -697,11 +697,13 @@ const METRIC_CONFIGS = {
     unit: '%',
     displayUnit: '%',
     field: 'loss_rate',
-    normalMax: 20,
-    defaultThreshold: 50,
-    minChartMax: 60,
-    chartStep: 10,
-    maxCap: 100,
+    normalMax: 1,
+    defaultThreshold: 2,
+    warningMax: 2,
+    dangerMax: 3,
+    minChartMax: 3,
+    chartStep: 0.5,
+    maxCap: 5,
   }
 };
 
@@ -798,23 +800,28 @@ function getCurrentTwoHourValue(arr) {
 }
 
 
+function getMetricBand(value) {
+  if (curMetric === 'loss') {
+    if (value <= 1) return 'normal';
+    if (value <= 2) return 'warning';
+    return 'danger';
+  }
+  if (value <= 20) return 'normal';
+  if (value <= 30) return 'warning';
+  return 'danger';
+}
+
 function getMetricColor(v, dynamicThreshold = null, thresholdPercent = 50) {
-  const cfg = getMetricConfig();
-  const threshold = Number.isFinite(dynamicThreshold) ? dynamicThreshold : cfg.defaultThreshold;
-  const reportLine = threshold * (1 + thresholdPercent / 100);
-  const lower = Math.min(threshold, reportLine);
-  const upper = Math.max(threshold, reportLine);
-  if (v <= lower) return '#67c23a';
-  if (v <= upper) return '#e6a23c';
+  const band = getMetricBand(v);
+  if (band === 'normal') return '#67c23a';
+  if (band === 'warning') return '#e6a23c';
   return '#f56c6c';
 }
 
-function heatmapColor(v, dynamicThreshold, policy = { percent: 50 }) {
-  const reportLine = dynamicThreshold * (1 + policy.thresholdPercent / 100);
-  const lower = Math.min(dynamicThreshold, reportLine);
-  const upper = Math.max(dynamicThreshold, reportLine);
-  if (v <= lower) return 'rgba(103,194,58,0.16)';
-  if (v <= upper) return 'rgba(230,162,60,0.18)';
+function heatmapColor(v, dynamicThreshold, policy = { thresholdPercent: 50 }) {
+  const band = getMetricBand(v);
+  if (band === 'normal') return 'rgba(103,194,58,0.16)';
+  if (band === 'warning') return 'rgba(230,162,60,0.18)';
   return 'rgba(245,108,108,0.18)';
 }
 
@@ -853,11 +860,20 @@ function getMetricChartMax(values) {
 }
 
 function getMetricLegendItems() {
-  return [
-    { color: '#67c23a', label: '≤ 7日均值（正常）' },
-    { color: '#e6a23c', label: '7日均值 ~ 动态阈值（关注）' },
+  const metricBands = curMetric === 'loss'
+    ? [
+        { color: '#67c23a', label: '0-1% 绿区（正常）' },
+        { color: '#e6a23c', label: '1-2% 黄区（关注）' },
+        { color: '#f56c6c', label: '2-3% 红区（高风险）' },
+      ]
+    : [
+        { color: '#67c23a', label: '0-20ms 绿区（正常）' },
+        { color: '#e6a23c', label: '20-30ms 黄区（关注）' },
+        { color: '#f56c6c', label: '>30ms 红区（高风险）' },
+      ];
+  return metricBands.concat([
     { color: '#f56c6c', label: `当前2小时偏离 > ${getActiveThresholdLabel()}（异常）` },
-  ];
+  ]);
 }
 
 function renderMetricLegend() {
