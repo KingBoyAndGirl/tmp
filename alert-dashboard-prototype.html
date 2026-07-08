@@ -80,7 +80,7 @@
       position: absolute;
       top: 42px;
       right: 34px;
-      width: min(520px, 34%);
+      width: min(620px, 40%);
       height: 52%;
       min-height: 280px;
       background: var(--table-bg);
@@ -134,7 +134,7 @@
     .table-header,
     .table-row {
       display: grid;
-      grid-template-columns: 50px 72px 1fr 80px 80px;
+      grid-template-columns: 46px 68px 1fr 72px 72px 94px;
       align-items: center;
     }
 
@@ -285,10 +285,10 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">统计周期：近7天</div>
+              <div class="table-sub">动态阈值：前7日均值上浮50%；每2小时更新</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警总数：7</span>
+              <span class="stat-pill">上报告警：6</span>
             </div>
           </div>
           <div class="table-header">
@@ -297,19 +297,20 @@
             <div>告警方向</div>
             <div>时延</div>
             <div>丢包率</div>
+            <div>动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span></span>
+            <span>规则：当前2小时值 &gt; 7日均值上浮50% 即上报</span>
             <a href="#" style="color:#619bff;font-size:12px;text-decoration:none;cursor:pointer;">查看详情 →</a>
           </div>
         </div>
@@ -323,10 +324,10 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">统计周期：近7天</div>
+              <div class="table-sub">动态阈值：前7日均值上浮50%；每2小时更新</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警总数：7</span>
+              <span class="stat-pill">上报告警：6</span>
             </div>
           </div>
           <div class="table-header">
@@ -335,19 +336,20 @@
             <div>告警方向</div>
             <div>时延</div>
             <div>丢包率</div>
+            <div>动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span></span>
+            <span>规则：当前2小时值 &gt; 7日均值上浮50% 即上报</span>
             <a href="#" style="color:#619bff;font-size:12px;text-decoration:none;cursor:pointer;">查看详情 →</a>
           </div>
         </div>
@@ -361,10 +363,10 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">统计周期：近7天</div>
+              <div class="table-sub">动态阈值：前7日均值上浮50%；每2小时更新</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警总数：7</span>
+              <span class="stat-pill">上报告警：6</span>
             </div>
           </div>
           <div class="table-header">
@@ -373,19 +375,20 @@
             <div>告警方向</div>
             <div>时延</div>
             <div>丢包率</div>
+            <div>动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span></span>
+            <span>规则：当前2小时值 &gt; 7日均值上浮50% 即上报</span>
             <a href="#" style="color:#619bff;font-size:12px;text-decoration:none;cursor:pointer;">查看详情 →</a>
           </div>
         </div>
@@ -399,10 +402,10 @@
           <div class="table-topbar">
             <div>
               <div class="table-title">动态阈值告警</div>
-              <div class="table-sub">统计周期：近7天</div>
+              <div class="table-sub">动态阈值：前7日均值上浮50%；每2小时更新</div>
             </div>
             <div class="table-stats">
-              <span class="stat-pill">告警总数：7</span>
+              <span class="stat-pill">上报告警：6</span>
             </div>
           </div>
           <div class="table-header">
@@ -411,19 +414,20 @@
             <div>告警方向</div>
             <div>时延</div>
             <div>丢包率</div>
+            <div>动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell"><div class="main">25.39ms</div></div><div class="loss-cell"><div class="main">1.82%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell"><div class="main">24.10ms</div></div><div class="loss-cell"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell"><div class="main">22.84ms</div></div><div class="loss-cell"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell"><div class="main">22.30ms</div></div><div class="loss-cell"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell"><div class="main">21.10ms</div></div><div class="loss-cell"><div class="main">1.35%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
+              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell"><div class="main">19.90ms</div></div><div class="loss-cell"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main">上浮50%</div></div></div>
             </div>
           </div>
           <div class="panel-footer">
-            <span></span>
+            <span>规则：当前2小时值 &gt; 7日均值上浮50% 即上报</span>
             <a href="#" style="color:#619bff;font-size:12px;text-decoration:none;cursor:pointer;">查看详情 →</a>
           </div>
         </div>

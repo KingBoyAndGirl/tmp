@@ -99,7 +99,7 @@
 
     .chart-box { height: 400px; width: 100%; }
 
-    /* ── 排行表（含7天均值列） ── */
+    /* ── 排行表（动态阈值口径） ── */
     .rank-table {
       width: calc(100% - 20px);
       min-width: 0;
@@ -107,7 +107,7 @@
       padding-right: 12px;
     }
     .rank-row {
-      display: grid; grid-template-columns: 40px minmax(96px, 1.18fr) minmax(84px, 0.92fr) minmax(76px, 0.8fr) minmax(60px, 0.58fr) 92px;
+      display: grid; grid-template-columns: 40px minmax(96px, 1.18fr) minmax(90px, 0.9fr) minmax(96px, 0.92fr) 76px;
       align-items: center; min-height: 42px;
       border-bottom: 1px solid #ebeef5; font-size: 12px;
       cursor: pointer; transition: background .15s;
@@ -265,9 +265,7 @@
     <div class="filter-row" id="provBarRow">
       <span class="filter-label">省份：</span>
       <select id="provSelect" class="el-select" onchange="onProvinceSelectChange(this.value)"></select>
-      <span class="filter-label">告警阈值：</span>
-      <input id="alertThresholdInput" class="el-input" type="number" min="0" step="1" value="30" onchange="onAlertThresholdChange(this.value)" />
-      
+      <span class="filter-hint">动态阈值：前 7 日均值上浮 50%；每 2 小时判断一次</span>
     </div>
   </div>
 
@@ -278,7 +276,7 @@
   <div class="legend" id="zoneLegend" style="margin-bottom:12px;">
     <span><span class="legend-dot" style="background:#67c23a;"></span> 0-20ms 绿区（正常）</span>
     <span><span class="legend-dot" style="background:#e6a23c;"></span> 20-30ms 黄区（关注）</span>
-    <span><span class="legend-dot" style="background:#f56c6c;"></span> &gt;30ms 红区（告警）</span>
+    <span><span class="legend-dot" style="background:#f56c6c;"></span> 当前 2 小时值 &gt; 7 日均值上浮 50%（上报告警）</span>
   </div>
 
   <!-- 图表 + 排行 -->
@@ -342,29 +340,28 @@
         </ul>
       </div>
       <div class="note-block">
-        <h4>四、排行 / 峰值 / 异常点</h4>
+        <h4>四、排行 / 动态阈值 / 上报告警</h4>
         <ul>
-          <li><code>7天均值</code>：当前对象近 7 天每日值的平均数。</li>
-          <li><code>峰值</code>：近 7 天内单日最大值。</li>
-          <li><code>异常点</code>：近 7 天里，单日值高于当前“告警阈值”的天数。</li>
-          <li><code>状态</code>：只要峰值超过告警阈值，就标记为“告警”，否则为“正常”。</li>
+          <li><code>当前2小时值</code>：用于模拟当天每 2 小时滚动判断的一次最新监测值。</li>
+          <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数上浮百分比，当前为 <code>上浮 50%</code>；按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
+          <li><code>状态</code>：仅判断当前 2 小时值是否超过 7 日均值上浮 50% 后的结果；超过则“上报”，否则“正常”。</li>
         </ul>
       </div>
       <div class="note-block">
-        <h4>五、告警阈值与颜色规则</h4>
+        <h4>五、动态阈值与颜色规则</h4>
         <ul>
-          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，分别独立维护阈值。</li>
-          <li>默认阈值：平均时延 <code>30ms</code>，丢包率 <code>50%</code>；可在页面顶部手工调整。</li>
-          <li>背景分区规则：绿色为正常区，黄色为关注区，红色为高于告警阈值的告警区。</li>
-          <li>峰值列只与“告警阈值”比较，超过阈值显示红色，否则显示蓝色。</li>
+          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一按 7 日均值上浮百分比计算动态阈值。</li>
+          <li>背景分区规则：绿色为低于 7 日均值，黄色为 7 日均值到上浮 50% 后的范围，红色为高于上浮 50% 后的范围。</li>
+          <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
+          <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
         </ul>
       </div>
       <div class="note-block">
         <h4>六、每日明细矩阵解释</h4>
         <ul>
           <li>矩阵每一行对应一个省份或一条城市链路，每一列对应一天。</li>
-          <li>格子中的数字就是该对象当天的指标值；背景色按区间着色，超过告警阈值会追加红色描边和角标。</li>
-          <li>最后一列“峰值”是该行近 7 天最大值，用于快速识别是否出现过极端异常。</li>
+          <li>格子中的数字就是该对象当天的指标值；背景色按该行 7 日均值与上浮 50% 后的动态阈值着色，超过动态阈值会追加红色描边和角标。</li>
+          <li>最后一列“动态阈值”展示上浮百分比（当前为上浮 50%），用于说明每 2 小时告警判断规则。</li>
         </ul>
       </div>
     </div>
@@ -579,7 +576,6 @@ let curMetric = 'delay';
 let drillProvince = null;
 let highlightName = null;
 let hoverName = null;
-const metricThresholds = { delay: 30, loss: 50 };
 
 const METRIC_CONFIGS = {
   delay: {
@@ -629,48 +625,51 @@ function formatMetricValueWithUnit(value, withSpace = false) {
   return `${formatMetricNumber(value)}${withSpace ? ` ${cfg.unit}` : cfg.displayUnit}`;
 }
 
-function getAlertThreshold() {
-  const cfg = getMetricConfig();
-  const current = Number(metricThresholds[curMetric]);
-  return Number.isFinite(current) ? current : cfg.defaultThreshold;
+function getDynamicThreshold(arr) {
+  return avg(arr);
 }
 
-function getMetricColor(v) {
+function getReportThreshold(arr) {
+  return +(getDynamicThreshold(arr) * 1.5).toFixed(2);
+}
+
+function getDynamicThresholdPercentText() {
+  return '上浮50%';
+}
+
+function getCurrentTwoHourValue(arr) {
+  if (!arr.length) return 0;
+  return getMetricValue(arr[arr.length - 1]);
+}
+
+
+function getMetricColor(v, dynamicThreshold = null) {
   const cfg = getMetricConfig();
-  const threshold = getAlertThreshold();
-  if (v <= cfg.normalMax) return '#67c23a';
-  if (v <= threshold) return '#e6a23c';
+  const threshold = Number.isFinite(dynamicThreshold) ? dynamicThreshold : cfg.defaultThreshold;
+  const reportLine = threshold * 1.5;
+  if (v <= threshold) return '#67c23a';
+  if (v <= reportLine) return '#e6a23c';
   return '#f56c6c';
 }
 
-function heatmapColor(v) {
-  const cfg = getMetricConfig();
-  const threshold = getAlertThreshold();
-  if (v <= cfg.normalMax) return 'rgba(103,194,58,0.16)';
-  if (v <= threshold) return 'rgba(230,162,60,0.18)';
+function heatmapColor(v, dynamicThreshold) {
+  const reportLine = dynamicThreshold * 1.5;
+  if (v <= dynamicThreshold) return 'rgba(103,194,58,0.16)';
+  if (v <= reportLine) return 'rgba(230,162,60,0.18)';
   return 'rgba(245,108,108,0.18)';
 }
 
-function peakColor(v) {
-  return v > getAlertThreshold() ? 'rgba(245,108,108,0.96)' : 'rgba(64,158,255,0.92)';
+function thresholdCellColor(currentValue, reportLine) {
+  return currentValue > reportLine ? 'rgba(245,108,108,0.96)' : 'rgba(64,158,255,0.92)';
 }
 
-function peakTextColor(v) {
-  return v > getAlertThreshold() ? '#f56c6c' : '#409EFF';
+function thresholdTextColor(currentValue, reportLine) {
+  return currentValue > reportLine ? '#f56c6c' : '#409EFF';
 }
 
 function avg(arr) {
   if (!arr.length) return 0;
   return +(arr.reduce((sum, item) => sum + getMetricValue(item), 0) / arr.length).toFixed(2);
-}
-
-function getPeak(arr) {
-  return arr.length ? Math.max(...arr.map(getMetricValue)) : 0;
-}
-
-function getAlertCount(arr) {
-  const threshold = getAlertThreshold();
-  return arr.filter(item => getMetricValue(item) > threshold).length;
 }
 
 function getVisibleData() {
@@ -687,7 +686,7 @@ function getVisibleData() {
 
 function getMetricChartMax(values) {
   const cfg = getMetricConfig();
-  const maxValue = values.length ? Math.max(...values, getAlertThreshold()) : getAlertThreshold();
+  const maxValue = values.length ? Math.max(...values) : cfg.defaultThreshold;
   const padded = curMetric === 'loss' ? maxValue + 5 : maxValue + 2;
   const computed = Math.ceil(padded / cfg.chartStep) * cfg.chartStep;
   const withFloor = Math.max(cfg.minChartMax, computed);
@@ -695,12 +694,10 @@ function getMetricChartMax(values) {
 }
 
 function getMetricLegendItems() {
-  const cfg = getMetricConfig();
-  const threshold = getAlertThreshold();
   return [
-    { color: '#67c23a', label: `0-${formatMetricNumber(cfg.normalMax)}${cfg.unit} 绿区（正常）` },
-    { color: '#e6a23c', label: `${formatMetricNumber(cfg.normalMax)}-${formatMetricNumber(threshold)}${cfg.unit} 黄区（关注）` },
-    { color: '#f56c6c', label: `>${formatMetricNumber(threshold)}${cfg.unit} 红区（告警）` },
+    { color: '#67c23a', label: '≤ 7日均值（正常）' },
+    { color: '#e6a23c', label: '7日均值 ~ 上浮50%（关注）' },
+    { color: '#f56c6c', label: '> 上浮50%（上报告警）' },
   ];
 }
 
@@ -754,14 +751,12 @@ function renderMetricToggle() {
 function renderProvBar() {
   const row = document.getElementById('provBarRow');
   const select = document.getElementById('provSelect');
-  const input = document.getElementById('alertThresholdInput');
   if (!row || !select) return;
   row.style.display = 'flex';
   select.innerHTML = [`<option value="">全国</option>`].concat(
     PROVINCES.map(p => `<option value="${p}" ${drillProvince === p ? 'selected' : ''}>${p}</option>`)
   ).join('');
   select.value = drillProvince || '';
-  if (input) input.value = getAlertThreshold();
 }
 
 function renderBreadcrumb() {
@@ -778,14 +773,6 @@ function onProvinceSelectChange(value) {
     return;
   }
   drillDown(value);
-}
-
-function onAlertThresholdChange(value) {
-  const next = Number(value);
-  metricThresholds[curMetric] = Number.isFinite(next) && next >= 0 ? next : 0;
-  const input = document.getElementById('alertThresholdInput');
-  if (input) input.value = getAlertThreshold();
-  refresh();
 }
 
 // ── ECharts ──
@@ -864,7 +851,8 @@ function renderChart() {
         activeParams.forEach(p => {
           const v = Number(p.value);
           const dot = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${getMetricColor(v)};margin-right:4px;"></span>`;
-          const over = v > getAlertThreshold() ? ' ⚠️' : '';
+          const seriesThreshold = getDynamicThreshold(getVisibleData()[p.seriesName] || []);
+          const over = v > seriesThreshold * 1.5 ? ' ⚠️' : '';
           s += `${dot}${p.seriesName}: <b>${formatMetricNumber(v)}</b>${unit}${over}<br/>`;
         });
         return s;
@@ -897,9 +885,9 @@ function renderChart() {
       markArea: {
         silent: true, itemStyle: { borderWidth: 0 },
         data: [
-          [{ yAxis: 0, itemStyle: { color: 'rgba(103,194,58,0.16)' } }, { yAxis: getMetricConfig().normalMax }],
-          [{ yAxis: getMetricConfig().normalMax, itemStyle: { color: 'rgba(230,162,60,0.18)' } }, { yAxis: getAlertThreshold() }],
-          [{ yAxis: getAlertThreshold(), itemStyle: { color: 'rgba(245,108,108,0.18)' } }, { yAxis: chartMax }],
+          [{ yAxis: 0, itemStyle: { color: 'rgba(103,194,58,0.12)' } }, { yAxis: avg(allSeriesValues.map(value => ({ [cfg.field]: value }))) }],
+          [{ yAxis: avg(allSeriesValues.map(value => ({ [cfg.field]: value }))), itemStyle: { color: 'rgba(230,162,60,0.14)' } }, { yAxis: avg(allSeriesValues.map(value => ({ [cfg.field]: value }))) * 1.5 }],
+          [{ yAxis: avg(allSeriesValues.map(value => ({ [cfg.field]: value }))) * 1.5, itemStyle: { color: 'rgba(245,108,108,0.12)' } }, { yAxis: chartMax }],
         ]
       }
     }]
@@ -958,8 +946,8 @@ function renderChart() {
 
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源市到目的市${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
   document.getElementById('chartSub').textContent = drillProvince
-    ? `点击城市链路${cfg.shortLabel}折线或图例高亮，其他链路置灰`
-    : `点击省份${cfg.shortLabel}折线高亮，双击可下钻到城市链路`;
+    ? `点击城市链路${cfg.shortLabel}折线或图例高亮；动态阈值=7日均值上浮50%`
+    : `点击省份${cfg.shortLabel}折线高亮；每2小时按7日均值上浮50%判断是否上报`;
 }
 
 // ── 排行 ──
@@ -969,23 +957,22 @@ function renderRanking() {
   const cfg = getMetricConfig();
 
   const rows = names.map(name => {
-    const avgVal = avg(data[name]);
-    const maxDay = getPeak(data[name]);
-    const alertCount = getAlertCount(data[name]);
-    const isAlert = maxDay > getAlertThreshold();
-    return { name, avgVal, maxDay, alertCount, isAlert };
+    const dynamicThreshold = getDynamicThreshold(data[name]);
+    const reportLine = getReportThreshold(data[name]);
+    const currentValue = getCurrentTwoHourValue(data[name]);
+    const isAlert = currentValue > reportLine;
+    return { name, dynamicThreshold, reportLine, currentValue, isAlert };
   });
 
-  rows.sort((a, b) => b.avgVal - a.avgVal);
+  rows.sort((a, b) => b.currentValue - a.currentValue);
 
   const el = document.getElementById('rankBody');
   el.innerHTML = `<div class="rank-table">
     <div class="rank-row rank-head">
       <div>#</div>
       <div class="rank-prov">名称</div>
-      <div class="rank-val">7天均值</div>
-      <div class="rank-threshold">峰值</div>
-      <div class="rank-threshold">异常点</div>
+      <div class="rank-val">当前2小时</div>
+      <div class="rank-threshold">动态阈值</div>
       <div class="rank-status">状态</div>
     </div>
     ${rows.map((r, i) => {
@@ -999,17 +986,16 @@ function renderRanking() {
       return `<div class="rank-row ${rowClass}" data-rank-name="${r.name}" ${clickAttr}>
         <div><span class="rank-num ${rc}">${i + 1}</span></div>
         <div class="rank-prov">${r.name}</div>
-        <div class="rank-val" style="color:${getMetricColor(r.avgVal)}">${formatMetricValueWithUnit(r.avgVal, true)}</div>
-        <div class="rank-threshold" style="color:${peakTextColor(r.maxDay)};font-weight:${r.maxDay > getAlertThreshold() ? '600' : '500'};">${formatMetricValueWithUnit(r.maxDay)}</div>
-        <div class="rank-threshold" style="color:${r.alertCount > 0 ? '#f56c6c' : '#909399'};font-weight:${r.alertCount > 0 ? '600' : '500'};">${r.alertCount}</div>
-        <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '告警' : '正常'}</span></div>
+        <div class="rank-val" style="color:${getMetricColor(r.currentValue, r.dynamicThreshold)}">${formatMetricValueWithUnit(r.currentValue, true)}</div>
+        <div class="rank-threshold" style="color:${thresholdTextColor(r.currentValue, r.reportLine)};font-weight:${r.isAlert ? '600' : '500'};">${getDynamicThresholdPercentText()}</div>
+        <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '上报' : '正常'}</span></div>
       </div>`;
     }).join('')}
   </div>`;
 
   document.getElementById('rankSub').textContent = drillProvince
-    ? `${drillProvince} 城市链路排行`
-    : '';
+    ? `${drillProvince} 城市链路排行 · 告警每 2 小时更新一次`
+    : '告警每 2 小时更新一次';
 }
 
 // ── 热力矩阵 ──
@@ -1020,7 +1006,7 @@ function renderHeatmap() {
 
   let html = '<table class="hm-table"><thead><tr><th>名称</th>';
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
-  html += '<th>峰值</th>';
+  html += '<th>动态阈值<br><small>上浮百分比</small></th>';
   html += '</tr></thead><tbody>';
   names.forEach(name => {
     const isHover = hoverName === name;
@@ -1028,18 +1014,21 @@ function renderHeatmap() {
     const activeName = getActiveSeriesName();
     const isDim = activeName && !isHover && !isLock;
     const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
-    const peak = getPeak(data[name]);
-    const alertCount = getAlertCount(data[name]);
-    const hasAlertPoint = alertCount > 0;
-    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${hasAlertPoint ? `本周存在 ${alertCount} 个异常点` : '本周无异常点'}"><span class="${hasAlertPoint ? 'hm-name-alert' : ''}">${name}</span></td>`;
+    const dynamicThreshold = getDynamicThreshold(data[name]);
+    const reportLine = getReportThreshold(data[name]);
+    const currentValue = getCurrentTwoHourValue(data[name]);
+    const isReportAlert = currentValue > reportLine;
+    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${isReportAlert ? '当前2小时值超过动态阈值' : '当前2小时值未超过动态阈值'}"><span class="${isReportAlert ? 'hm-name-alert' : ''}">${name}</span></td>`;
     data[name].forEach(item => {
       const v = getMetricValue(item);
-      const isAlertCell = v > getAlertThreshold();
-      html += `<td><div class="hm-cell ${isAlertCell ? 'alert-cell' : ''}" style="background:${heatmapColor(v)}" title="${name} ${item.date}
-${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}"><span>${formatMetricNumber(v)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
+      const isAlertCell = v > reportLine;
+      html += `<td><div class="hm-cell ${isAlertCell ? 'alert-cell' : ''}" style="background:${heatmapColor(v, dynamicThreshold)}" title="${name} ${item.date}
+${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}
+动态阈值: 7日均值上浮50%"><span>${formatMetricNumber(v)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
     });
-    html += `<td><div class="hm-cell" style="background:${peakColor(peak)}" title="${name} 峰值
-峰值: ${formatMetricNumber(peak)}${cfg.unit}"><span>${formatMetricNumber(peak)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
+    html += `<td><div class="hm-cell" style="background:${thresholdCellColor(currentValue, reportLine)}" title="${name} 动态阈值
+动态阈值: 7日均值上浮50%
+当前2小时值: ${formatMetricNumber(currentValue)}${cfg.unit}"><span>${getDynamicThresholdPercentText()}</span></div></td>`;
     html += '</tr>';
   });
   html += '</tbody></table>';
