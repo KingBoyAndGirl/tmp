@@ -334,7 +334,7 @@
         </select>
         <input id="customThresholdInput" class="threshold-input" type="number" value="50" min="0" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
         <span>%</span>
-        <span class="threshold-note">当前2小时值相对7日均值偏离 > 用户设置阈值才异常；默认50%，含↑54%/↓62%异常示例</span>
+        <span class="threshold-note" id="thresholdNote"></span>
       </span>
     </div>
   </div>
@@ -861,7 +861,7 @@ function getMetricLegendItems() {
   return [
     { color: '#67c23a', label: '≤ 7日均值（正常）' },
     { color: '#e6a23c', label: '7日均值 ~ 动态阈值（关注）' },
-    { color: '#f56c6c', label: '当前2小时偏离 > 用户设置阈值（异常）' },
+    { color: '#f56c6c', label: `当前2小时偏离 > ${getActiveThresholdLabel()}（异常）` },
   ];
 }
 
@@ -912,14 +912,32 @@ function renderMetricToggle() {
   ].map(metric => `<div class="radio-item ${metric.key === curMetric ? 'active' : ''}" onclick="setMetric('${metric.key}')">${metric.toggleLabel}</div>`).join('');
 }
 
+function getActiveThresholdPercent() {
+  if (thresholdMode === 'mixed') return null;
+  if (thresholdMode === 'custom') return normalizeThresholdPercent(customThresholdPercent, DEFAULT_ABNORMAL_PERCENT);
+  return normalizeThresholdPercent(thresholdMode, DEFAULT_ABNORMAL_PERCENT);
+}
+
+function getActiveThresholdLabel() {
+  const percent = getActiveThresholdPercent();
+  return percent === null ? '混合示例' : `${percent}%`;
+}
+
 function renderThresholdControls() {
   const modeSelect = document.getElementById('thresholdMode');
   const customInput = document.getElementById('customThresholdInput');
+  const note = document.getElementById('thresholdNote');
   if (!modeSelect || !customInput) return;
   modeSelect.value = thresholdMode;
   customInput.value = customThresholdPercent;
   customInput.disabled = thresholdMode !== 'custom';
   customInput.style.opacity = thresholdMode === 'custom' ? '1' : '0.52';
+  if (note) {
+    const percent = getActiveThresholdPercent();
+    note.textContent = percent === null
+      ? '混合示例：每行阈值不同，状态随行阈值联动刷新'
+      : `当前阈值 ${percent}%：偏离 > ${percent}% 显示异常，≤ ${percent}% 显示正常`;
+  }
 }
 
 function onThresholdModeChange(value) {
@@ -1132,7 +1150,7 @@ function renderChart() {
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源市到目的市${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
   document.getElementById('chartSub').textContent = drillProvince
     ? `点击城市链路${cfg.shortLabel}折线或图例高亮；动态阈值=当前2小时值相对7日均值偏离`
-    : `点击省份${cfg.shortLabel}折线高亮；每2小时按用户设置阈值判断是否异常`;
+    : `点击省份${cfg.shortLabel}折线高亮；每2小时按当前阈值${getActiveThresholdLabel()}判断是否异常`;
 }
 
 // ── 排行 ──
@@ -1181,8 +1199,8 @@ function renderRanking() {
   </div>`;
 
   document.getElementById('rankSub').textContent = drillProvince
-    ? `${drillProvince} 城市链路排行 · 告警每 2 小时更新一次`
-    : '告警每 2 小时更新一次';
+    ? `${drillProvince} 城市链路排行 · 阈值${getActiveThresholdLabel()}联动`
+    : `阈值${getActiveThresholdLabel()}联动 · 每 2 小时更新一次`;
 }
 
 // ── 热力矩阵 ──
