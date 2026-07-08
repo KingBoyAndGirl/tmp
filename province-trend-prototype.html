@@ -334,7 +334,7 @@
         </select>
         <input id="customThresholdInput" class="threshold-input" type="number" value="50" min="0" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
         <span>%</span>
-        <span class="threshold-note">当前2小时值相对7日均值偏离 > 用户设置阈值才异常；默认阈值50%，如↑28%应为正常</span>
+        <span class="threshold-note">当前2小时值相对7日均值偏离 > 用户设置阈值才异常；默认50%，含↑54%/↓62%异常示例</span>
       </span>
     </div>
   </div>
@@ -413,7 +413,7 @@
         <h4>四、排行 / 动态阈值 / 上报告警</h4>
         <ul>
           <li><code>当前2小时值</code>：用于模拟当天每 2 小时滚动判断的一次最新监测值。</li>
-          <li><code>动态阈值</code>：动态阈值是用户设置的允许偏离幅度；箭头百分比表示当前2小时值相对7日均值的实际变化，例如7日均值65、当前50显示<code>↓23%</code>并超过20%阈值则异常；7日均值65、当前40显示<code>↓38%</code>且未超过40%阈值则正常。</li>
+          <li><code>动态阈值</code>：动态阈值是用户设置的允许偏离幅度；箭头百分比表示当前2小时值相对7日均值的实际变化，例如7日均值65、当前50显示<code>↓23%</code>为正常；当前100显示<code>↑54%</code>为异常；当前25显示<code>↓62%</code>为异常。</li>
           <li><code>状态</code>：状态按当前2小时值相对7日均值的实际偏离判断：实际偏离绝对值大于用户设置阈值即“异常”，否则“正常”；上箭头和下箭头只是方向。</li>
         </ul>
       </div>
@@ -431,7 +431,7 @@
         <ul>
           <li>矩阵每一行对应一个省份或一条城市链路，每一列对应一天。</li>
           <li>格子中的数字就是该对象当天的指标值；背景色按该行 7 日均值与箭头百分比动态阈值着色，超过动态阈值会追加红色描边和角标。</li>
-          <li>最后一列展示当前2小时值相对7日均值的实际箭头百分比；用户可通过顶部控件切换异常阈值；默认50%，低于或等于50%均正常。</li>
+          <li>最后一列展示当前2小时值相对7日均值的实际箭头百分比；默认50%，低于或等于50%正常，高于50%异常。</li>
         </ul>
       </div>
     </div>
@@ -605,9 +605,11 @@ function applyDeviationDemoRow(name, currentDelay, currentLoss) {
   PROV_DATA[name][PROV_DATA[name].length - 1].loss_rate = currentLoss;
 }
 
-// 明确体现“65→50 显示↓异常、65→40 显示↓正常”的口径。
-applyDeviationDemoRow('贵州', 50, 50);
-applyDeviationDemoRow('云南', 40, 40);
+// 明确体现默认 50% 阈值下：↑/↓ 低于 50% 正常，高于 50% 异常。
+applyDeviationDemoRow('贵州', 50, 50); // 65→50，↓23%，正常
+applyDeviationDemoRow('云南', 40, 40); // 65→40，↓38%，正常
+applyDeviationDemoRow('四川', 100, 100); // 65→100，↑54%，异常
+applyDeviationDemoRow('广东', 25, 25); // 65→25，↓62%，异常
 
 // 生成地市级 mock 数据（下钻用）
 // 每个地市 = 该城市所有探测点的 AVG(avg_delay / loss_rate)
