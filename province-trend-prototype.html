@@ -282,7 +282,7 @@
     <div class="filter-row" id="provBarRow">
       <span class="filter-label">省份：</span>
       <select id="provSelect" class="el-select" onchange="onProvinceSelectChange(this.value)"></select>
-      <span class="filter-hint">动态阈值：前 7 日均值↑50%；每 2 小时判断一次</span>
+      <span class="filter-hint">动态阈值：示例含↑60%、↑50%、↓20%；每 2 小时判断一次</span>
     </div>
   </div>
 
@@ -293,7 +293,7 @@
   <div class="legend" id="zoneLegend" style="margin-bottom:12px;">
     <span><span class="legend-dot" style="background:#67c23a;"></span> 0-20ms 绿区（正常）</span>
     <span><span class="legend-dot" style="background:#e6a23c;"></span> 20-30ms 黄区（关注）</span>
-    <span><span class="legend-dot" style="background:#f56c6c;"></span> 当前 2 小时值 &gt; 7 日均值↑50%（上报告警）</span>
+    <span><span class="legend-dot" style="background:#f56c6c;"></span> 当前 2 小时值 &gt; 7 日均值箭头百分比阈值（上报告警）</span>
   </div>
 
   <!-- 图表 + 排行 -->
@@ -360,15 +360,15 @@
         <h4>四、排行 / 动态阈值 / 上报告警</h4>
         <ul>
           <li><code>当前2小时值</code>：用于模拟当天每 2 小时滚动判断的一次最新监测值。</li>
-          <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数箭头百分比，当前为 <code>↑50%</code>；按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
-          <li><code>状态</code>：仅判断当前 2 小时值是否超过 7 日均值↑50% 后的结果；超过则“上报”，否则“正常”。</li>
+          <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数按箭头百分比调整，例如 <code>↑60%</code>、<code>↑50%</code>、<code>↓20%</code>；按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
+          <li><code>状态</code>：仅判断当前 2 小时值是否超过 7 日均值按箭头百分比调整后的结果；超过则“上报”，否则“正常”。</li>
         </ul>
       </div>
       <div class="note-block">
         <h4>五、动态阈值与颜色规则</h4>
         <ul>
-          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一按 7 日均值箭头百分比计算动态阈值。</li>
-          <li>背景分区规则：绿色为低于 7 日均值，黄色为 7 日均值到↑50%后的范围，红色为高于↑50%后的范围。</li>
+          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一按 7 日均值箭头百分比计算动态阈值；本原型刻意展示↑60%、↑50%、↓20%、↓10%等状态。</li>
+          <li>背景分区规则：绿色为≤7日均值，黄色为7日均值到当前箭头阈值之间，红色为超过当前箭头阈值。</li>
           <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
           <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
         </ul>
@@ -377,8 +377,8 @@
         <h4>六、每日明细矩阵解释</h4>
         <ul>
           <li>矩阵每一行对应一个省份或一条城市链路，每一列对应一天。</li>
-          <li>格子中的数字就是该对象当天的指标值；背景色按该行 7 日均值与↑50%后的动态阈值着色，超过动态阈值会追加红色描边和角标。</li>
-          <li>最后一列“动态阈值”展示箭头百分比（当前为↑50%），用于说明每 2 小时告警判断规则。</li>
+          <li>格子中的数字就是该对象当天的指标值；背景色按该行 7 日均值与箭头百分比动态阈值着色，超过动态阈值会追加红色描边和角标。</li>
+          <li>最后一列“动态阈值”展示箭头百分比，用于同时体现↑60%、↑50%、↓20%、↓10%等状态。</li>
         </ul>
       </div>
     </div>
@@ -646,16 +646,23 @@ function getDynamicThreshold(arr) {
   return avg(arr);
 }
 
-function getReportThreshold(arr) {
-  return +(getDynamicThreshold(arr) * 1.5).toFixed(2);
+function getDynamicThresholdPolicy(name, index = 0) {
+  const demoPolicies = [60, 50, -20, -10, 50, 60, -20, 50];
+  const percent = demoPolicies[index % demoPolicies.length];
+  return { percent, direction: percent < 0 ? 'down' : 'up' };
 }
 
-function getDynamicThresholdPercentText() {
-  return '↑50%';
+function getReportThreshold(arr, policy = { percent: 50 }) {
+  return +(getDynamicThreshold(arr) * (1 + policy.percent / 100)).toFixed(2);
 }
 
-function getDynamicThresholdPercentHtml() {
-  const text = getDynamicThresholdPercentText();
+function getDynamicThresholdPercentText(policy = { percent: 50 }) {
+  const arrow = policy.percent < 0 ? '↓' : '↑';
+  return `${arrow}${Math.abs(policy.percent)}%`;
+}
+
+function getDynamicThresholdPercentHtml(policy = { percent: 50 }) {
+  const text = getDynamicThresholdPercentText(policy);
   const isDown = text.startsWith('↓') || text.startsWith('-');
   const cls = isDown ? 'down' : 'up';
   const arrow = isDown ? '↓' : '↑';
@@ -663,8 +670,8 @@ function getDynamicThresholdPercentHtml() {
   return `<span class="trend-arrow ${cls}">${arrow}</span>${percent}`;
 }
 
-function getDynamicThresholdDisplayColor(currentValue, dynamicThreshold) {
-  return getMetricColor(currentValue, dynamicThreshold);
+function getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy = { percent: 50 }) {
+  return getMetricColor(currentValue, dynamicThreshold, policy.percent);
 }
 
 function getCurrentTwoHourValue(arr) {
@@ -673,19 +680,23 @@ function getCurrentTwoHourValue(arr) {
 }
 
 
-function getMetricColor(v, dynamicThreshold = null) {
+function getMetricColor(v, dynamicThreshold = null, thresholdPercent = 50) {
   const cfg = getMetricConfig();
   const threshold = Number.isFinite(dynamicThreshold) ? dynamicThreshold : cfg.defaultThreshold;
-  const reportLine = threshold * 1.5;
-  if (v <= threshold) return '#67c23a';
-  if (v <= reportLine) return '#e6a23c';
+  const reportLine = threshold * (1 + thresholdPercent / 100);
+  const lower = Math.min(threshold, reportLine);
+  const upper = Math.max(threshold, reportLine);
+  if (v <= lower) return '#67c23a';
+  if (v <= upper) return '#e6a23c';
   return '#f56c6c';
 }
 
-function heatmapColor(v, dynamicThreshold) {
-  const reportLine = dynamicThreshold * 1.5;
-  if (v <= dynamicThreshold) return 'rgba(103,194,58,0.16)';
-  if (v <= reportLine) return 'rgba(230,162,60,0.18)';
+function heatmapColor(v, dynamicThreshold, policy = { percent: 50 }) {
+  const reportLine = dynamicThreshold * (1 + policy.percent / 100);
+  const lower = Math.min(dynamicThreshold, reportLine);
+  const upper = Math.max(dynamicThreshold, reportLine);
+  if (v <= lower) return 'rgba(103,194,58,0.16)';
+  if (v <= upper) return 'rgba(230,162,60,0.18)';
   return 'rgba(245,108,108,0.18)';
 }
 
@@ -726,8 +737,8 @@ function getMetricChartMax(values) {
 function getMetricLegendItems() {
   return [
     { color: '#67c23a', label: '≤ 7日均值（正常）' },
-    { color: '#e6a23c', label: '7日均值 ~ ↑50%（关注）' },
-    { color: '#f56c6c', label: '> ↑50%（上报告警）' },
+    { color: '#e6a23c', label: '7日均值 ~ 动态阈值（关注）' },
+    { color: '#f56c6c', label: '> 动态阈值（上报告警）' },
   ];
 }
 
@@ -976,8 +987,8 @@ function renderChart() {
 
   document.getElementById('chartTitle').textContent = drillProvince ? `${drillProvince} — 源市到目的市${cfg.label}趋势` : `近 7 天${cfg.label}趋势对比`;
   document.getElementById('chartSub').textContent = drillProvince
-    ? `点击城市链路${cfg.shortLabel}折线或图例高亮；动态阈值=7日均值↑50%`
-    : `点击省份${cfg.shortLabel}折线高亮；每2小时按7日均值↑50%判断是否上报`;
+    ? `点击城市链路${cfg.shortLabel}折线或图例高亮；动态阈值=7日均值箭头百分比`
+    : `点击省份${cfg.shortLabel}折线高亮；每2小时按7日均值箭头百分比判断是否上报`;
 }
 
 // ── 排行 ──
@@ -986,12 +997,13 @@ function renderRanking() {
   const names = Object.keys(data);
   const cfg = getMetricConfig();
 
-  const rows = names.map(name => {
+  const rows = names.map((name, index) => {
+    const policy = getDynamicThresholdPolicy(name, index);
     const dynamicThreshold = getDynamicThreshold(data[name]);
-    const reportLine = getReportThreshold(data[name]);
+    const reportLine = getReportThreshold(data[name], policy);
     const currentValue = getCurrentTwoHourValue(data[name]);
     const isAlert = currentValue > reportLine;
-    return { name, dynamicThreshold, reportLine, currentValue, isAlert };
+    return { name, policy, dynamicThreshold, reportLine, currentValue, isAlert };
   });
 
   rows.sort((a, b) => b.currentValue - a.currentValue);
@@ -1016,8 +1028,8 @@ function renderRanking() {
       return `<div class="rank-row ${rowClass}" data-rank-name="${r.name}" ${clickAttr}>
         <div><span class="rank-num ${rc}">${i + 1}</span></div>
         <div class="rank-prov">${r.name}</div>
-        <div class="rank-val" style="color:${getMetricColor(r.currentValue, r.dynamicThreshold)}">${formatMetricValueWithUnit(r.currentValue, true)}</div>
-        <div class="rank-threshold" style="color:${getDynamicThresholdDisplayColor(r.currentValue, r.dynamicThreshold)};font-weight:600;">${getDynamicThresholdPercentHtml()}</div>
+        <div class="rank-val" style="color:${getMetricColor(r.currentValue, r.dynamicThreshold, r.policy.percent)}">${formatMetricValueWithUnit(r.currentValue, true)}</div>
+        <div class="rank-threshold" style="color:${getDynamicThresholdDisplayColor(r.currentValue, r.dynamicThreshold, r.policy)};font-weight:600;">${getDynamicThresholdPercentHtml(r.policy)}</div>
         <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '上报' : '正常'}</span></div>
       </div>`;
     }).join('')}
@@ -1038,27 +1050,28 @@ function renderHeatmap() {
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
   html += '<th>动态阈值<br><small>箭头百分比</small></th>';
   html += '</tr></thead><tbody>';
-  names.forEach(name => {
+  names.forEach((name, index) => {
     const isHover = hoverName === name;
     const isLock = !hoverName && highlightName === name;
     const activeName = getActiveSeriesName();
     const isDim = activeName && !isHover && !isLock;
     const rowClass = isHover ? 'hover-highlight' : isLock ? 'lock-highlight' : isDim ? 'dimmed' : '';
+    const policy = getDynamicThresholdPolicy(name, index);
     const dynamicThreshold = getDynamicThreshold(data[name]);
-    const reportLine = getReportThreshold(data[name]);
+    const reportLine = getReportThreshold(data[name], policy);
     const currentValue = getCurrentTwoHourValue(data[name]);
     const isReportAlert = currentValue > reportLine;
     html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${isReportAlert ? '当前2小时值超过动态阈值' : '当前2小时值未超过动态阈值'}"><span class="${isReportAlert ? 'hm-name-alert' : ''}">${name}</span></td>`;
     data[name].forEach(item => {
       const v = getMetricValue(item);
       const isAlertCell = v > reportLine;
-      html += `<td><div class="hm-cell ${isAlertCell ? 'alert-cell' : ''}" style="background:${heatmapColor(v, dynamicThreshold)}" title="${name} ${item.date}
+      html += `<td><div class="hm-cell ${isAlertCell ? 'alert-cell' : ''}" style="background:${heatmapColor(v, dynamicThreshold, policy)}" title="${name} ${item.date}
 ${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}
-动态阈值: 7日均值↑50%"><span>${formatMetricNumber(v)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
+动态阈值: 7日均值${getDynamicThresholdPercentText(policy)}"><span>${formatMetricNumber(v)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
     });
-    html += `<td><div class="hm-cell" style="background:${heatmapColor(currentValue, dynamicThreshold)};color:${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold)};font-weight:700;border:1px solid ${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold)};" title="${name} 动态阈值
-动态阈值: 7日均值↑50%
-当前2小时值: ${formatMetricNumber(currentValue)}${cfg.unit}"><span>${getDynamicThresholdPercentHtml()}</span></div></td>`;
+    html += `<td><div class="hm-cell" style="background:${heatmapColor(currentValue, dynamicThreshold, policy)};color:${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy)};font-weight:700;border:1px solid ${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy)};" title="${name} 动态阈值
+动态阈值: 7日均值${getDynamicThresholdPercentText(policy)}
+当前2小时值: ${formatMetricNumber(currentValue)}${cfg.unit}"><span>${getDynamicThresholdPercentHtml(policy)}</span></div></td>`;
     html += '</tr>';
   });
   html += '</tbody></table>';
