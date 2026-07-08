@@ -637,8 +637,8 @@ function getDynamicThresholdPercentText() {
   return '上浮50%';
 }
 
-function getDynamicThresholdDisplayColor() {
-  return '#e6a23c';
+function getDynamicThresholdDisplayColor(currentValue, dynamicThreshold) {
+  return getMetricColor(currentValue, dynamicThreshold);
 }
 
 function getCurrentTwoHourValue(arr) {
@@ -991,7 +991,7 @@ function renderRanking() {
         <div><span class="rank-num ${rc}">${i + 1}</span></div>
         <div class="rank-prov">${r.name}</div>
         <div class="rank-val" style="color:${getMetricColor(r.currentValue, r.dynamicThreshold)}">${formatMetricValueWithUnit(r.currentValue, true)}</div>
-        <div class="rank-threshold" style="color:${getDynamicThresholdDisplayColor()};font-weight:600;">${getDynamicThresholdPercentText()}</div>
+        <div class="rank-threshold" style="color:${getDynamicThresholdDisplayColor(r.currentValue, r.dynamicThreshold)};font-weight:600;">${getDynamicThresholdPercentText()}</div>
         <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '上报' : '正常'}</span></div>
       </div>`;
     }).join('')}
@@ -1030,7 +1030,7 @@ function renderHeatmap() {
 ${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}
 动态阈值: 7日均值上浮50%"><span>${formatMetricNumber(v)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
     });
-    html += `<td><div class="hm-cell" style="background:rgba(230,162,60,0.22);color:${getDynamicThresholdDisplayColor()};font-weight:700;border:1px solid rgba(230,162,60,0.42);" title="${name} 动态阈值
+    html += `<td><div class="hm-cell" style="background:${heatmapColor(currentValue, dynamicThreshold)};color:${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold)};font-weight:700;border:1px solid ${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold)};" title="${name} 动态阈值
 动态阈值: 7日均值上浮50%
 当前2小时值: ${formatMetricNumber(currentValue)}${cfg.unit}"><span>${getDynamicThresholdPercentText()}</span></div></td>`;
     html += '</tr>';
