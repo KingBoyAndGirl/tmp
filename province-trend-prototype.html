@@ -267,6 +267,14 @@
       color: #67c23a;
     }
 
+    .threshold-percent.up {
+      color: #f56c6c;
+    }
+
+    .threshold-percent.down {
+      color: #67c23a;
+    }
+
 
     .threshold-setting {
       display: inline-flex;
@@ -327,7 +335,7 @@
         </select>
         <input id="customThresholdInput" class="threshold-input" type="number" value="60" min="-100" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
         <span>%</span>
-        <span class="threshold-note">仅↑幅度 &gt; 50% 且当前2小时值超阈值才上报</span>
+        <span class="threshold-note">仅↑幅度 &gt; 50% 且当前2小时值超阈值才上报；≤50%/↓显示“不触发”</span>
       </span>
     </div>
   </div>
@@ -407,7 +415,7 @@
         <ul>
           <li><code>当前2小时值</code>：用于模拟当天每 2 小时滚动判断的一次最新监测值。</li>
           <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数按箭头百分比调整，例如 <code>↑60%</code>、<code>↑50%</code>、<code>↓20%</code>；用户可在顶部下拉框选择或自定义百分比，按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
-          <li><code>状态</code>：仅当动态阈值为 <code>↑</code> 且幅度 <code>&gt; 50%</code> 时才具备上报资格；同时当前 2 小时值必须超过该动态阈值，否则一律为“正常”。</li>
+          <li><code>状态</code>：仅当动态阈值为 <code>↑</code> 且幅度 <code>&gt; 50%</code> 时才具备上报资格；同时当前 2 小时值必须超过该动态阈值，否则显示“正常”；≤50% 或 ↓ 方向显示“不触发”。</li>
         </ul>
       </div>
       <div class="note-block">
@@ -725,6 +733,18 @@ function shouldReportAlert(currentValue, reportLine, policy = { percent: 50 }) {
   return isReportEligible(policy) && currentValue > reportLine;
 }
 
+function getStatusText(isAlert, policy = { percent: 50 }) {
+  if (isAlert) return '上报';
+  if (!isReportEligible(policy)) return '不触发';
+  return '正常';
+}
+
+function getStatusTitle(isAlert, policy = { percent: 50 }, reportLine = null) {
+  if (isAlert) return '↑幅度大于50%，且当前2小时值超过动态阈值';
+  if (!isReportEligible(policy)) return '仅↑幅度大于50%才触发上报，当前阈值不参与上报';
+  return '↑幅度大于50%，但当前2小时值未超过动态阈值';
+}
+
 function getDynamicThresholdPercentText(policy = { percent: 50 }) {
   const arrow = policy.percent < 0 ? '↓' : '↑';
   return `${arrow}${Math.abs(policy.percent)}%`;
@@ -736,11 +756,11 @@ function getDynamicThresholdPercentHtml(policy = { percent: 50 }) {
   const cls = isDown ? 'down' : 'up';
   const arrow = isDown ? '↓' : '↑';
   const percent = text.replace(/^[↑↓+-]/, '');
-  return `<span class="trend-arrow ${cls}">${arrow}</span>${percent}`;
+  return `<span class="trend-arrow ${cls}">${arrow}</span><span class="threshold-percent ${cls}">${percent}</span>`;
 }
 
 function getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy = { percent: 50 }) {
-  return getMetricColor(currentValue, dynamicThreshold, policy.percent);
+  return policy.percent < 0 ? '#67c23a' : '#f56c6c';
 }
 
 function getCurrentTwoHourValue(arr) {
@@ -1119,8 +1139,8 @@ function renderRanking() {
         <div><span class="rank-num ${rc}">${i + 1}</span></div>
         <div class="rank-prov">${r.name}</div>
         <div class="rank-val" style="color:${getMetricColor(r.currentValue, r.dynamicThreshold, r.policy.percent)}">${formatMetricValueWithUnit(r.currentValue, true)}</div>
-        <div class="rank-threshold" style="color:${getDynamicThresholdDisplayColor(r.currentValue, r.dynamicThreshold, r.policy)};font-weight:600;">${getDynamicThresholdPercentHtml(r.policy)}</div>
-        <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}">${r.isAlert ? '上报' : '正常'}</span></div>
+        <div class="rank-threshold" style="font-weight:600;">${getDynamicThresholdPercentHtml(r.policy)}</div>
+        <div class="rank-status"><span class="rank-tag ${r.isAlert ? 'tag-alert' : 'tag-normal'}" title="${getStatusTitle(r.isAlert, r.policy, r.reportLine)}">${getStatusText(r.isAlert, r.policy)}</span></div>
       </div>`;
     }).join('')}
   </div>`;
@@ -1159,7 +1179,7 @@ function renderHeatmap() {
 ${cfg.shortLabel}: ${formatMetricNumber(v)}${cfg.unit}
 动态阈值: 7日均值${getDynamicThresholdPercentText(policy)}"><span>${formatMetricNumber(v)}</span><span class="hm-unit">${cfg.unit}</span></div></td>`;
     });
-    html += `<td><div class="hm-cell" style="background:${heatmapColor(currentValue, dynamicThreshold, policy)};color:${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy)};font-weight:700;border:1px solid ${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy)};" title="${name} 动态阈值
+    html += `<td><div class="hm-cell" style="background:${heatmapColor(currentValue, dynamicThreshold, policy)};font-weight:700;border:1px solid ${getDynamicThresholdDisplayColor(currentValue, dynamicThreshold, policy)};" title="${name} 动态阈值
 动态阈值: 7日均值${getDynamicThresholdPercentText(policy)}
 当前2小时值: ${formatMetricNumber(currentValue)}${cfg.unit}"><span>${getDynamicThresholdPercentHtml(policy)}</span></div></td>`;
     html += '</tr>';
