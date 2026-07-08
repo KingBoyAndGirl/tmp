@@ -335,7 +335,7 @@
         </select>
         <input id="customThresholdInput" class="threshold-input" type="number" value="60" min="-100" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
         <span>%</span>
-        <span class="threshold-note">仅↑幅度 &gt; 50% 且当前2小时值超阈值才上报；≤50%/↓显示“不触发”</span>
+        <span class="threshold-note">只要动态阈值幅度 &gt; 50% 即上报异常；≤50% 一律正常</span>
       </span>
     </div>
   </div>
@@ -347,7 +347,7 @@
   <div class="legend" id="zoneLegend" style="margin-bottom:12px;">
     <span><span class="legend-dot" style="background:#67c23a;"></span> 0-20ms 绿区（正常）</span>
     <span><span class="legend-dot" style="background:#e6a23c;"></span> 20-30ms 黄区（关注）</span>
-    <span><span class="legend-dot" style="background:#f56c6c;"></span> ↑幅度 > 50% 且当前 2 小时值 > 动态阈值（上报告警）</span>
+    <span><span class="legend-dot" style="background:#f56c6c;"></span> 动态阈值幅度 > 50%（异常）</span>
   </div>
 
   <!-- 图表 + 排行 -->
@@ -415,14 +415,14 @@
         <ul>
           <li><code>当前2小时值</code>：用于模拟当天每 2 小时滚动判断的一次最新监测值。</li>
           <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数按箭头百分比调整，例如 <code>↑60%</code>、<code>↑50%</code>、<code>↓20%</code>；用户可在顶部下拉框选择或自定义百分比，按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
-          <li><code>状态</code>：仅当动态阈值为 <code>↑</code> 且幅度 <code>&gt; 50%</code> 时才具备上报资格；同时当前 2 小时值必须超过该动态阈值，否则显示“正常”；≤50% 或 ↓ 方向显示“不触发”。</li>
+          <li><code>状态</code>：只判断动态阈值幅度本身：绝对值 <code>&gt; 50%</code> 即“异常”，其余无论上浮还是下浮均为“正常”。</li>
         </ul>
       </div>
       <div class="note-block">
         <h4>五、动态阈值与颜色规则</h4>
         <ul>
           <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一按 7 日均值箭头百分比计算动态阈值；顶部控件支持混合示例、↑60%、↑50%、↓20%、↓10%和自定义。</li>
-          <li>背景分区规则：绿色为≤7日均值，黄色为7日均值到当前箭头阈值之间，红色为超过当前箭头阈值；但上报告警只对↑幅度>50%的动态阈值生效。</li>
+          <li>背景分区规则仅用于展示当前值区间；状态列只按动态阈值幅度判断，绝对值>50%为异常，其余正常。</li>
           <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
           <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
         </ul>
@@ -649,7 +649,7 @@ let highlightName = null;
 let hoverName = null;
 let thresholdMode = 'mixed';
 let customThresholdPercent = 60;
-const REPORT_MIN_UPLIFT_PERCENT = 50;
+const REPORT_MIN_ABNORMAL_PERCENT = 50;
 
 const METRIC_CONFIGS = {
   delay: {
@@ -725,24 +725,22 @@ function getReportThreshold(arr, policy = { percent: 50 }) {
   return +(getDynamicThreshold(arr) * (1 + policy.percent / 100)).toFixed(2);
 }
 
-function isReportEligible(policy = { percent: 50 }) {
-  return policy.percent > REPORT_MIN_UPLIFT_PERCENT;
+function isThresholdAbnormal(policy = { percent: 50 }) {
+  return Math.abs(policy.percent) > REPORT_MIN_ABNORMAL_PERCENT;
 }
 
 function shouldReportAlert(currentValue, reportLine, policy = { percent: 50 }) {
-  return isReportEligible(policy) && currentValue > reportLine;
+  return isThresholdAbnormal(policy);
 }
 
 function getStatusText(isAlert, policy = { percent: 50 }) {
-  if (isAlert) return '上报';
-  if (!isReportEligible(policy)) return '不触发';
-  return '正常';
+  return isAlert ? '异常' : '正常';
 }
 
 function getStatusTitle(isAlert, policy = { percent: 50 }, reportLine = null) {
-  if (isAlert) return '↑幅度大于50%，且当前2小时值超过动态阈值';
-  if (!isReportEligible(policy)) return '仅↑幅度大于50%才触发上报，当前阈值不参与上报';
-  return '↑幅度大于50%，但当前2小时值未超过动态阈值';
+  return isAlert
+    ? '动态阈值幅度大于50%，判定为异常'
+    : '动态阈值幅度小于等于50%，无论上浮还是下浮均为正常';
 }
 
 function getDynamicThresholdPercentText(policy = { percent: 50 }) {
@@ -827,7 +825,7 @@ function getMetricLegendItems() {
   return [
     { color: '#67c23a', label: '≤ 7日均值（正常）' },
     { color: '#e6a23c', label: '7日均值 ~ 动态阈值（关注）' },
-    { color: '#f56c6c', label: '↑>50% 且 > 动态阈值（上报告警）' },
+    { color: '#f56c6c', label: '动态阈值幅度 > 50%（异常）' },
   ];
 }
 
@@ -1171,7 +1169,7 @@ function renderHeatmap() {
     const reportLine = getReportThreshold(data[name], policy);
     const currentValue = getCurrentTwoHourValue(data[name]);
     const isReportAlert = shouldReportAlert(currentValue, reportLine, policy);
-    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${isReportAlert ? '↑幅度超过50%且当前2小时值超过动态阈值' : '未达到上报条件'}"><span class="${isReportAlert ? 'hm-name-alert' : ''}">${name}</span></td>`;
+    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${isReportAlert ? '动态阈值幅度大于50%，异常' : '动态阈值幅度≤50%，正常'}"><span class="${isReportAlert ? 'hm-name-alert' : ''}">${name}</span></td>`;
     data[name].forEach(item => {
       const v = getMetricValue(item);
       const isAlertCell = v > reportLine;
