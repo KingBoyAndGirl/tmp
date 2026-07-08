@@ -286,7 +286,6 @@
       white-space: nowrap;
     }
 
-    .threshold-select,
     .threshold-input {
       height: 28px;
       border: 1px solid #dcdfe6;
@@ -301,6 +300,23 @@
     .threshold-input {
       width: 58px;
       text-align: right;
+    }
+
+    .threshold-btn {
+      height: 28px;
+      border: 1px solid #409EFF;
+      border-radius: 4px;
+      background: #409EFF;
+      color: #fff;
+      font-size: 12px;
+      padding: 0 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .threshold-btn:hover {
+      background: #66b1ff;
+      border-color: #66b1ff;
     }
 
     .threshold-note {
@@ -325,15 +341,9 @@
       <select id="provSelect" class="el-select" onchange="onProvinceSelectChange(this.value)"></select>
       <span class="threshold-setting">
         动态阈值：
-        <select id="thresholdMode" class="threshold-select" onchange="onThresholdModeChange(this.value)">
-          <option value="50">50%</option>
-          <option value="60">60%</option>
-          <option value="40">40%</option>
-          <option value="mixed">混合示例</option>
-          <option value="custom">自定义</option>
-        </select>
-        <input id="customThresholdInput" class="threshold-input" type="number" value="50" min="0" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
+        <input id="customThresholdInput" class="threshold-input" type="number" value="50" min="0" max="200" step="1" onkeydown="onThresholdInputKeydown(event)" />
         <span>%</span>
+        <button class="threshold-btn" type="button" onclick="applyThresholdSetting()">设置</button>
         <span class="threshold-note" id="thresholdNote"></span>
       </span>
     </div>
@@ -420,7 +430,7 @@
       <div class="note-block">
         <h4>五、动态阈值与颜色规则</h4>
         <ul>
-          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一用当前2小时值与7日均值计算实际偏离百分比；顶部控件支持50%、60%、40%、混合示例和自定义阈值；默认按50%判断。</li>
+          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一用当前2小时值与7日均值计算实际偏离百分比；顶部输入框支持手动填写阈值并点击“设置”生效；默认按50%判断。</li>
           <li>背景分区规则仅用于展示当前值区间；状态列按实际偏离百分比是否超过用户设置阈值判断。</li>
           <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
           <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
@@ -662,7 +672,6 @@ let curMetric = 'delay';
 let drillProvince = null;
 let highlightName = null;
 let hoverName = null;
-let thresholdMode = '50';
 let customThresholdPercent = 50;
 const DEFAULT_ABNORMAL_PERCENT = 50;
 
@@ -725,21 +734,7 @@ function normalizeThresholdPercent(value, fallback = 60) {
 }
 
 function getDynamicThresholdPolicy(name, index = 0) {
-  if (thresholdMode === 'mixed') {
-    const namedDemoPolicies = {
-      '贵州': 20, // 65→50，↓23%，超过20%阈值，异常
-      '云南': 40, // 65→40，↓38%，未超过40%阈值，正常
-    };
-    if (Object.prototype.hasOwnProperty.call(namedDemoPolicies, name)) {
-      return { thresholdPercent: namedDemoPolicies[name] };
-    }
-    const demoPolicies = [20, 40, 50, 60, 20, 40, 50, 60];
-    return { thresholdPercent: demoPolicies[index % demoPolicies.length] };
-  }
-  const thresholdPercent = thresholdMode === 'custom'
-    ? normalizeThresholdPercent(customThresholdPercent)
-    : normalizeThresholdPercent(thresholdMode, DEFAULT_ABNORMAL_PERCENT);
-  return { thresholdPercent };
+  return { thresholdPercent: normalizeThresholdPercent(customThresholdPercent, DEFAULT_ABNORMAL_PERCENT) };
 }
 
 function getReportThreshold(arr, policy = { thresholdPercent: DEFAULT_ABNORMAL_PERCENT }) {
@@ -913,42 +908,33 @@ function renderMetricToggle() {
 }
 
 function getActiveThresholdPercent() {
-  if (thresholdMode === 'mixed') return null;
-  if (thresholdMode === 'custom') return normalizeThresholdPercent(customThresholdPercent, DEFAULT_ABNORMAL_PERCENT);
-  return normalizeThresholdPercent(thresholdMode, DEFAULT_ABNORMAL_PERCENT);
+  return normalizeThresholdPercent(customThresholdPercent, DEFAULT_ABNORMAL_PERCENT);
 }
 
 function getActiveThresholdLabel() {
-  const percent = getActiveThresholdPercent();
-  return percent === null ? '混合示例' : `${percent}%`;
+  return `${getActiveThresholdPercent()}%`;
 }
 
 function renderThresholdControls() {
-  const modeSelect = document.getElementById('thresholdMode');
   const customInput = document.getElementById('customThresholdInput');
   const note = document.getElementById('thresholdNote');
-  if (!modeSelect || !customInput) return;
-  modeSelect.value = thresholdMode;
+  if (!customInput) return;
   customInput.value = customThresholdPercent;
-  customInput.disabled = thresholdMode !== 'custom';
-  customInput.style.opacity = thresholdMode === 'custom' ? '1' : '0.52';
   if (note) {
     const percent = getActiveThresholdPercent();
-    note.textContent = percent === null
-      ? '混合示例：每行阈值不同，状态随行阈值联动刷新'
-      : `当前阈值 ${percent}%：偏离 > ${percent}% 显示异常，≤ ${percent}% 显示正常`;
+    note.textContent = `当前阈值 ${percent}%：偏离 > ${percent}% 显示异常，≤ ${percent}% 显示正常`;
   }
 }
 
-function onThresholdModeChange(value) {
-  thresholdMode = value;
+function applyThresholdSetting() {
+  const customInput = document.getElementById('customThresholdInput');
+  customThresholdPercent = normalizeThresholdPercent(customInput?.value, customThresholdPercent);
   renderThresholdControls();
   refresh();
 }
 
-function onCustomThresholdChange(value) {
-  customThresholdPercent = normalizeThresholdPercent(value, customThresholdPercent);
-  if (thresholdMode === 'custom') refresh();
+function onThresholdInputKeydown(event) {
+  if (event.key === 'Enter') applyThresholdSetting();
 }
 
 function renderProvBar() {
