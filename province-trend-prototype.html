@@ -267,6 +267,39 @@
       color: #67c23a;
     }
 
+
+    .threshold-setting {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+      color: #606266;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .threshold-select,
+    .threshold-input {
+      height: 28px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      background: #fff;
+      color: #303133;
+      font-size: 12px;
+      padding: 0 8px;
+      outline: none;
+    }
+
+    .threshold-input {
+      width: 58px;
+      text-align: right;
+    }
+
+    .threshold-note {
+      color: #909399;
+      font-size: 11px;
+    }
+
   </style>
 </head>
 <body>
@@ -282,7 +315,20 @@
     <div class="filter-row" id="provBarRow">
       <span class="filter-label">省份：</span>
       <select id="provSelect" class="el-select" onchange="onProvinceSelectChange(this.value)"></select>
-      <span class="filter-hint">动态阈值：示例含↑60%、↑50%、↓20%；每 2 小时判断一次</span>
+      <span class="threshold-setting">
+        动态阈值：
+        <select id="thresholdMode" class="threshold-select" onchange="onThresholdModeChange(this.value)">
+          <option value="mixed">混合示例</option>
+          <option value="60">↑60%</option>
+          <option value="50">↑50%</option>
+          <option value="-20">↓20%</option>
+          <option value="-10">↓10%</option>
+          <option value="custom">自定义</option>
+        </select>
+        <input id="customThresholdInput" class="threshold-input" type="number" value="60" min="-100" max="200" step="1" onchange="onCustomThresholdChange(this.value)" oninput="onCustomThresholdChange(this.value)" />
+        <span>%</span>
+        <span class="threshold-note">仅↑幅度 &gt; 50% 且当前2小时值超阈值才上报</span>
+      </span>
     </div>
   </div>
 
@@ -293,7 +339,7 @@
   <div class="legend" id="zoneLegend" style="margin-bottom:12px;">
     <span><span class="legend-dot" style="background:#67c23a;"></span> 0-20ms 绿区（正常）</span>
     <span><span class="legend-dot" style="background:#e6a23c;"></span> 20-30ms 黄区（关注）</span>
-    <span><span class="legend-dot" style="background:#f56c6c;"></span> 当前 2 小时值 &gt; 7 日均值箭头百分比阈值（上报告警）</span>
+    <span><span class="legend-dot" style="background:#f56c6c;"></span> ↑幅度 > 50% 且当前 2 小时值 > 动态阈值（上报告警）</span>
   </div>
 
   <!-- 图表 + 排行 -->
@@ -360,15 +406,15 @@
         <h4>四、排行 / 动态阈值 / 上报告警</h4>
         <ul>
           <li><code>当前2小时值</code>：用于模拟当天每 2 小时滚动判断的一次最新监测值。</li>
-          <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数按箭头百分比调整，例如 <code>↑60%</code>、<code>↑50%</code>、<code>↓20%</code>；按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
-          <li><code>状态</code>：仅判断当前 2 小时值是否超过 7 日均值按箭头百分比调整后的结果；超过则“上报”，否则“正常”。</li>
+          <li><code>动态阈值</code>：当前对象前 7 日每日值的平均数按箭头百分比调整，例如 <code>↑60%</code>、<code>↑50%</code>、<code>↓20%</code>；用户可在顶部下拉框选择或自定义百分比，按天粒度滚动计算，例如 8 日看 1-7 日均值，9 日看 2-8 日均值。</li>
+          <li><code>状态</code>：仅当动态阈值为 <code>↑</code> 且幅度 <code>&gt; 50%</code> 时才具备上报资格；同时当前 2 小时值必须超过该动态阈值，否则一律为“正常”。</li>
         </ul>
       </div>
       <div class="note-block">
         <h4>五、动态阈值与颜色规则</h4>
         <ul>
-          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一按 7 日均值箭头百分比计算动态阈值；本原型刻意展示↑60%、↑50%、↓20%、↓10%等状态。</li>
-          <li>背景分区规则：绿色为≤7日均值，黄色为7日均值到当前箭头阈值之间，红色为超过当前箭头阈值。</li>
+          <li>当前支持两个指标：<code>平均时延</code> 与 <code>丢包率</code>，统一按 7 日均值箭头百分比计算动态阈值；顶部控件支持混合示例、↑60%、↑50%、↓20%、↓10%和自定义。</li>
+          <li>背景分区规则：绿色为≤7日均值，黄色为7日均值到当前箭头阈值之间，红色为超过当前箭头阈值；但上报告警只对↑幅度>50%的动态阈值生效。</li>
           <li>页面不再使用固定手工阈值，只展示动态阈值与当前 2 小时判断结果。</li>
           <li>告警判断每 2 小时更新一次，当前原型用最新 2 小时值模拟。</li>
         </ul>
@@ -378,7 +424,7 @@
         <ul>
           <li>矩阵每一行对应一个省份或一条城市链路，每一列对应一天。</li>
           <li>格子中的数字就是该对象当天的指标值；背景色按该行 7 日均值与箭头百分比动态阈值着色，超过动态阈值会追加红色描边和角标。</li>
-          <li>最后一列“动态阈值”展示箭头百分比，用于同时体现↑60%、↑50%、↓20%、↓10%等状态。</li>
+          <li>最后一列“动态阈值”展示箭头百分比；用户可通过顶部控件切换整体阈值或查看混合示例。</li>
         </ul>
       </div>
     </div>
@@ -593,6 +639,9 @@ let curMetric = 'delay';
 let drillProvince = null;
 let highlightName = null;
 let hoverName = null;
+let thresholdMode = 'mixed';
+let customThresholdPercent = 60;
+const REPORT_MIN_UPLIFT_PERCENT = 50;
 
 const METRIC_CONFIGS = {
   delay: {
@@ -646,14 +695,34 @@ function getDynamicThreshold(arr) {
   return avg(arr);
 }
 
+function normalizeThresholdPercent(value, fallback = 60) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(-100, Math.min(200, Math.round(n)));
+}
+
 function getDynamicThresholdPolicy(name, index = 0) {
-  const demoPolicies = [60, 50, -20, -10, 50, 60, -20, 50];
-  const percent = demoPolicies[index % demoPolicies.length];
+  if (thresholdMode === 'mixed') {
+    const demoPolicies = [60, 50, -20, -10, 50, 60, -20, 50];
+    const percent = demoPolicies[index % demoPolicies.length];
+    return { percent, direction: percent < 0 ? 'down' : 'up' };
+  }
+  const percent = thresholdMode === 'custom'
+    ? normalizeThresholdPercent(customThresholdPercent)
+    : normalizeThresholdPercent(thresholdMode, 50);
   return { percent, direction: percent < 0 ? 'down' : 'up' };
 }
 
 function getReportThreshold(arr, policy = { percent: 50 }) {
   return +(getDynamicThreshold(arr) * (1 + policy.percent / 100)).toFixed(2);
+}
+
+function isReportEligible(policy = { percent: 50 }) {
+  return policy.percent > REPORT_MIN_UPLIFT_PERCENT;
+}
+
+function shouldReportAlert(currentValue, reportLine, policy = { percent: 50 }) {
+  return isReportEligible(policy) && currentValue > reportLine;
 }
 
 function getDynamicThresholdPercentText(policy = { percent: 50 }) {
@@ -738,7 +807,7 @@ function getMetricLegendItems() {
   return [
     { color: '#67c23a', label: '≤ 7日均值（正常）' },
     { color: '#e6a23c', label: '7日均值 ~ 动态阈值（关注）' },
-    { color: '#f56c6c', label: '> 动态阈值（上报告警）' },
+    { color: '#f56c6c', label: '↑>50% 且 > 动态阈值（上报告警）' },
   ];
 }
 
@@ -787,6 +856,27 @@ function renderMetricToggle() {
     METRIC_CONFIGS.delay,
     METRIC_CONFIGS.loss,
   ].map(metric => `<div class="radio-item ${metric.key === curMetric ? 'active' : ''}" onclick="setMetric('${metric.key}')">${metric.toggleLabel}</div>`).join('');
+}
+
+function renderThresholdControls() {
+  const modeSelect = document.getElementById('thresholdMode');
+  const customInput = document.getElementById('customThresholdInput');
+  if (!modeSelect || !customInput) return;
+  modeSelect.value = thresholdMode;
+  customInput.value = customThresholdPercent;
+  customInput.disabled = thresholdMode !== 'custom';
+  customInput.style.opacity = thresholdMode === 'custom' ? '1' : '0.52';
+}
+
+function onThresholdModeChange(value) {
+  thresholdMode = value;
+  renderThresholdControls();
+  refresh();
+}
+
+function onCustomThresholdChange(value) {
+  customThresholdPercent = normalizeThresholdPercent(value, customThresholdPercent);
+  if (thresholdMode === 'custom') refresh();
 }
 
 function renderProvBar() {
@@ -1002,7 +1092,7 @@ function renderRanking() {
     const dynamicThreshold = getDynamicThreshold(data[name]);
     const reportLine = getReportThreshold(data[name], policy);
     const currentValue = getCurrentTwoHourValue(data[name]);
-    const isAlert = currentValue > reportLine;
+    const isAlert = shouldReportAlert(currentValue, reportLine, policy);
     return { name, policy, dynamicThreshold, reportLine, currentValue, isAlert };
   });
 
@@ -1060,8 +1150,8 @@ function renderHeatmap() {
     const dynamicThreshold = getDynamicThreshold(data[name]);
     const reportLine = getReportThreshold(data[name], policy);
     const currentValue = getCurrentTwoHourValue(data[name]);
-    const isReportAlert = currentValue > reportLine;
-    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${isReportAlert ? '当前2小时值超过动态阈值' : '当前2小时值未超过动态阈值'}"><span class="${isReportAlert ? 'hm-name-alert' : ''}">${name}</span></td>`;
+    const isReportAlert = shouldReportAlert(currentValue, reportLine, policy);
+    html += `<tr class="hm-row ${rowClass}" data-hm-name="${name}"><td title="${isReportAlert ? '↑幅度超过50%且当前2小时值超过动态阈值' : '未达到上报条件'}"><span class="${isReportAlert ? 'hm-name-alert' : ''}">${name}</span></td>`;
     data[name].forEach(item => {
       const v = getMetricValue(item);
       const isAlertCell = v > reportLine;
@@ -1085,6 +1175,7 @@ function setMetric(m) { curMetric = m; refresh(); }
 
 function refresh() {
   renderMetricToggle();
+  renderThresholdControls();
   renderMetricLegend();
   renderProvBar();
   renderBreadcrumb();
