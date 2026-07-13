@@ -1139,7 +1139,7 @@ function renderRanking() {
   el.innerHTML = `<div class="rank-table">
     <div class="rank-row rank-head">
       <div>#</div>
-      <div class="rank-prov">名称</div>
+      <div class="rank-prov">省份/地市</div>
       <div class="rank-val">当前2小时</div>
       <div class="rank-threshold">动态阈值<br><small>7日均值</small></div>
       <div class="rank-threshold">超阈值比</div>
@@ -1175,7 +1175,7 @@ function renderHeatmap() {
   const names = Object.keys(data);
   const cfg = getMetricConfig();
 
-  let html = '<table class="hm-table"><thead><tr><th>名称</th>';
+  let html = '<table class="hm-table"><thead><tr><th>省份/地市</th>';
   dates.forEach(d => { html += `<th>${d.slice(5)}</th>`; });
   html += '<th>动态阈值<br><small>7日均值</small></th>';
   html += '</tr></thead><tbody>';
