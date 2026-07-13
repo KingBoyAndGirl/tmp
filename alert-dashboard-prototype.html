@@ -134,7 +134,7 @@
     .table-header,
     .table-row {
       display: grid;
-      grid-template-columns: 46px 68px minmax(108px, 1fr) 86px 72px 96px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       align-items: center;
     }
 
@@ -331,21 +331,19 @@
             </div>
           </div>
           <div class="table-header">
-            <div>序号</div>
-            <div>告警省份</div>
-            <div>告警方向</div>
-            <div>时延</div>
-            <div>丢包率</div>
-            <div>动态阈值</div>
+            <div>时延当前值</div>
+            <div>时延动态阈值</div>
+            <div>丢包率当前值</div>
+            <div>丢包率动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">54%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">28%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">12%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">32%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">23%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">38%</span></div></div></div>
             </div>
           </div>
           <div class="panel-footer">
@@ -370,21 +368,19 @@
             </div>
           </div>
           <div class="table-header">
-            <div>序号</div>
-            <div>告警省份</div>
-            <div>告警方向</div>
-            <div>时延</div>
-            <div>丢包率</div>
-            <div>动态阈值</div>
+            <div>时延当前值</div>
+            <div>时延动态阈值</div>
+            <div>丢包率当前值</div>
+            <div>丢包率动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">54%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">28%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">12%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">32%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">23%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">38%</span></div></div></div>
             </div>
           </div>
           <div class="panel-footer">
@@ -409,21 +405,19 @@
             </div>
           </div>
           <div class="table-header">
-            <div>序号</div>
-            <div>告警省份</div>
-            <div>告警方向</div>
-            <div>时延</div>
-            <div>丢包率</div>
-            <div>动态阈值</div>
+            <div>时延当前值</div>
+            <div>时延动态阈值</div>
+            <div>丢包率当前值</div>
+            <div>丢包率动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">54%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">28%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">12%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">32%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">23%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">38%</span></div></div></div>
             </div>
           </div>
           <div class="panel-footer">
@@ -448,21 +442,19 @@
             </div>
           </div>
           <div class="table-header">
-            <div>序号</div>
-            <div>告警省份</div>
-            <div>告警方向</div>
-            <div>时延</div>
-            <div>丢包率</div>
-            <div>动态阈值</div>
+            <div>时延当前值</div>
+            <div>时延动态阈值</div>
+            <div>丢包率当前值</div>
+            <div>丢包率动态阈值</div>
           </div>
           <div class="table-body">
             <div class="table-track">
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">1</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→烟台</div></div><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">2</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→威海</div></div><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">3</span></div><div class="province-cell"><div class="main">山东</div></div><div class="alert-cell"><div class="main">济南→青岛</div></div><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">4</span></div><div class="province-cell"><div class="main">江苏</div></div><div class="alert-cell"><div class="main">南京→南通</div></div><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">5</span></div><div class="province-cell"><div class="main">河北</div></div><div class="alert-cell"><div class="main">石家庄→秦皇岛</div></div><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div></div>
-              <div class="table-row"><div class="index-wrap"><span class="index-circle">6</span></div><div class="province-cell"><div class="main">四川</div></div><div class="alert-cell"><div class="main">成都→绵阳</div></div><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">25.39ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-danger"><div class="main">2.35%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">54%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">24.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.65%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">28%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.84ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">20%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.43%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">12%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">22.30ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">10%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.58%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">32%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-warning"><div class="main">21.10ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">50%</span></div></div><div class="loss-cell metric-normal"><div class="main">0.82%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">23%</span></div></div></div>
+              <div class="table-row"><div class="delay-cell metric-normal"><div class="main">19.90ms</div></div><div class="delay-cell"><div class="main"><span class="trend-arrow up">↑</span><span class="threshold-percent up">60%</span></div></div><div class="loss-cell metric-warning"><div class="main">1.28%</div></div><div class="loss-cell"><div class="main"><span class="trend-arrow down">↓</span><span class="threshold-percent down">38%</span></div></div></div>
             </div>
           </div>
           <div class="panel-footer">
